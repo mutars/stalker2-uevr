@@ -2,6 +2,8 @@
 
 #include "Plugin.hpp"
 #include "glm/fwd.hpp"
+#include "utility/Module.hpp"
+#include "utility/Scan.hpp"
 
 using namespace uevr;
 
@@ -81,6 +83,31 @@ Stalker2VR::~Stalker2VR() {
 
 }
 
+bool is_scope_active() {
+    auto pawn = API::get()->get_local_pawn(0);
+    if(!pawn) return false;
+    auto scope_component = pawn->get_property_data(L"PlayerOpticScopeComponent");
+    if(!scope_component) return false;
+    auto scope_active = *(uint8_t*)(*(uintptr_t*)scope_component + 0xA8);
+    return scope_active;
+}
+
+bool level_changed(API::UEngine* engine) {
+    static API::UObject* last_level = nullptr;
+    if(!engine) return false;
+
+    auto viewport_client = engine->get_property<API::UObject*>(L"GameViewport");
+    if(!viewport_client) return false;
+    auto world = viewport_client->get_property<API::UObject*>(L"World");
+    if(!world) return false;
+    auto level = world->get_property<API::UObject*>(L"PersistentLevel");
+    if(level != last_level) {
+        last_level = level;
+        return true;
+    }
+    return false;
+}
+
 API::UObject* get_weapon_in_hands() {
     struct {
         API::UClass* c;
@@ -135,9 +162,85 @@ SDK::FTransform* Stalker2VR::on_get_weapon_forward(/*SDK::APC*/void* actor, SDK:
     return res;
 }
 
+char Stalker2VR::on_set_scalar_value_mci(void *materialCollectionInstance, uevr::API::FName name, float value) {
+
+    static uevr::API::FName fOpticScopePhase{L"OpticScope_Phase", uevr::API::FName::EFindName::Find};
+
+    auto original_fn = g_plugin->m_original_set_scalar_value_mci;
+    //TODO check for hmd active
+    if(name == fOpticScopePhase && is_scope_active()) {
+        value = 1.0f;
+    }
+    return original_fn(materialCollectionInstance, name, value);
+}
+
+
+void Stalker2VR::on_set_scalar_value(void *materialInstance, uevr::API::FName name, float value) {
+    auto original_fn = g_plugin->m_original_set_scalar_value;
+    static uevr::API::FName fOpticCutOutEnabled{L"OpticCutoutEnabled", uevr::API::FName::EFindName::Find};
+    static uevr::API::FName fLensFlare{L"Lens_Flare", uevr::API::FName::EFindName::Find};
+    //TODO check for hmd active
+    if ((name == fLensFlare || name == fOpticCutOutEnabled) && is_scope_active()) {
+        value = 0.0f;
+    }
+    original_fn(materialInstance, name, value);
+}
+
 void Stalker2VR::on_initialize() {
     PLUGIN_LOG_ONCE("Stalker2VR::on_initialize()");
     hook();
+    // Asset loading moved to on_pre_engine_tick for stability
+}
+
+using StaticLoadObject_t = uevr::API::UObject* (*)(uevr::API::UClass* ObjectClass, uevr::API::UObject* InOuter, const wchar_t *inName,const wchar_t *Filename, int32_t LoadFlags, struct UPackageMap* Sandbox, bool bAllowObjectReconciliation, const struct FLinkerInstancingContext* InstancingContext);
+
+void Stalker2VR::on_pre_engine_tick(uevr::API::UGameEngine* engine, float delta) {
+    static unsigned int monotonic = 0;
+    if(!m_scope_asset_loaded || (monotonic++ > 50 && (monotonic = 0, level_changed(engine)))) {
+        std::cout << "Level changed" << std::endl;
+        load_asset();
+    }
+}
+
+using StaticLoadObject_t = uevr::API::UObject* (*)(uevr::API::UClass* ObjectClass, uevr::API::UObject* InOuter, const wchar_t *inName,const wchar_t *Filename, int32_t LoadFlags, struct UPackageMap* Sandbox, bool bAllowObjectReconciliation, const struct FLinkerInstancingContext* InstancingContext);
+
+void Stalker2VR::load_asset() {
+    auto mod = utility::get_executable();
+    // StaticLoadObject
+    static const auto func_signature = "40 55 53 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 A8 FE FF FF 48 81 EC 58 02 00 00 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 48";
+    static auto static_load_asset_func = utility::scan(mod, func_signature);
+    if(!static_load_asset_func) {
+        PLUGIN_LOG_ONCE_ERROR("Failed to find StaticLoadObject function");
+        return;
+    }
+//    auto static_load_asset_func_addr = (uintptr_t)mod + 0x2e1f3b0;
+    auto func = (StaticLoadObject_t)static_load_asset_func.value();
+    auto static_mesh_cl = API::get()->find_uobject<API::UClass>(L"Class /Script/Engine.StaticMesh");
+
+    if(!static_mesh_cl) {
+        PLUGIN_LOG_ONCE_ERROR("Failed to find StaticMesh class");
+        return;
+    }
+
+    auto cylinder = func(static_mesh_cl, nullptr, L"/Engine/BasicShapes/Cylinder.Cylinder", nullptr, 0, nullptr, true, nullptr);
+
+    if(!cylinder) {
+        PLUGIN_LOG_ONCE_ERROR("Failed to load cylinder");
+        return;
+    }
+    PLUGIN_LOG_ONCE("Loaded cylinder");
+    m_scope_asset_loaded = true;
+}
+
+void Stalker2VR::on_custom_event(const char *event_name, const char *event_data) {
+    static std::chrono::steady_clock::time_point last_load_asset_time{};
+    const auto current_time = std::chrono::steady_clock::now();
+
+    // Check if enough time has passed since the last event (1 second)
+    if (event_name == std::string("LoadAsset") && (current_time - last_load_asset_time) >= std::chrono::seconds(1)) {
+        last_load_asset_time = current_time;
+        m_scope_asset_loaded = false;
+    }
 }
 
 void Stalker2VR::hook() {
@@ -149,6 +252,32 @@ void Stalker2VR::hook() {
     if(m_on_get_weapon_forward_hook_id == -1) {
         PLUGIN_LOG_ONCE_ERROR("Failed to hook on_get_weapon_forward");
     }
+    const auto mod      = utility::get_executable();
+
+//    const auto func_addr = (uintptr_t )mod + 0x4aebaa0;
+    // UMaterialInstanceDynamic::SetScalarParameterValue
+    static const auto set_scalar_value_func_signature = "40 53 48 81 EC C0 00 00 00 48 8B D9 0F";
+    static auto set_scalar_value_func = utility::scan(mod, set_scalar_value_func_signature);
+    if(set_scalar_value_func) {
+        m_on_set_scalar_value_hook_id = API::get()->param()->functions->register_inline_hook((void*)set_scalar_value_func.value(), (void*)&on_set_scalar_value, (void**)&m_original_set_scalar_value);
+        if(m_on_set_scalar_value_hook_id == -1) {
+            PLUGIN_LOG_ONCE_ERROR("Failed to hook on_set_scalar_value");
+        }
+    } else {
+        PLUGIN_LOG_ONCE_ERROR("Failed to find set_scalar_value function");
+    }
+
+    const auto func_addr2 = (uintptr_t )mod + 0x4b505d0; // 4b505d0
+    // UMaterialParameterCollectionInstance::SetScalarParameterValue
+    static const auto set_scalar_value_mci_func_signature = "F3 0F 11 54 24 18 48 89 54 24 10 53 55 56 48";
+    static auto set_scalar_value_mci_func = utility::scan(mod, set_scalar_value_mci_func_signature);
+    if(set_scalar_value_mci_func) {
+        m_on_set_scalar_value_mci_id = API::get()->param()->functions->register_inline_hook((void*)set_scalar_value_mci_func.value(), (void*)&on_set_scalar_value_mci, (void**)&m_original_set_scalar_value_mci);
+        if(m_on_set_scalar_value_mci_id == -1) {
+            PLUGIN_LOG_ONCE_ERROR("Failed to hook m_on_set_scalar_value_mci_id");
+        }
+    } else {
+        PLUGIN_LOG_ONCE_ERROR("Failed to find set_scalar_value_mci function");
+    }
 
 }
-

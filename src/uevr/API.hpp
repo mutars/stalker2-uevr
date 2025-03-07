@@ -110,6 +110,12 @@ public:
         fn(event_name.data(), event_data.data());
     }
 
+    // This is not sent to Lua, it's sent to all plugins
+    void dispatch_custom_event(std::string_view event_name, std::string_view event_data) {
+        static const auto fn = param()->functions->dispatch_custom_event;
+        fn(event_name.data(), event_data.data());
+    }
+
     template <typename... Args> void log_error(const char* format, Args... args) { m_param->functions->log_error(format, args...); }
     template <typename... Args> void log_warn(const char* format, Args... args) { m_param->functions->log_warn(format, args...); }
     template <typename... Args> void log_info(const char* format, Args... args) { m_param->functions->log_info(format, args...); }
@@ -181,6 +187,11 @@ public:
     UObject* spawn_object(UClass* klass, UObject* outer) {
         static const auto fn = sdk()->functions->spawn_object;
         return (UObject*)fn(klass->to_handle(), outer->to_handle());
+    }
+
+    UObject* add_component_by_class(UObject* actor, UClass* klass, bool deferred = false) {
+        static const auto fn = sdk()->functions->add_component_by_class;
+        return (UObject*)fn(actor->to_handle(), klass->to_handle(), deferred);
     }
 
     void execute_command(std::wstring_view command) {
@@ -270,6 +281,15 @@ public:
         int32_t comparison_index{};
         int32_t number{};
 
+        bool operator==(const FName& Other) const
+        {
+            return comparison_index == Other.comparison_index && number == Other.number;
+        }
+        bool operator!=(const FName& Other) const
+        {
+            return comparison_index != Other.comparison_index || number != Other.number;
+        }
+
     private:
         static inline const UEVR_FNameFunctions* s_functions{nullptr};
         static inline const UEVR_FNameFunctions* initialize() {
@@ -282,6 +302,10 @@ public:
     };
     
     struct UObject {
+        static consteval std::string_view internal_name() {
+            return "Object";
+        }
+
         inline UEVR_UObjectHandle to_handle() { return (UEVR_UObjectHandle)this; }
         inline UEVR_UObjectHandle to_handle() const { return (UEVR_UObjectHandle)this; }
 
@@ -387,6 +411,10 @@ public:
     };
 
     struct UField : public UObject {
+        static consteval std::string_view internal_name() {
+            return "Field";
+        }
+
         inline UEVR_UFieldHandle to_handle() { return (UEVR_UFieldHandle)this; }
         inline UEVR_UFieldHandle to_handle() const { return (UEVR_UFieldHandle)this; }
 
@@ -412,6 +440,10 @@ public:
     };
 
     struct UStruct : public UField {
+        static consteval std::string_view internal_name() {
+            return "Struct";
+        }
+
         inline UEVR_UStructHandle to_handle() { return (UEVR_UStructHandle)this; }
         inline UEVR_UStructHandle to_handle() const { return (UEVR_UStructHandle)this; }
 
@@ -472,6 +504,10 @@ public:
     };
 
     struct UClass : public UStruct {
+        static consteval std::string_view internal_name() {
+            return "Class";
+        }
+
         inline UEVR_UClassHandle to_handle() { return (UEVR_UClassHandle)this; }
         inline UEVR_UClassHandle to_handle() const { return (UEVR_UClassHandle)this; }
 
@@ -532,6 +568,10 @@ public:
     };
 
     struct UFunction : public UStruct {
+        static consteval std::string_view internal_name() {
+            return "Function";
+        }
+
         inline UEVR_UFunctionHandle to_handle() { return (UEVR_UFunctionHandle)this; }
         inline UEVR_UFunctionHandle to_handle() const { return (UEVR_UFunctionHandle)this; }
 
@@ -583,6 +623,10 @@ public:
     };
 
     struct UScriptStruct : public UStruct {
+        static consteval std::string_view internal_name() {
+            return "ScriptStruct";
+        }
+
         inline UEVR_UScriptStructHandle to_handle() { return (UEVR_UScriptStructHandle)this; }
         inline UEVR_UScriptStructHandle to_handle() const { return (UEVR_UScriptStructHandle)this; }
 
@@ -797,7 +841,9 @@ public:
     };
 
     struct UEnum : public UObject {
-
+        static consteval std::string_view internal_name() {
+            return "Enum";
+        }
     };
 
     struct FNumericProperty : public FProperty {
@@ -980,17 +1026,25 @@ public:
 
     // TODO
     struct UEngine : public UObject {
+        static consteval std::string_view internal_name() {
+            return "Engine";
+        }
+
         static UEngine* get() {
             return API::get()->get_engine();
         }
     };
 
     struct UGameEngine : public UEngine {
-
+        static consteval std::string_view internal_name() {
+            return "GameEngine";
+        }
     };
 
     struct UWorld : public UObject {
-
+        static consteval std::string_view internal_name() {
+            return "World";
+        }
     };
 
     struct FUObjectArray {
@@ -1301,9 +1355,9 @@ public:
             return result;
         }
 
-        static void trigger_haptic_vibration(UEVR_TrackedDeviceIndex index, float amplitude, float frequency, float duration, UEVR_InputSourceHandle source) {
+        static void trigger_haptic_vibration(float seconds_from_now, float amplitude, float frequency, float duration, UEVR_InputSourceHandle source) {
             static const auto fn = initialize()->trigger_haptic_vibration;
-            fn(index, amplitude, frequency, duration, source);
+            fn(seconds_from_now, amplitude, frequency, duration, source);
         }
 
         static bool is_using_contriollers() {
@@ -1530,7 +1584,16 @@ public:
             fn(obj->to_handle());
         }
 
+        static void remove_all_motion_controller_states() {
+            static const auto fn = initialize()->remove_all_motion_controller_states;
+            fn();
+        }
+
         struct MotionControllerState {
+            static consteval std::string_view internal_name() {
+                return "MotionControllerState";
+            }
+
             inline UEVR_UObjectHookMotionControllerStateHandle to_handle() { return (UEVR_UObjectHookMotionControllerStateHandle)this; }
             inline UEVR_UObjectHookMotionControllerStateHandle to_handle() const { return (UEVR_UObjectHookMotionControllerStateHandle)this; }
 

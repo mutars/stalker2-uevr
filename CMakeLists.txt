@@ -147,6 +147,14 @@ target_link_libraries(stalker2_uevr PUBLIC
 	glm_static
 )
 
+add_custom_command(TARGET stalker2_uevr POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory "$ENV{APPDATA}/UnrealVRMod/Stalker2-Win64-Shipping/plugins"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "$<TARGET_FILE:stalker2_uevr>"
+        "$ENV{APPDATA}/UnrealVRMod/Stalker2-Win64-Shipping/plugins/$<TARGET_FILE_NAME:stalker2_uevr>"
+    COMMENT "Copying DLL to UnrealVRMod directory"
+)
+
 unset(CMKR_TARGET)
 unset(CMKR_SOURCES)
 
