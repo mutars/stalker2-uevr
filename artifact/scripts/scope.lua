@@ -385,31 +385,6 @@ local function attach_components_to_weapon(weapon_mesh)
     end
 end
 
--- local function on_level_changed(new_level)
---     -- All actors can be assumed to be deleted when the level changes
---     print("Level changed")
---     if new_level then
---         print("New level: " .. new_level:get_full_name())
---     end
---     scope_actor = nil
---     scene_capture = nil
---     plane_component = nil
--- end
-
-local function fix_effects(world)
-    if not KismetMaterialLibrary then
-        print("KismetMaterialLibrary is nil")
-        return
-    end
-    local game_encamera_manager = UEVR_UObjectHook.get_first_object_by_class(CameraManager_c)
-    if not game_encamera_manager then return end
-    local fov_mpc = game_encamera_manager.FovMPC
-    if not fov_mpc then return end
-    local fov_collection = fov_mpc.Collection
-    if not fov_collection then return end
-    KismetMaterialLibrary:SetScalarParameterValue(world, fov_collection, "IsFOVEnabled", 0.0)
-end
-
 local function is_scope_active(pawn)
     if not pawn then return false end
     local optical_scope = pawn.PlayerOpticScopeComponent
@@ -460,10 +435,8 @@ uevr.sdk.callbacks.on_pre_engine_tick(
                     render_target = nil
                     scope_mesh = nil
                     reset_static_objects()
-
                     init_static_objects()
                 end
-                fix_effects(world)
                 last_level = level
             end
         end
