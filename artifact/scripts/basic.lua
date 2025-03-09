@@ -14,6 +14,9 @@ local VertTickCount=0
 local StoppedShooting= false
 local RotDiffLast=0
 local VertDiffLast=0
+local DefaultAimMethod= uevr.params.vr:get_mod_value("VR_AimMethod")
+local PreFireAimMethod= DefaultAimMethod
+local UpdatePrefireAimMethod= false
 
 -- Cache required classes
 local function find_required_object(name)
@@ -60,6 +63,7 @@ local function fix_effects(world)
     KismetMaterialLibrary:SetScalarParameterValue(world, fov_collection, "IsFOVEnabled", 0.0)
 end
 
+
 -- Helper function to calculate socket offset
 local function update_weapon_offset(weapon_mesh)
     if not weapon_mesh then return end
@@ -102,6 +106,7 @@ end)
 uevr.sdk.callbacks.on_script_reset(function()
     print("Resetting weapon offset script")
 end)
+
 -- Helper Function for recoil calculation
 
 function PositiveIntegerMask(text)
@@ -150,15 +155,23 @@ local function UpdateOnStoppedShooting()
 end
 
 local function ApplyRecoil()
-
+	
 	--if SkipTick then
-	uevr.params.vr.set_mod_value("VR_AimMethod" , "2")
+	--uevr.params.vr.set_mod_value("VR_AimMethod" , PreFireAimMethod)
 	--SkipTick=false
 	--end
 	
 	if RotDiff~=0 then
+		if UpdatePrefireAimMethod ==false then		
+				PreFireAimMethod=uevr.params.vr:get_mod_value("VR_AimMethod")
+				UpdatePrefireAimMethod=true
+		end
 			uevr.params.vr.set_mod_value("VR_AimMethod" , "0")
-	--else	SkipTick=true   
+	else
+		if UpdatePrefireAimMethod == true then
+			uevr.params.vr.set_mod_value("VR_AimMethod" , PreFireAimMethod)
+		end
+		UpdatePrefireAimMethod = false   
 	end
 				
 	if GunFiringState == 1 then
@@ -209,4 +222,4 @@ function(retval, user_index, state)
 	end
 	
 	
-end)										 
+end)
