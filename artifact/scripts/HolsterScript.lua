@@ -1056,7 +1056,7 @@ uevr.sdk.callbacks.on_pre_engine_tick(
 		 SendKeyDown('M')
 		elseif LZone==6 and lGrabActive then
 		 isDpadLeft=true
-		 SendKeyDown('M')
+		 --SendKeyDown('M')
 		end
 	else 
 		if LZone == 2 and lGrabActive then
