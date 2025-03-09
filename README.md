@@ -6,7 +6,41 @@ A plugin for UEVR (Unreal Engine VR) that enhances the VR experience in S.T.A.L.
 
 - Fixed weapon origin alignment to ensure bullets shoot correctly from the muzzle position
 - Basic VR implementation for weapon handling
+- Holster System and Weapon Interaction Zones
+- Full Recoil effects
+## HOW TO - Holster System, Weapon Interaction Zones:
 
+1. This mod features a holster system that replaces the default gamepad buttons or offers an optional method to interact with the game mechanics:
+   
+     **Holster Zones**: Hover over a zone and you will get a haptic feedback, pressing the Grip button will interact with the zone.
+  
+   |      VR Button         | Zone                          | Action                         |
+   |----------------|-------------------------------|-----------------------------|
+   |   Press Right Grip   |   Rigth Shoulder      |    Primary Slot Weapon    |
+   |      |   Left Shoulder   |    2nd Primary Slot Weapon   |
+   |      |   Right Hip Area     |   Sidearm Slot Weapon    |
+   |      |   Left Lower Area       |   Melee Slot Weapon    |
+   |      |   Left Chest  |    Nail   |
+   |                     |  Right Chest  |     Grenade Slot  |
+   |   Press Left Grip   |   Left Shoulder  |  Open Inventory      |
+   |                     |   Right Shoulder |   Simulates Dpad Left aka QuickSlot for item usage  |
+   |                     |   Left Chest |  Scanner  |
+   |                     |   Right Chest |      PDA    |
+  
+2. **Weapon Interaction zones**: These zones are around your right controller (or weapon basically) and can be triggered with your left controller
+   |      VR Button         | Zone                          | Action                         |
+   |----------------|-------------------------------|-----------------------------|
+   |   Press Left Grip   |   Underneath your weapon    |    Reloading  |
+   |    Press Left Thumb   |   Front area of your weapon   |    Toggle Flashlight   |
+   |    Press Left Trigger  |  Left controller slightly above your right controller (you can touch them)     |   FireMode Switch    |
+
+## VR Button layout changes 
+- Some buttons have been changed from the normal XBOX gamepad bindings:
+   |VR Button| Action  | 
+   |---------|-- |
+   |Right Stick Up| Jump |
+   |Right Stick Down| Crouch |
+   |  Left Grip   |  Sprinting  |
 ## Work in Progress
 
 Currently, the plugin is in early development with limited functionality. The following features are pending implementation:
