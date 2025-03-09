@@ -2,7 +2,8 @@
 --------	
 	local isRhand = true
 	local HapticFeedback = true
-	local PhysicalLeaning = false
+	--local PhysicalLeaning = false
+	local SwapLShoulderLThumb =true
 --------
 --------	
 	local api = uevr.api
@@ -478,10 +479,10 @@ function(retval, user_index, state)
 	--end
 	
 	--Disable BUttons:
-	if lShoulder then
+	if lShoulder and SwapLShoulderLThumb then
 		unpressButton(state, XINPUT_GAMEPAD_LEFT_SHOULDER)
 	end
-	if lThumb then
+	if lThumb and SwapLShoulderLThumb then
 		unpressButton(state, XINPUT_GAMEPAD_LEFT_THUMB)
 	end
 	
@@ -749,9 +750,11 @@ function(retval, user_index, state)
 	end
 		
 		--CONTROL REMAP:
-	if lShoulder then
+		
+	if lShoulder and SwapLShoulderLThumb then
 		pressButton(state, XINPUT_GAMEPAD_LEFT_THUMB)
 	end
+	
 	if lThumb and not RWeaponZone== 3 then
 		pressButton(state,XINPUT_GAMEPAD_LEFT_SHOULDER)
 	end
