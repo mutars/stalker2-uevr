@@ -430,6 +430,10 @@ local KeySpace=false
 local KeyCtrl=false
 local vecy=0
 local isJump=false
+local isInventoryPDA=false
+local LastWorldTime= 0.000
+local WorldTime=0.000
+
 uevr.sdk.callbacks.on_xinput_get_state(
 function(retval, user_index, state)
 
@@ -453,7 +457,7 @@ function(retval, user_index, state)
 	
 	
 	--inMenu = api:get_player_controller().bShowMouseCursor
-	
+if inMenu== false and isInventoryPDA== false then	
 	if  LTrigger<10 then
 		LTriggerWasPressed = 0
 	end
@@ -758,7 +762,7 @@ function(retval, user_index, state)
 	if lThumb and RWeaponZone ~= 3 then
 		pressButton(state, XINPUT_GAMEPAD_LEFT_SHOULDER)
 	end
-	
+end	
 	
 --	print(VecA.x)
 	
@@ -786,6 +790,35 @@ end)
 --local LHandLocation = left_hand_actor:K2_GetActorLocation()
 --local HMDLocation = hmd_actor:K2_GetActorLocation()
 
+local function isInMenu()
+	WorldTime = api:get_engine().GameViewport.World.GameState.ReplicatedWorldTimeSeconds
+	
+	if WorldTime == LastWorldTime then
+		WorldTimeTick=WorldTimeTick+1
+		--uevr.params.vr.set_mod_value("FrameworkConfig_AlwaysShowCursor", "true")
+		if WorldTimeTick >= 50 then
+		inMenu=true
+		end
+	else --uevr.params.vr.set_mod_value("FrameworkConfig_AlwaysShowCursor", "false")
+		inMenu=false
+		WorldTimeTick=0
+	end
+		
+	LastWorldTime=WorldTime
+end
+
+local SceneCaptureComponent2dClass= find_static_class("Class /Script/Engine.SceneCaptureComponent2D")
+
+local function isInInventoryOrPDA()
+	local Check1 =	pawn.Mesh.AnimScriptInstance.HandItemData.bHasItemInHands
+	local Check2 =	pawn.Mesh.AnimScriptInstance.HandItemData.bIsUsesLeftHand
+	local Check3 =	pawn.Mesh.AnimScriptInstance.HandItemData.bIsUsesRightHand
+	if Check1 and Check2 and Check3 then
+		isInventoryPDA=true
+	else isInventoryPDA=false
+	end
+end
+
 uevr.sdk.callbacks.on_pre_engine_tick(
 	function(engine, delta)
 	pawn=api:get_local_pawn(0)
@@ -806,48 +839,46 @@ uevr.sdk.callbacks.on_pre_engine_tick(
 	local RHandRotation = right_hand_component:K2_GetComponentRotation()
 	local LHandRotation = left_hand_component:K2_GetComponentRotation()
 	
-	--Show Cursor
-	if api:get_player_controller().bShowMouseCursor or pawn["RadialMenuOpen?"] then
-		--uevr.params.vr.set_mod_value("FrameworkConfig_AlwaysShowCursor", "true")
-		inMenu=true
-	else --uevr.params.vr.set_mod_value("FrameworkConfig_AlwaysShowCursor", "false")
-		inMenu=false
-	end
+	--inMenu
+	isInMenu()
+	isInInventoryOrPDA()
+	
+	--print(inMenu)
 
 	--LEANING
-	if PhysicalLeaning then
-	
-		if HmdRotation.z > 20 then
-			leanState = 2
-			--pawn:ToggleLeanRight(true)
-		elseif HmdRotation.z <20 and HmdRotation.z>-20 then
-			leanState=0
-			--pawn:ToggleLeanRight(false) 
-			--pawn:ToggleLeanLeft(false)
-		elseif HmdRotation.z < -20 then 
-			leanState=1
-			--pawn:ToggleLeanLeft(true)
-		end
-		
-		if leanState == 0 and leanStateLast ~= leanState then
-			if leanStateLast == 1 then
-				pawn:ToggleLeanLeft(false)
-			elseif leanStateLast ==2 then
-				pawn:ToggleLeanRight(false)
-			end
-			leanStateLast=leanState
-			uevr.params.vr.set_mod_value("VR_RoomscaleMovement", "true")
-		elseif leanState ==1 and leanStateLast ~= leanState then
-			pawn:ToggleLeanLeft(true)
-			leanStateLast=leanState
-			uevr.params.vr.set_mod_value("VR_RoomscaleMovement", "false")
-		elseif leanState == 2 and leanStateLast ~= leanState then
-			pawn:ToggleLeanRight(true)
-			leanStateLast=leanState
-			uevr.params.vr.set_mod_value("VR_RoomscaleMovement", "false")
-		end
-	
-	end	
+	--if PhysicalLeaning then
+	--
+	--	if HmdRotation.z > 20 then
+	--		leanState = 2
+	--		--pawn:ToggleLeanRight(true)
+	--	elseif HmdRotation.z <20 and HmdRotation.z>-20 then
+	--		leanState=0
+	--		--pawn:ToggleLeanRight(false) 
+	--		--pawn:ToggleLeanLeft(false)
+	--	elseif HmdRotation.z < -20 then 
+	--		leanState=1
+	--		--pawn:ToggleLeanLeft(true)
+	--	end
+	--	
+	--	if leanState == 0 and leanStateLast ~= leanState then
+	--		if leanStateLast == 1 then
+	--			pawn:ToggleLeanLeft(false)
+	--		elseif leanStateLast ==2 then
+	--			pawn:ToggleLeanRight(false)
+	--		end
+	--		leanStateLast=leanState
+	--		uevr.params.vr.set_mod_value("VR_RoomscaleMovement", "true")
+	--	elseif leanState ==1 and leanStateLast ~= leanState then
+	--		pawn:ToggleLeanLeft(true)
+	--		leanStateLast=leanState
+	--		uevr.params.vr.set_mod_value("VR_RoomscaleMovement", "false")
+	--	elseif leanState == 2 and leanStateLast ~= leanState then
+	--		pawn:ToggleLeanRight(true)
+	--		leanStateLast=leanState
+	--		uevr.params.vr.set_mod_value("VR_RoomscaleMovement", "false")
+	--	end
+	--
+	--end	
 	
 	-- Y IS LEFT RIGHT, X IS BACK FORWARD, Z IS DOWN  UP
 	local RotDiff= HmdRotation.y	--(z axis of location)
@@ -1056,7 +1087,7 @@ uevr.sdk.callbacks.on_pre_engine_tick(
 		 SendKeyDown('M')
 		elseif LZone==6 and lGrabActive then
 		 isDpadLeft=true
-		
+		-- SendKeyDown('M')
 		end
 	else 
 		if LZone == 2 and lGrabActive then
