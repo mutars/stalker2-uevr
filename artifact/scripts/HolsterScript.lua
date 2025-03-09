@@ -586,7 +586,7 @@ function(retval, user_index, state)
 
 	if isRhand then	
 		if  RZone ~=0 then
-			--unpressButton(state, XINPUT_GAMEPAD_LEFT_SHOULDER)
+			unpressButton(state, XINPUT_GAMEPAD_LEFT_SHOULDER)
 			unpressButton(state, XINPUT_GAMEPAD_RIGHT_SHOULDER)
 			--unpressButton(state, XINPUT_GAMEPAD_LEFT_THUMB)
 			unpressButton(state, XINPUT_GAMEPAD_RIGHT_THUMB)
@@ -751,12 +751,12 @@ function(retval, user_index, state)
 		
 		--CONTROL REMAP:
 		
-	if lShoulder and SwapLShoulderLThumb then
+	if lShoulder and SwapLShoulderLThumb and LZone ==0 then
 		pressButton(state, XINPUT_GAMEPAD_LEFT_THUMB)
 	end
 	
-	if lThumb and not RWeaponZone== 3 then
-		pressButton(state,XINPUT_GAMEPAD_LEFT_SHOULDER)
+	if lThumb and RWeaponZone ~= 3 then
+		pressButton(state, XINPUT_GAMEPAD_LEFT_SHOULDER)
 	end
 	
 	
@@ -793,7 +793,7 @@ uevr.sdk.callbacks.on_pre_engine_tick(
 
 	params.vr.get_joystick_axis(RightJoystickIndex,RAxis)
 	 vecy=RAxis.y
-	print("vecyy"..vecy)
+	--print("vecyy"..vecy)
 
 
 
@@ -1056,7 +1056,7 @@ uevr.sdk.callbacks.on_pre_engine_tick(
 		 SendKeyDown('M')
 		elseif LZone==6 and lGrabActive then
 		 isDpadLeft=true
-		 --SendKeyDown('M')
+		
 		end
 	else 
 		if LZone == 2 and lGrabActive then
