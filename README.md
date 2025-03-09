@@ -23,7 +23,6 @@ A plugin for UEVR (Unreal Engine VR) that enhances the VR experience in S.T.A.L.
    |      |   Left Chest  |    Nail   |
    |                     |  Right Chest  |     Grenade Slot  |
    |   Press Left Grip   |   Left Shoulder  |  Open Inventory      |
-   |                     |   Left Shoulder |   Simulates Dpad Left aka QuickSlot for item usage    |
    |                     |   Right Shoulder |   Simulates Dpad Left aka QuickSlot for item usage  |
    |                     |   Left Chest |  Scanner  |
    |                     |   Right Chest |      PDA    |
@@ -33,8 +32,15 @@ A plugin for UEVR (Unreal Engine VR) that enhances the VR experience in S.T.A.L.
    |----------------|-------------------------------|-----------------------------|
    |   Press Left Grip   |   Underneath your weapon    |    Reloading  |
    |    Press Left Thumb   |   Front area of your weapon   |    Toggle Flashlight   |
-   |    Press Left Trigger  |   when holding your left controller slightly above your right controller (you can touch them)     |   FireMode Switch    |
- 
+   |    Press Left Trigger  |  Left controller slightly above your right controller (you can touch them)     |   FireMode Switch    |
+
+## VR Button layout changes 
+- Some buttons have been changed from the normal XBOX gamepad bindings:
+   |VR Button| Action  | 
+   |---------|-- |
+   |Right Stick Up| Jump |
+   |Right Stick Down| Crouch |
+   |  Left Grip   |  Sprinting  |
 ## Work in Progress
 
 Currently, the plugin is in early development with limited functionality. The following features are pending implementation:
