@@ -207,7 +207,9 @@ end
 local function get_render_target(world)
     render_target = validate_object(render_target)
     if render_target == nil then
-        render_target = Kismet:CreateRenderTarget2D(world, 1024, 1024, 6, zero_color, false)
+        render_target = Kismet:CreateRenderTarget2D(world, 512, 512, 6, zero_color, false)
+        -- render_target.bHDR = 0;
+        -- render_target.SRGB = 0;
     end
     return render_target
 end
@@ -282,7 +284,16 @@ local function spawn_scene_capture_component(world, owner, pos, fov, rt)
     end
     scene_capture_component.TextureTarget = rt
     scene_capture_component.FOVAngle = fov
-    scene_capture_component:SetVisibility(flase)
+    -- scene_capture_component.bCacheVolumetricCloudsShadowMaps = 1;
+    -- scene_capture_component.bCachedDistanceFields = 1;
+    -- scene_capture_component.bUseRayTracingIfEnabled = 0;
+    scene_capture_component.PrimitiveRenderMode = 2; -- 0 - legacy, 1 - other
+    -- scene_capture_component.CaptureSource = 1;
+    -- scene_capture_component.bAlwaysPersistRenderingState = true;
+    -- scene_capture_component.bEnableVolumetricCloudsCapture = false;
+    -- scene_capture_component.bCaptureEveryFrame = 0;
+
+    scene_capture_component:SetVisibility(false)
 end
 
 local function spawn_scope(game_engine, pawn)
@@ -379,7 +390,7 @@ local function attach_components_to_weapon(weapon_mesh)
             true -- Weld simulated bodies
         )
         scope_plane_component:K2_SetRelativeRotation(temp_vec3:set(0, 90, 90), false, reusable_hit_result, false)
-        scope_plane_component:K2_SetRelativeLocation(temp_vec3:set(0.22, 0, 0), false, reusable_hit_result, false)
+        scope_plane_component:K2_SetRelativeLocation(temp_vec3:set(0.25, 0, 0), false, reusable_hit_result, false)
         scope_plane_component:SetWorldScale3D(temp_vec3:set(0.025, 0.025, 0.00001))
         scope_plane_component:SetVisibility(false)
     end

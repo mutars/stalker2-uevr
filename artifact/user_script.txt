@@ -1,0 +1,2 @@
+foliage.LODDistanceScale 3
+r.StaticMeshLODDistanceScale 0.1
