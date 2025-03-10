@@ -383,7 +383,9 @@ local function SendKeyUp(key_value)
     SendKeyPress(key_value, true)
 end
 
-
+function PositiveIntegerMask(text)
+	return text:gsub("[^%-%d]", "")
+end
 
 
 local rGrabActive =false
@@ -433,6 +435,8 @@ local isJump=false
 local isInventoryPDA=false
 local LastWorldTime= 0.000
 local WorldTime=0.000
+local isRShoulderHeadR= false
+local isRShoulderHeadL= false
 
 uevr.sdk.callbacks.on_xinput_get_state(
 function(retval, user_index, state)
@@ -617,7 +621,7 @@ if inMenu== false and isInventoryPDA== false then
 		lThumbSwitchState=1
 	elseif lThumb and lThumbSwitchState ==1 then
 		lThumbOut = false
-	elseif not lThumb then
+	elseif not lThumb and lThumbSwitchState ==1 then
 		lThumbOut = false
 		lThumbSwitchState=0
 		isRShoulder=false
@@ -630,6 +634,19 @@ if inMenu== false and isInventoryPDA== false then
 	elseif not rThumb then
 		rThumbOut = false
 		rThumbSwitchState=0
+	end
+	
+	if isRShoulderHeadR == true then
+		pressButton(state,XINPUT_GAMEPAD_RIGHT_SHOULDER)
+		if rGrabActive == false then
+			isRShoulderHeadR= false
+		end
+	end
+	if isRShoulderHeadL == true then
+		pressButton(state,XINPUT_GAMEPAD_RIGHT_SHOULDER)
+		if lGrabActive == false then
+			isRShoulderHeadL= false
+		end
 	end
 	--print(rThumbOut)
 	if isReloading then
@@ -971,11 +988,11 @@ end
 		isHapticZoneR =true
 		RZone=1-- RShoulder
 		
-	elseif RCheckZone(-10, 15, -30, -5, -5, 20)      then
+	elseif RCheckZone(-10, 15, -30, -10, -5, 20)      then
 		isHapticZoneR =true
 		RZone=2--Left Shoulder
 		
-	elseif RCheckZone(0, 20, -5, 5, 0, 10)  then
+	elseif RCheckZone(0, 20, -5, 5, 0, 20)  then
 		isHapticZoneR= true
 		RZone=3-- Over Head
 		
@@ -1011,7 +1028,7 @@ end
 		RZone=0--EMPTY
 	end
 	--define Haptic zone Lhandx Z: UP/DOWN, Y:RIGHT LEFT, X FORWARD BACKWARD, checks if RHand is in RZone
-	if LCheckZone(-10, 15, 5, 30, -5, 20) then
+	if LCheckZone(-10, 15, 10, 30, -5, 20) then
 		isHapticZoneL =true
 		LZone=1-- RShoulder
 		
@@ -1019,7 +1036,7 @@ end
 		isHapticZoneL =true
 		LZone=2--Left Shoulder
 		
-	elseif LCheckZone(0, 20, -5, 5, 0, 10) then
+	elseif LCheckZone(0, 30, -5, 5, 0, 20) then
 		isHapticZoneL= true
 		LZone=3-- Over Head
 		
@@ -1117,8 +1134,16 @@ end
 		elseif LZone==2 and lGrabActive then
 			KeyI=true
 			SendKeyDown('I')
-		elseif LZone==5 and lGrabActive then
-			
+		elseif RZone == 3 and rGrabActive and isRShoulderHeadR== false then
+			if string.sub(uevr.params.vr:get_mod_value("VR_AimMethod"),1,1) == "1" then
+				isRShoulderHeadR=true
+				--print(isRShoulder)
+			end
+		elseif LZone ==3 and lGrabActive and isRShoulderHeadL==false then
+			if string.sub(uevr.params.vr:get_mod_value("VR_AimMethod"),1,1) == "1" then
+				isRShoulderHeadL=true
+				--print(isRShoulder)
+			end
 		elseif LZone==7 and lGrabActive then
 			KeyM=true
 			SendKeyDown('M')
@@ -1165,7 +1190,10 @@ end
 			LTriggerWasPressed=1
 				
 		elseif RWeaponZone==3 and lThumbOut then
-			isRShoulder=true
+			if string.sub(uevr.params.vr:get_mod_value("VR_AimMethod"),1,1) == "2" then
+				isRShoulder=true
+			end
+			
 		end
 	else
 		
