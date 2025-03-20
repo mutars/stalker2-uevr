@@ -28,7 +28,7 @@ jobs:
 
       - name: Prepare Release Structure
         run: |
-          mkdir -p artifact/plugins
+          if (!(Test-Path "artifact/plugins")) { New-Item -Path "artifact/plugins" -ItemType Directory -Force }
           cp ${{github.workspace}}/build/${{env.BUILD_TYPE}}/stalker2_uevr.dll artifact/plugins/
           if (Test-Path "artifacts/*") { cp -r artifacts/* artifact/ }
 

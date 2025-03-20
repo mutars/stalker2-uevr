@@ -22,17 +22,23 @@ A plugin for UEVR (Unreal Engine VR) that enhances the VR experience in S.T.A.L.
    |      |   Left Lower Area       |   Melee Slot Weapon    |
    |      |   Left Chest  |    Nail   |
    |                     |  Right Chest  |     Grenade Slot  |
+   |      |   Top Head, if AimMethod Head  |    Toggle Flashlight   |
    |   Press Left Grip   |   Left Shoulder  |  Open Inventory      |
    |                     |   Right Shoulder |   Simulates Dpad Left aka QuickSlot for item usage  |
    |                     |   Left Chest |  Scanner  |
    |                     |   Right Chest |      PDA    |
+   |      |   Top Head, if AimMethod Head  |    Toggle Flashlight   |
+
+![Alt text](./vr-controls-holster-system.svg)
   
-2. **Weapon Interaction zones**: These zones are around your right controller (or weapon basically) and can be triggered with your left controller
+3. **Weapon Interaction zones**: These zones are around your right controller (or weapon basically) and can be triggered with your left controller
    |      VR Button         | Zone                          | Action                         |
    |----------------|-------------------------------|-----------------------------|
    |   Press Left Grip   |   Underneath your weapon    |    Reloading  |
-   |    Press Left Thumb   |   Front area of your weapon   |    Toggle Flashlight   |
+   |    Press Left Thumb   |   Front area of your weapon, if Aim Method Right Hand   |    Toggle Flashlight   |
    |    Press Left Trigger  |  Left controller slightly above your right controller (you can touch them)     |   FireMode Switch    |
+
+![Alt text](./vr-controls-weapon-interaction.svg)
 
 ## VR Button layout changes 
 - Some buttons have been changed from the normal XBOX gamepad bindings:
