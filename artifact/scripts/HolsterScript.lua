@@ -2,8 +2,10 @@
 --------	
 	local isRhand = true
 	local HapticFeedback = true
+	local isLeftHandModeTriggerSwitchOnly = true
 	--local PhysicalLeaning = false
 	local SwapLShoulderLThumb =true
+	local SeatedOffset=20            
 --------
 --------	
 	local api = uevr.api
@@ -460,8 +462,9 @@ function(retval, user_index, state)
 	
 	
 	
-	--inMenu = api:get_player_controller().bShowMouseCursor
+--Checks if in menu or inventory or pda, if so doesnt change vanilla controls
 if inMenu== false and isInventoryPDA== false then	
+	--Reset variable for weapon zone Firemode switch
 	if  LTrigger<10 then
 		LTriggerWasPressed = 0
 	end
@@ -487,67 +490,76 @@ if inMenu== false and isInventoryPDA== false then
 	--end
 	
 	--Disable BUttons:
-	if lShoulder and SwapLShoulderLThumb then
-		unpressButton(state, XINPUT_GAMEPAD_LEFT_SHOULDER)
+	if 	isRhand or isLeftHandModeTriggerSwitchOnly then
+		if lShoulder and SwapLShoulderLThumb then
+			unpressButton(state, XINPUT_GAMEPAD_LEFT_SHOULDER)
+		end
+	else
+		if rShoulder and SwapLShoulderLThumb then
+			unpressButton(state, XINPUT_GAMEPAD_RIGHT_SHOULDER)
+		end
 	end
 	--if lThumb and SwapLShoulderLThumb then
 	--	unpressButton(state, XINPUT_GAMEPAD_LEFT_THUMB)
 	--end
 	
 	
-	
+	--Left Hand config (currently not used)
 	if not isRhand then
-		state.Gamepad.sThumbRX=ThumbLX
-		state.Gamepad.sThumbRY=ThumbLY
-		state.Gamepad.sThumbLX=ThumbRX
-		state.Gamepad.sThumbLY=ThumbRY
 		state.Gamepad.bLeftTrigger=RTrigger
 		state.Gamepad.bRightTrigger=LTrigger
-		unpressButton(state, XINPUT_GAMEPAD_B)
-		unpressButton(state, XINPUT_GAMEPAD_A				)
-		unpressButton(state, XINPUT_GAMEPAD_X				)	
-		unpressButton(state, XINPUT_GAMEPAD_Y				)
-		----unpressButton(state, XINPUT_GAMEPAD_DPAD_RIGHT		)
-		----unpressButton(state, XINPUT_GAMEPAD_DPAD_LEFT		)
-		----unpressButton(state, XINPUT_GAMEPAD_DPAD_UP			)
-		----unpressButton(state, XINPUT_GAMEPAD_DPAD_DOWN	    )
-		--unpressButton(state, XINPUT_GAMEPAD_LEFT_SHOULDER	)
-		unpressButton(state, XINPUT_GAMEPAD_RIGHT_SHOULDER	)
-		unpressButton(state, XINPUT_GAMEPAD_LEFT_THUMB		)
-		unpressButton(state, XINPUT_GAMEPAD_RIGHT_THUMB		)
-		if Ybutton then
-			pressButton(state,XINPUT_GAMEPAD_X)
+		if not isLeftHandModeTriggerSwitchOnly then
+			state.Gamepad.sThumbRX=ThumbLX
+			state.Gamepad.sThumbRY=ThumbLY
+			state.Gamepad.sThumbLX=ThumbRX
+			state.Gamepad.sThumbLY=ThumbRY
+			state.Gamepad.bLeftTrigger=RTrigger
+			state.Gamepad.bRightTrigger=LTrigger
+			unpressButton(state, XINPUT_GAMEPAD_B)
+			unpressButton(state, XINPUT_GAMEPAD_A				)
+			unpressButton(state, XINPUT_GAMEPAD_X				)	
+			unpressButton(state, XINPUT_GAMEPAD_Y				)
+			----unpressButton(state, XINPUT_GAMEPAD_DPAD_RIGHT		)
+			----unpressButton(state, XINPUT_GAMEPAD_DPAD_LEFT		)
+			----unpressButton(state, XINPUT_GAMEPAD_DPAD_UP			)
+			----unpressButton(state, XINPUT_GAMEPAD_DPAD_DOWN	    )
+			--unpressButton(state, XINPUT_GAMEPAD_LEFT_SHOULDER	)
+			unpressButton(state, XINPUT_GAMEPAD_RIGHT_SHOULDER	)
+			unpressButton(state, XINPUT_GAMEPAD_LEFT_THUMB		)
+			unpressButton(state, XINPUT_GAMEPAD_RIGHT_THUMB		)
+			if Ybutton then
+				pressButton(state,XINPUT_GAMEPAD_X)
+			end
+			if Bbutton then
+			--	unpressButton(state, XINPUT_GAMEPAD_B)	
+				pressButton(state,XINPUT_GAMEPAD_A)
+			end
+			if Xbutton then
+				pressButton(state,XINPUT_GAMEPAD_Y)
+				--unpressButton(state, XINPUT_GAMEPAD_X)
+			end	
+			if Abutton then
+				pressButton(state,XINPUT_GAMEPAD_B)
+				--unpressButton(state, XINPUT_GAMEPAD_A)
+			end		
+			
+			if lShoulder then
+				pressButton(state,XINPUT_GAMEPAD_RIGHT_SHOULDER)
+	--			unpressButton(state, XINPUT_GAMEPAD_LEFT_SHOULDER)
+			end
+			if rShoulder then
+				pressButton(state,XINPUT_GAMEPAD_LEFT_SHOULDER)
+			--	unpressButton(state, XINPUT_GAMEPAD_RIGHT_SHOULDER)
+			end
+			if lThumb then
+				pressButton(state,XINPUT_GAMEPAD_RIGHT_THUMB)
+--				unpressButton(state, XINPUT_GAMEPAD_LEFT_THUMB)
+			end	
+			if rThumb then
+				pressButton(state,XINPUT_GAMEPAD_LEFT_THUMB)
+	--			unpressButton(state, XINPUT_GAMEPAD_RIGHT_THUMB)
+			end
 		end
-		if Bbutton then
-		--	unpressButton(state, XINPUT_GAMEPAD_B)	
-			pressButton(state,XINPUT_GAMEPAD_A)
-		end
-		if Xbutton then
-			pressButton(state,XINPUT_GAMEPAD_Y)
-			--unpressButton(state, XINPUT_GAMEPAD_X)
-		end	
-		if Abutton then
-			pressButton(state,XINPUT_GAMEPAD_B)
-			--unpressButton(state, XINPUT_GAMEPAD_A)
-		end		
-		
-		if lShoulder then
-			pressButton(state,XINPUT_GAMEPAD_RIGHT_SHOULDER)
-	--		unpressButton(state, XINPUT_GAMEPAD_LEFT_SHOULDER)
-		end
-		if rShoulder then
-			pressButton(state,XINPUT_GAMEPAD_LEFT_SHOULDER)
-		--	unpressButton(state, XINPUT_GAMEPAD_RIGHT_SHOULDER)
-		end
-		if lThumb then
-			pressButton(state,XINPUT_GAMEPAD_RIGHT_THUMB)
---			unpressButton(state, XINPUT_GAMEPAD_LEFT_THUMB)
-		end	
-		if rThumb then
-			pressButton(state,XINPUT_GAMEPAD_LEFT_THUMB)
-	--		unpressButton(state, XINPUT_GAMEPAD_RIGHT_THUMB)
-		end
-		
 	end
 		--pressdpad--
 	if isDpadUp then
@@ -592,7 +604,7 @@ if inMenu== false and isInventoryPDA== false then
 	
 	--Unpress when in Zone
 
-	if isRhand then	
+	if isRhand or isLeftHandModeTriggerSwitchOnly then	
 		if  RZone ~=0 then
 			unpressButton(state, XINPUT_GAMEPAD_LEFT_SHOULDER)
 			unpressButton(state, XINPUT_GAMEPAD_RIGHT_SHOULDER)
@@ -601,16 +613,20 @@ if inMenu== false and isInventoryPDA== false then
 		end
 	else
 		if LZone ~= 0 then
-			--unpressButton(state, XINPUT_GAMEPAD_LEFT_SHOULDER)
+			unpressButton(state, XINPUT_GAMEPAD_LEFT_SHOULDER)
 			unpressButton(state, XINPUT_GAMEPAD_RIGHT_SHOULDER)
-			--unpressButton(state, XINPUT_GAMEPAD_LEFT_THUMB)
-			unpressButton(state, XINPUT_GAMEPAD_RIGHT_THUMB)
+			unpressButton(state, XINPUT_GAMEPAD_LEFT_THUMB)
+			--unpressButton(state, XINPUT_GAMEPAD_RIGHT_THUMB)
 		end
 	end
 	--print(RWeaponZone .. "   " .. RZone)
 	--disable Trigger for modeswitch
 	if RWeaponZone == 2 then
 		state.Gamepad.bLeftTrigger=0
+	end
+	
+	if LWeaponZone == 3 then
+		unpressButton(state, XINPUT_GAMEPAD_RIGHT_THUMB)
 	end
 	--disable Thumb for flashlight
 
@@ -634,6 +650,7 @@ if inMenu== false and isInventoryPDA== false then
 	elseif not rThumb then
 		rThumbOut = false
 		rThumbSwitchState=0
+		isRShoulder=false
 	end
 	
 	if isRShoulderHeadR == true then
@@ -734,27 +751,28 @@ if inMenu== false and isInventoryPDA== false then
 		SendKeyUp('0x20')
 		KeySpace=false
 	end
-		if math.abs(vecy)< 0.1 and isJump==true then
-			isJump=false
-			
-		end
-		if math.abs(vecy)< 0.1 and isCrouch==true then
-			isCrouch=false
-			
-		end
-		if vecy > 0.8 and isJump==false then
-			
-			KeySpace=true
-			SendKeyDown('0x20')
-			isJump=true
-			
-		end
+
+	if math.abs(vecy)< 0.1 and isJump==true then
+		isJump=false
 		
-		if vecy <-0.8 and isCrouch == false then
-			KeyCtrl=true
-			SendKeyDown('0xA2')
-			isCrouch=true
-		end
+	end
+	if math.abs(vecy)< 0.1 and isCrouch==true then
+		isCrouch=false
+		
+	end
+	if vecy > 0.8 and isJump==false then
+		
+		KeySpace=true
+		SendKeyDown('0x20')
+		isJump=true
+		
+	end
+	
+	if vecy <-0.8 and isCrouch == false then
+		KeyCtrl=true
+		SendKeyDown('0xA2')
+		isCrouch=true
+	end
 	
 	
 	if GrenadeReady then
@@ -771,13 +789,19 @@ if inMenu== false and isInventoryPDA== false then
 	end
 		
 		--CONTROL REMAP:
-		
-	if lShoulder and SwapLShoulderLThumb then
-		if LZone== 0 or LZone == 5 then
-			pressButton(state, XINPUT_GAMEPAD_LEFT_THUMB)
+	if isRhand or isLeftHandModeTriggerSwitchOnly then	
+		if lShoulder and SwapLShoulderLThumb then
+			if LZone== 0 or LZone == 5 and RWeaponZone==0 then
+				pressButton(state, XINPUT_GAMEPAD_LEFT_THUMB)
+			end
+		end
+	else
+		if rShoulder and SwapLShoulderLThumb then
+			if RZone== 0 or RZone == 5 and LWeaponZone==0 then
+				pressButton(state, XINPUT_GAMEPAD_LEFT_THUMB)
+			end
 		end
 	end
-	
 	--if lThumb and RWeaponZone ~= 3 then
 	--	pressButton(state, XINPUT_GAMEPAD_LEFT_SHOULDER)
 	--end
@@ -798,9 +822,9 @@ end)
 	local isHapticZoneRLast= false
 	local isHapticZoneWRLast= false
 	local isHapticZoneWLLast= false
-	local LeftController=uevr.params.vr.get_left_joystick_source()
-	local RightController= uevr.params.vr.get_right_joystick_source()
-	local RightJoystickIndex= uevr.params.vr.get_right_joystick_source()
+	local LeftController=		 uevr.params.vr.get_left_joystick_source()
+	local RightController=		 uevr.params.vr.get_right_joystick_source()
+	local RightJoystickIndex=	 uevr.params.vr.get_right_joystick_source()
 	local RAxis=UEVR_Vector2f.new()
 	params.vr.get_joystick_axis(RightJoystickIndex,RAxis)
 	local leanState=0 --1 =left, 2=right
@@ -842,9 +866,13 @@ uevr.sdk.callbacks.on_pre_engine_tick(
 	function(engine, delta)
 	pawn=api:get_local_pawn(0)
 
-
-	params.vr.get_joystick_axis(RightJoystickIndex,RAxis)
-	 vecy=RAxis.y
+	if isRhand or isLeftHandModeTriggerSwitchOnly then
+		params.vr.get_joystick_axis(RightJoystickIndex,RAxis)
+		vecy=RAxis.y
+	else 
+		params.vr.get_joystick_axis(LeftController,RAxis)
+		vecy=RAxis.y
+	end
 	--print("vecyy"..vecy)
 
 
@@ -984,31 +1012,31 @@ end
 	-----EDIT HERE-------------
 	---------------------------
 	--define Haptic zones RHand Z: UP/DOWN, Y:RIGHT LEFT, X FORWARD BACKWARD, checks if RHand is in RZone
-	if 	   RCheckZone(-10, 15, 10, 30, -5, 20) then 
+	if 	   RCheckZone(-10, 15, 10, 30, -10, 20+SeatedOffset) then 
 		isHapticZoneR =true
 		RZone=1-- RShoulder
 		
-	elseif RCheckZone(-10, 15, -30, -10, -5, 20)      then
+	elseif RCheckZone(-10, 15, -30, -10, -10, 20+SeatedOffset)      then
 		isHapticZoneR =true
 		RZone=2--Left Shoulder
 		
-	elseif RCheckZone(0, 20, -5, 5, 0, 20)  then
+	elseif RCheckZone(0, 20, -5, 5, 0, 20+SeatedOffset)  then
 		isHapticZoneR= true
 		RZone=3-- Over Head
 		
-	elseif RCheckZone(-100,-60,22,50,-10,10)   then
+	elseif RCheckZone(-100,-60,22,50,-10,10+SeatedOffset)   then
 		isHapticZoneR= true
 		RZone=4--RHip
 		
-	elseif RCheckZone(-100,-60,-30,-5,-10,30)   then
+	elseif RCheckZone(-100,-50,-30,5,-10,30+SeatedOffset)   then
 		isHapticZoneR= true
 		RZone=5--LHip
 		
-	elseif RCheckZone(-40,-25,-15,-5,0,10)   then
+	elseif RCheckZone(-40,-25,-15,-5,0,10+SeatedOffset)   then
 		isHapticZoneR= true
 		RZone=6--ChestLeft
 		
-	elseif RCheckZone(-40,-25,5,15,0,10)  then
+	elseif RCheckZone(-40,-25,5,15,0,10+SeatedOffset)  then
 		isHapticZoneR= true
 		RZone=7--ChestRight
 		
@@ -1028,31 +1056,31 @@ end
 		RZone=0--EMPTY
 	end
 	--define Haptic zone Lhandx Z: UP/DOWN, Y:RIGHT LEFT, X FORWARD BACKWARD, checks if RHand is in RZone
-	if LCheckZone(-10, 15, 10, 30, -5, 20) then
+	if LCheckZone(-10, 15, 10, 30, -10, 20+SeatedOffset) then
 		isHapticZoneL =true
 		LZone=1-- RShoulder
 		
-	elseif LCheckZone (-10, 15, -30, -10, -5, 20) then
+	elseif LCheckZone (-10, 15, -30, -10, -10, 20+SeatedOffset) then
 		isHapticZoneL =true
 		LZone=2--Left Shoulder
 		
-	elseif LCheckZone(0, 30, -5, 5, 0, 20) then
+	elseif LCheckZone(0, 30, -5, 5, 0, 20+SeatedOffset) then
 		isHapticZoneL= true
 		LZone=3-- Over Head
 		
-	elseif LCheckZone(-100,-60,22,50,-10,10)  then
+	elseif LCheckZone(-100,-50,-5,50,-10,30+SeatedOffset)  then
 		isHapticZoneL= true
 		LZone=4--RPouch
 		
-	elseif LCheckZone(-100,-60,-50,-10,-10,10)  then
+	elseif LCheckZone(-100,-60,-50,-10,-10,10+SeatedOffset)  then
 		isHapticZoneL= true
 		LZone=5--LPouch
 		
-	elseif LCheckZone(-40,-25,-15,-5,0,10)   then
+	elseif LCheckZone(-40,-25,-15,-5,0,10+SeatedOffset)   then
 		isHapticZoneL= true
 		LZone=6--ChestLeft
 		
-	elseif LCheckZone(-40,-25,5,15,0,10)  then
+	elseif LCheckZone(-40,-25,5,15,0,10+SeatedOffset)  then
 		isHapticZoneL= true
 		LZone=7--ChestRight
 		
@@ -1107,7 +1135,7 @@ end
 	
 	--Code to equip
 	if isRhand then
-		if RZone== 1 and rGrabActive then
+		if RZone== 1 and rGrabActive and RWeaponZone==0 then
 			--local Primary= pawn.Inventory:GetPrimaryWeapon()
 			Key3=true
 			SendKeyDown('3')
@@ -1120,7 +1148,7 @@ end
 		elseif RZone== 5 and rGrabActive then
 			Key1=true
 			SendKeyDown('1')
-		elseif LZone== 1 and lGrabActive then
+		elseif LZone== 1 and lGrabActive and RWeaponZone==0 then
 			isDpadLeft=true
 		elseif RZone== 8 and rGrabActive then
 			Key1=true
@@ -1131,7 +1159,7 @@ end
 		elseif RZone== 7 and rGrabActive  then
 			Key5=true
 			SendKeyDown('5')
-		elseif LZone==2 and lGrabActive then
+		elseif LZone==2 and lGrabActive and RWeaponZone==0 then
 			KeyI=true
 			SendKeyDown('I')
 		elseif RZone == 3 and rGrabActive and isRShoulderHeadR== false then
@@ -1144,37 +1172,57 @@ end
 				isRShoulderHeadL=true
 				--print(isRShoulder)
 			end
-		elseif LZone==7 and lGrabActive then
+		elseif LZone==7 and lGrabActive and RWeaponZone==0 then
 			KeyM=true
 			SendKeyDown('M')
-		elseif LZone==6 and lGrabActive then
+		elseif LZone==6 and lGrabActive and RWeaponZone==0 then
 		-- isDpadLeft=true
 			Key7=true
 			SendKeyDown('7')
 		end
 	else 
 		if LZone == 2 and lGrabActive then
-		--	pawn:EquipPrimaryItem()
+			Key3=true
+			SendKeyDown('3')
 		elseif LZone== 1 and lGrabActive then
-		--	pawn:EquipLongTactical()
+			Key4=true
+			SendKeyDown('4')
 		elseif LZone== 5 and lGrabActive then
-		--	pawn:EquipSecondaryItem()
-		elseif LZone== 3 and lGrabActive then
-		--	pawn:ToggleNightvisionGoggles()
-		elseif RZone== 3 and rGrabActive then
-		--	pawn:ToggleNightvisionGoggles()
+			Key2=true
+			SendKeyDown('2')
+		elseif RZone == 3 and rGrabActive and isRShoulderHeadR== false then
+			if string.sub(uevr.params.vr:get_mod_value("VR_AimMethod"),1,1) == "1" then
+				isRShoulderHeadR=true
+				--print(isRShoulder)
+			end
+		elseif LZone ==3 and lGrabActive and isRShoulderHeadL==false then
+			if string.sub(uevr.params.vr:get_mod_value("VR_AimMethod"),1,1) == "1" then
+				isRShoulderHeadL=true
+				--print(isRShoulder)
+			end
 		elseif LZone== 8 and lGrabActive then
-		--	pawn:EquipFlashbang()
+			Key1=true
+			SendKeyDown('1')
 		elseif LZone== 6 and lGrabActive then
-			
+			Key5=true
+			SendKeyDown('5')
 		elseif LZone== 7 and lGrabActive then
-			GrenadeReady=true
-		elseif RZone==1 and rGrabActive then
-		--	pawn:EquipLongTactical()
-		elseif RZone==4 and rGrabActive then
-		--	pawn.InventoryComp:EquipItemFromGroup_Index(1,1)
-		elseif RZone==8 and rGrabActive then
-		--	pawn.InventoryComp:EquipItemFromGroup_Index(8,0)
+			Key6=true
+			SendKeyDown('6')
+		elseif RZone==1 and rGrabActive and LWeaponZone==0 then
+			KeyI=true
+			SendKeyDown('I')
+		elseif RZone==2 and rGrabActive and LWeaponZone==0 then
+			isDpadLeft=true
+		elseif LZone==4 and lGrabActive then
+			Key1=true
+			SendKeyDown('1')
+		elseif RZone==7 and rGrabActive and LWeaponZone==0 then
+			Key7=true
+			SendKeyDown('7')
+		elseif RZone==6 and rGrabActive and LWeaponZone==0 then
+			KeyM=true
+			SendKeyDown('M')
 		end
 		
 	end
@@ -1203,9 +1251,13 @@ end
 			else isReloading = false
 			end
 		elseif LWeaponZone== 2 and RTrigger > 230 and RTriggerWasPressed ==0 then
-		
+			KeyB=true
+			SendKeyDown('B')
+			RTriggerWasPressed=1
 		elseif LWeaponZone ==3 and rThumbOut then
-			isLShoulder=true
+			if string.sub(uevr.params.vr:get_mod_value("VR_AimMethod"),1,1) == "3" then
+				isRShoulder=true
+			end
 		end
 	end
 --print(LWeaponZone)
