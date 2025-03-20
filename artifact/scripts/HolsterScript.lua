@@ -4,10 +4,16 @@
 	local HapticFeedback = true
 	local isLeftHandModeTriggerSwitchOnly = true
 	--local PhysicalLeaning = false
-	local SwapLShoulderLThumb =true
-	local SeatedOffset=20            
+	local SwapLShoulderLThumb =true --sprinting switch with l shoulder
+	local SitMode=false
+	        
 --------
 --------	
+	local SeatedOffset=0 
+	if SitMode then
+		SeatedOffset=20
+	end
+		
 	local api = uevr.api
 	
 	local params = uevr.params
