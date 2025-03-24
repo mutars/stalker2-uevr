@@ -247,7 +247,8 @@ void Stalker2VR::hook() {
     auto apc = (API::UClass*)API::get()->find_uobject(L"Class /Script/Stalker2.PC");
     auto obj = apc->get_class_default_object();
     auto vtable = *(uintptr_t**)obj;
-    auto source_of_damage = vtable[306];
+    // 48 89 5C 24 18 57 48 81 EC 90 00 00 00 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 84 24 80 00 00 00 48 8B FA 48 8B D9 48
+    auto source_of_damage = vtable[307];
     m_on_get_weapon_forward_hook_id = API::get()->param()->functions->register_inline_hook((void*)source_of_damage, (void*)&on_get_weapon_forward, (void**)&m_original_on_get_weapon_forward);
     if(m_on_get_weapon_forward_hook_id == -1) {
         PLUGIN_LOG_ONCE_ERROR("Failed to hook on_get_weapon_forward");
@@ -266,8 +267,7 @@ void Stalker2VR::hook() {
     } else {
         PLUGIN_LOG_ONCE_ERROR("Failed to find set_scalar_value function");
     }
-
-    const auto func_addr2 = (uintptr_t )mod + 0x4b505d0; // 4b505d0
+    // const auto func_addr2 = (uintptr_t )mod + 0x4b505d0; // 4b505d0
     // UMaterialParameterCollectionInstance::SetScalarParameterValue
     static const auto set_scalar_value_mci_func_signature = "F3 0F 11 54 24 18 48 89 54 24 10 53 55 56 48";
     static auto set_scalar_value_mci_func = utility::scan(mod, set_scalar_value_mci_func_signature);
