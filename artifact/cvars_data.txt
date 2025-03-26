@@ -1,3 +1,4 @@
 Engine_r.AllowOcclusionQueries=0
 Engine_r.DepthOfFieldQuality=0
 Engine_r.MotionBlurQuality=0
+r.TonemapperGamma=1.7000
