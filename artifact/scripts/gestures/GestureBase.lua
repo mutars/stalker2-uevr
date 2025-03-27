@@ -6,7 +6,7 @@ local global_id_sequence = 0
 
 local GestureBase = {
     -- Unique identifier for the gesture
-    id = -1,
+    id = nil,
     
     -- Name for this gesture (for debugging)
     name = "Generic Gesture",
@@ -73,10 +73,11 @@ function GestureBase:new(config)
     config = config or {}
     setmetatable(config, self)
     self.__index = self
-    if not config.id then
-        global_id_sequence = global_id_sequence + 1
-        config.id = global_id_sequence
-    end
+    
+    -- Always generate a new ID for each instance
+    global_id_sequence = global_id_sequence + 1
+    config.id = global_id_sequence
+    
     return config
 end
 
