@@ -19,6 +19,11 @@ function BodyZoneGesture:new(config)
         error("locationGesture is required for BodyZoneGesture")
     end
     config = config or {}
+    -- Populate dependencies from fields
+    config.dependencies = {}
+    if config.locationGesture then
+        table.insert(config.dependencies, config.locationGesture)
+    end
     setmetatable(config, self)
     self.__index = self
     return config
@@ -57,6 +62,11 @@ function WeaponZoneGesture:new(config)
         error("weaponLocationGesture is required for WeaponZoneGesture")
     end
     config = config or {}
+    -- Populate dependencies from fields
+    config.dependencies = {}
+    if config.weaponLocationGesture then
+        table.insert(config.dependencies, config.weaponLocationGesture)
+    end
     setmetatable(config, self)
     self.__index = self
     return config

@@ -8,134 +8,204 @@ local LocationGestureBase = GestureBase:new({
     weaponLocation = Vector3f.new(0, 0, 0)
 })
 
+function LocationGestureBase:new(config)
+    config = config or {}
+    config.location = Vector3f.new(0, 0, 0)
+    config.rotation = Vector3f.new(0, 0, 0)
+    config.weaponLocation = Vector3f.new(0, 0, 0)
+    setmetatable(config, self)
+    self.__index = self
+    return config
+end
+
 -- Left Hand Location Gesture
 local LeftHandLocationGesture = LocationGestureBase:new({
-    name = "Left Hand Location"
+    name = "Left Hand Location",
+    leftHand = nil,
+    hmd = nil
 })
 
+function LeftHandLocationGesture:new(config)
+    config = config or {}
+    -- Populate dependencies from fields
+    config.dependencies = {}
+    if config.leftHand then table.insert(config.dependencies, config.leftHand) end
+    if config.hmd then table.insert(config.dependencies, config.hmd) end
+    setmetatable(config, self)
+    self.__index = self
+    return config
+end
+
 function LeftHandLocationGesture:EvaluateInternal(context)
-    local leftHand = self.dependencies[1]
-    local hmd = self.dependencies[2]
-    
-    if not leftHand.isActive or not hmd.isActive then
+    if not self.leftHand or not self.hmd or
+       not self.leftHand.isActive or not self.hmd.isActive then
         return false
     end
 
     -- Calculate HMD-relative position
-    local rotDiff = hmd.rotation.y
-    local dx = leftHand.location.x - hmd.location.x
-    local dy = leftHand.location.y - hmd.location.y
+    local rotDiff = self.hmd.rotation.y
+    local dx = self.leftHand.location.x - self.hmd.location.x
+    local dy = self.leftHand.location.y - self.hmd.location.y
     
     self.location.x = dx * math.cos(-rotDiff/180*math.pi) - dy * math.sin(-rotDiff/180*math.pi)
     self.location.y = dx * math.sin(-rotDiff/180*math.pi) + dy * math.cos(-rotDiff/180*math.pi)
-    self.location.z = leftHand.location.z - hmd.location.z
+    self.location.z = self.leftHand.location.z - self.hmd.location.z
     
     return true
 end
 
 -- Right Hand Location Gesture
 local RightHandLocationGesture = LocationGestureBase:new({
-    name = "Right Hand Location"
+    name = "Right Hand Location",
+    rightHand = nil,
+    hmd = nil
 })
 
+function RightHandLocationGesture:new(config)
+    config = config or {}
+    -- Populate dependencies from fields
+    config.dependencies = {}
+    if config.rightHand then table.insert(config.dependencies, config.rightHand) end
+    if config.hmd then table.insert(config.dependencies, config.hmd) end
+    setmetatable(config, self)
+    self.__index = self
+    return config
+end
+
 function RightHandLocationGesture:EvaluateInternal(context)
-    local rightHand = self.dependencies[1]
-    local hmd = self.dependencies[2]
-    
-    if not rightHand.isActive or not hmd.isActive then
+    if not self.rightHand or not self.hmd or
+       not self.rightHand.isActive or not self.hmd.isActive then
         return false
     end
 
     -- Calculate HMD-relative position
-    local rotDiff = hmd.rotation.y
-    local dx = rightHand.location.x - hmd.location.x
-    local dy = rightHand.location.y - hmd.location.y
+    local rotDiff = self.hmd.rotation.y
+    local dx = self.rightHand.location.x - self.hmd.location.x
+    local dy = self.rightHand.location.y - self.hmd.location.y
     
     self.location.x = dx * math.cos(-rotDiff/180*math.pi) - dy * math.sin(-rotDiff/180*math.pi)
     self.location.y = dx * math.sin(-rotDiff/180*math.pi) + dy * math.cos(-rotDiff/180*math.pi)
-    self.location.z = rightHand.location.z - hmd.location.z
+    self.location.z = self.rightHand.location.z - self.hmd.location.z
     
     return true
 end
 
 -- Left Hand Weapon Location Gesture
-local LeftHandWeaponLocationGesture = LocationGestureBase:new({
-    name = "Left Hand Weapon Location"
+local LeftHandRelativeToRightLocationGesture = LocationGestureBase:new({
+    name = "Left Hand Weapon Location",
+    leftHand = nil,
+    rightHand = nil,
+    weaponLocation = Vector3f.new(0, 0, 0)
 })
 
-function LeftHandWeaponLocationGesture:EvaluateInternal(context)
-    local leftHand = self.dependencies[1]
-    local rightHand = self.dependencies[2]
-    
-    if not leftHand.isActive or not rightHand.isActive then
+function LeftHandRelativeToRightLocationGesture:new(config)
+    config = config or {}
+    -- Populate dependencies from fields
+    config.dependencies = {}
+    if config.leftHand then table.insert(config.dependencies, config.leftHand) end
+    if config.rightHand then table.insert(config.dependencies, config.rightHand) end
+    setmetatable(config, self)
+    self.__index = self
+    return config
+end
+
+function LeftHandRelativeToRightLocationGesture:EvaluateInternal(context)
+    if not self.leftHand or not self.rightHand or
+       not self.leftHand.isActive or not self.rightHand.isActive then
         return false
     end
 
     -- Calculate right-hand-relative position with rotations
-    local rotZ = rightHand.rotation.y
-    local rotX = rightHand.rotation.z
-    local rotY = rightHand.rotation.x
+    local rotZ = self.rightHand.rotation.y
+    local rotX = self.rightHand.rotation.z
+    local rotY = self.rightHand.rotation.x
     
-    local dx = leftHand.location.x - rightHand.location.x
-    local dy = leftHand.location.y - rightHand.location.y
-    local dz = leftHand.location.z - rightHand.location.z
+    local dx = self.leftHand.location.x - self.rightHand.location.x
+    local dy = self.leftHand.location.y - self.rightHand.location.y
+    local dz = self.leftHand.location.z - self.rightHand.location.z
 
-    -- Apply rotations in sequence (yaw, roll, pitch)
+    -- Calculate all transformations first
+    local newX, newY, newZ = dx, dy, dz
+
     -- Yaw (Z rotation)
-    self.weaponLocation.x = dx * math.cos(-rotZ/180*math.pi) - dy * math.sin(-rotZ/180*math.pi)
-    self.weaponLocation.y = dx * math.sin(-rotZ/180*math.pi) + dy * math.cos(-rotZ/180*math.pi)
-    self.weaponLocation.z = dz
+    newX = dx * math.cos(-rotZ/180*math.pi) - dy * math.sin(-rotZ/180*math.pi)
+    newY = dx * math.sin(-rotZ/180*math.pi) + dy * math.cos(-rotZ/180*math.pi)
+    newZ = dz
 
     -- Roll (X rotation)
-    local tempY = self.weaponLocation.y
-    self.weaponLocation.y = tempY * math.cos(rotX/180*math.pi) - self.weaponLocation.z * math.sin(rotX/180*math.pi)
-    self.weaponLocation.z = tempY * math.sin(rotX/180*math.pi) + self.weaponLocation.z * math.cos(rotX/180*math.pi)
+    local tempY = newY
+    newY = tempY * math.cos(rotX/180*math.pi) - newZ * math.sin(rotX/180*math.pi)
+    newZ = tempY * math.sin(rotX/180*math.pi) + newZ * math.cos(rotX/180*math.pi)
 
     -- Pitch (Y rotation)
-    local tempX = self.weaponLocation.x
-    self.weaponLocation.x = tempX * math.cos(-rotY/180*math.pi) - self.weaponLocation.z * math.sin(-rotY/180*math.pi)
-    self.weaponLocation.z = tempX * math.sin(-rotY/180*math.pi) + self.weaponLocation.z * math.cos(-rotY/180*math.pi)
+    local tempX = newX
+    newX = tempX * math.cos(-rotY/180*math.pi) - newZ * math.sin(-rotY/180*math.pi)
+    newZ = tempX * math.sin(-rotY/180*math.pi) + newZ * math.cos(-rotY/180*math.pi)
+
+    -- Atomic assignment of final position
+    self.weaponLocation.x = newX
+    self.weaponLocation.y = newY
+    self.weaponLocation.z = newZ
     
     return true
 end
 
 -- Right Hand Weapon Location Gesture
-local RightHandWeaponLocationGesture = LocationGestureBase:new({
-    name = "Right Hand Weapon Location"
+local RightHandRelativeToLeftLocationGesture = LocationGestureBase:new({
+    name = "Right Hand Weapon Location",
+    rightHand = nil,
+    leftHand = nil,
+    weaponLocation = Vector3f.new(0, 0, 0)
 })
 
-function RightHandWeaponLocationGesture:EvaluateInternal(context)
-    local rightHand = self.dependencies[1]
-    local leftHand = self.dependencies[2]
-    
-    if not rightHand.isActive or not leftHand.isActive then
+function RightHandRelativeToLeftLocationGesture:new(config)
+    config = config or {}
+    -- Populate dependencies from fields
+    config.dependencies = {}
+    if config.rightHand then table.insert(config.dependencies, config.rightHand) end
+    if config.leftHand then table.insert(config.dependencies, config.leftHand) end
+    setmetatable(config, self)
+    self.__index = self
+    return config
+end
+
+function RightHandRelativeToLeftLocationGesture:EvaluateInternal(context)
+    if not self.rightHand or not self.leftHand or
+       not self.rightHand.isActive or not self.leftHand.isActive then
         return false
     end
 
     -- Calculate left-hand-relative position with rotations
-    local rotZ = leftHand.rotation.y
-    local rotX = leftHand.rotation.z
-    local rotY = leftHand.rotation.x
+    local rotZ = self.leftHand.rotation.y
+    local rotX = self.leftHand.rotation.z
+    local rotY = self.leftHand.rotation.x
     
-    local dx = rightHand.location.x - leftHand.location.x
-    local dy = rightHand.location.y - leftHand.location.y
-    local dz = rightHand.location.z - leftHand.location.z
+    local dx = self.rightHand.location.x - self.leftHand.location.x
+    local dy = self.rightHand.location.y - self.leftHand.location.y
+    local dz = self.rightHand.location.z - self.leftHand.location.z
 
-    -- Apply rotations in sequence (yaw, roll, pitch)
+    -- Calculate all transformations first
+    local newX, newY, newZ = dx, dy, dz
+
     -- Yaw (Z rotation)
-    self.weaponLocation.x = dx * math.cos(-rotZ/180*math.pi) - dy * math.sin(-rotZ/180*math.pi)
-    self.weaponLocation.y = dx * math.sin(-rotZ/180*math.pi) + dy * math.cos(-rotZ/180*math.pi)
-    self.weaponLocation.z = dz
+    newX = dx * math.cos(-rotZ/180*math.pi) - dy * math.sin(-rotZ/180*math.pi)
+    newY = dx * math.sin(-rotZ/180*math.pi) + dy * math.cos(-rotZ/180*math.pi)
+    newZ = dz
 
     -- Roll (X rotation)
-    local tempY = self.weaponLocation.y
-    self.weaponLocation.y = tempY * math.cos(rotX/180*math.pi) - self.weaponLocation.z * math.sin(rotX/180*math.pi)
-    self.weaponLocation.z = tempY * math.sin(rotX/180*math.pi) + self.weaponLocation.z * math.cos(rotX/180*math.pi)
+    local tempY = newY
+    newY = tempY * math.cos(rotX/180*math.pi) - newZ * math.sin(rotX/180*math.pi)
+    newZ = tempY * math.sin(rotX/180*math.pi) + newZ * math.cos(rotX/180*math.pi)
 
     -- Pitch (Y rotation)
-    local tempX = self.weaponLocation.x
-    self.weaponLocation.x = tempX * math.cos(-rotY/180*math.pi) - self.weaponLocation.z * math.sin(-rotY/180*math.pi)
-    self.weaponLocation.z = tempX * math.sin(-rotY/180*math.pi) + self.weaponLocation.z * math.cos(-rotY/180*math.pi)
+    local tempX = newX
+    newX = tempX * math.cos(-rotY/180*math.pi) - newZ * math.sin(-rotY/180*math.pi)
+    newZ = tempX * math.sin(-rotY/180*math.pi) + newZ * math.cos(-rotY/180*math.pi)
+
+    -- Atomic assignment of final position
+    self.weaponLocation.x = newX
+    self.weaponLocation.y = newY
+    self.weaponLocation.z = newZ
     
     return true
 end
@@ -143,6 +213,6 @@ end
 return {
     LeftHandLocationGesture = LeftHandLocationGesture,
     RightHandLocationGesture = RightHandLocationGesture,
-    LeftHandWeaponLocationGesture = LeftHandWeaponLocationGesture,
-    RightHandWeaponLocationGesture = RightHandWeaponLocationGesture
+    LeftHandRelativeToRightLocationGesture = LeftHandRelativeToRightLocationGesture,
+    RightHandRelativeToLeftLocationGesture = RightHandRelativeToLeftLocationGesture
 }

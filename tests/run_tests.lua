@@ -33,7 +33,8 @@ else
     -- Otherwise run all tests in the tests directory
     local testFiles = {
         "tests/test_simple_gesture.lua",
-        "tests/test_zoned_gesture.lua"
+        "tests/test_zoned_gesture.lua",
+        "tests/test_nested_gestures.lua"
         -- Add more test files here as you create them
     }
     

@@ -17,6 +17,9 @@ local GestureBase = {
     -- Previous state for detecting transitions
     wasActive = false,
     
+    -- Whether the gesture is locked in its current state
+    isLocked = false,
+    
     -- List of dependencies (other gestures this one depends on)
     dependencies = {},
     
@@ -33,6 +36,7 @@ function GestureBase:Update(visited, context)
             dep:Update(visited, context)
         end
     end
+    self:Unlock()
     self:Evaluate(context)
 end
 
@@ -52,9 +56,24 @@ function GestureBase:EvaluateInternal(context)
     return false
 end
 
+-- Lock the gesture in its current state
+function GestureBase:Lock()
+    self.isLocked = true
+end
+
+-- Unlock the gesture to allow state changes
+function GestureBase:Unlock()
+    self.isLocked = false
+end
+
+function GestureBase:IsLocked()
+    return self.isLocked
+end
+
 function GestureBase:Reset()
     self.isActive = false
     self.wasActive = false
+    self.isLocked = false
 end
 
 -- Returns true if gesture just became active this frame
