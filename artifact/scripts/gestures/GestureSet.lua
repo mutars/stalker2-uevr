@@ -1,9 +1,9 @@
 --[[
-    GestureController.lua
+    GestureSet.lua
     Manages a collection of gestures in a graph structure
 ]]--
 
-local GestureController = {
+local GestureSet = {
     -- Collection of root/top-level gestures
     rootGestures = {},
     
@@ -15,14 +15,14 @@ local GestureController = {
 }
 
 -- Initialize the controller with a list of root gestures
-function GestureController:Init()
+function GestureSet:Init()
     self.rootGestures = {}
     self.initialized = true
     return self
 end
 
 -- Reset all gestures to their default state
-function GestureController:Reset()
+function GestureSet:Reset()
     -- Reset all gestures (both top-level and dependencies)
     local visited = {}
     for _, gesture in ipairs(self.rootGestures) do
@@ -32,7 +32,7 @@ function GestureController:Reset()
 end
 
 -- Helper function to reset a gesture and its dependencies
-function GestureController:ResetGesture(gesture, visited)
+function GestureSet:ResetGesture(gesture, visited)
     if not gesture or visited[gesture.id] then
         return
     end
@@ -49,7 +49,7 @@ function GestureController:ResetGesture(gesture, visited)
 end
 
 -- Update all gestures in the graph (depth-first)
-function GestureController:Update(context)
+function GestureSet:Update(context)
     if not self.initialized then
         return self
     end
@@ -70,11 +70,11 @@ function GestureController:Update(context)
 end
 
 -- Create a new instance of the controller
-function GestureController:new()
+function GestureSet:new()
     local instance = {}
     setmetatable(instance, self)
     self.__index = self
     return instance
 end
 
-return GestureController
+return GestureSet

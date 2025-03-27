@@ -2,13 +2,14 @@
     GestureBase.lua
     Base class for all gestures in the gesture system
 ]]--
+local global_id_sequence = 0
 
 local GestureBase = {
     -- Unique identifier for the gesture
-    id = "",
+    id = -1,
     
     -- Name for this gesture (for debugging)
-    name = "Unnamed Gesture",
+    name = "Generic Gesture",
     
     -- Whether this gesture is currently active/detected
     isActive = false,
@@ -72,6 +73,10 @@ function GestureBase:new(config)
     config = config or {}
     setmetatable(config, self)
     self.__index = self
+    if not config.id then
+        global_id_sequence = global_id_sequence + 1
+        config.id = global_id_sequence
+    end
     return config
 end
 
