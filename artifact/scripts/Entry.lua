@@ -1,8 +1,8 @@
 require(".\\Base\\basic")
-
-
-if basicInit then
-	print("basic lua loaded")
+require(".\\Base\\HolsterScript")
+require(".\\Base\\scope")
+if basicInit and HolsterInit and scopeInit then
+	
 	print("Luas loaded")
 end
 
