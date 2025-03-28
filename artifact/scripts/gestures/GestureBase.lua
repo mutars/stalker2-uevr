@@ -19,6 +19,8 @@ local GestureBase = {
     
     -- Whether the gesture is locked in its current state
     isLocked = false,
+
+    executionCallback = nil,
     
     -- List of dependencies (other gestures this one depends on)
     dependencies = {},
@@ -38,6 +40,12 @@ function GestureBase:Update(visited, context)
     end
     self:Unlock()
     self:Evaluate(context)
+end
+
+function GestureBase:Execute(context)
+    if self:JustActivated() and self.executionCallback then
+        self.executionCallback(self, context)
+    end
 end
 
 -- Update the gesture state (should be called from GestureGraph)
@@ -84,6 +92,14 @@ end
 -- Returns true if gesture just became inactive this frame
 function GestureBase:JustDeactivated()
     return not self.isActive and self.wasActive
+end
+
+function GestureBase:SetExecutionCallback(callback)
+    if type(callback) ~= "function" then
+        error("Execution callback must be a function")
+    end
+    self.executionCallback = callback
+    return self -- Allow method chaining
 end
 
 

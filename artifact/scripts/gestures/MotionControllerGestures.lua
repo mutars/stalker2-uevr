@@ -45,98 +45,122 @@ local HMDGesture = MotionControllerGesture:new({
 })
 
 -- Base Joystick State Gesture class
-local MotionControllerJoystickState = GestureBase:new({
-    name = "Joystick State Base",
+local MotionControllerAction = GestureBase:new({
+    name = "Joystick Action",
     controllerIndex = 0,
-    triggerHandle = nil,
-    gripHandle = nil,
+    handle_name = "",
+    handle = nil,
+    controller = nil,
     isInitialized = false,
     
-    -- Current states
-    triggerActive = false,
-    gripActive = false,
-    
-    -- Past states
-    wasTriggerActive = false,
-    wasGripActive = false
+    actionState = false,
+    pastActionState = false
 })
 
-function MotionControllerJoystickState:InitHandles()
-    if not self.isInitialized then
-        self.triggerHandle = uevr.params.vr.get_action_handle("/actions/default/in/Trigger")
-        self.gripHandle = uevr.params.vr.get_action_handle("/actions/default/in/Grip")
+function MotionControllerAction:InitHandle()
+    if not self.isInitialized and self.handle_name then
+        self.handle = uevr.params.vr.get_action_handle(self.handle_name)
+        if self.controllerIndex == 1 then
+            self.controller = uevr.params.vr.get_left_joystick_source()
+        else
+            self.controller = uevr.params.vr.get_right_joystick_source()
+        end
+
+        -- self.handle = uevr.params.vr.get_action_handle("/actions/default/in/Trigger")
+        -- self.gripHandle = uevr.params.vr.get_action_handle("/actions/default/in/Grip")
         self.isInitialized = true
     end
 end
 
-function MotionControllerJoystickState:EvaluateInternal(context)
-    if not context then
+function MotionControllerAction:EvaluateInternal(context)
+    if not context or not self.handle or not self.controller then
         return false
     end
     
-    self:InitHandles()
+    self:InitHandle()
     
     -- Store past states
-    self.wasTriggerActive = self.triggerActive
-    self.wasGripActive = self.gripActive
-    
-    -- Get controller source based on index
-    local controller
-    if self.controllerIndex == 1 then
-        controller = uevr.params.vr.get_left_joystick_source()
-    else
-        controller = uevr.params.vr.get_right_joystick_source()
-    end
+    self.pastActionState = self.actionState
     
     -- Update button states
-    self.triggerActive = uevr.params.vr.is_action_active(self.triggerHandle, controller)
-    self.gripActive = uevr.params.vr.is_action_active(self.gripHandle, controller)
+    self.actionState = uevr.params.vr.is_action_active(self.handle, self.controller)
     
     -- Gesture is considered active if any button is pressed
-    return self.triggerActive or self.gripActive
+    return self.actionState
 end
 
 -- Helper functions for state transitions
-function MotionControllerJoystickState:TriggerJustPressed()
-    return self.triggerActive and not self.wasTriggerActive
+function MotionControllerAction:HasActivated()
+    return self.actionState and not self.pastActionState
 end
 
-function MotionControllerJoystickState:TriggerJustReleased()
-    return not self.triggerActive and self.wasTriggerActive
+function MotionControllerAction:HasDeactivated()
+    return not self.actionState and self.pastActionState
 end
 
-function MotionControllerJoystickState:GripJustPressed()
-    return self.gripActive and not self.wasGripActive
-end
-
-function MotionControllerJoystickState:GripJustReleased()
-    return not self.gripActive and self.wasGripActive
-end
-
-function MotionControllerJoystickState:Reset()
+function MotionControllerAction:Reset()
     GestureBase.Reset(self)
-    self.triggerActive = false
-    self.gripActive = false
-    self.wasTriggerActive = false
-    self.wasGripActive = false
+    self.actionState = false
+    self.pastActionState = false
+    self.handle = nil
+    self.controller = nil
+    self.isInitialized = false
 end
 
--- Left Controller Joystick State
-local LeftJoystickState = MotionControllerJoystickState:new({
-    name = "Left Joystick State",
-    controllerIndex = 1
+local LeftGripAction = MotionControllerAction:new({
+    name = "Left Grip Action",
+    controllerIndex = 1,
+    handle_name = "/actions/default/in/Grip"
 })
 
--- Right Controller Joystick State
-local RightJoystickState = MotionControllerJoystickState:new({
-    name = "Right Joystick State",
-    controllerIndex = 2
+function LeftGripAction:Execute(context)
+    if self:IsLocked() then
+        context.gamepad:unpressButton(XINPUT_GAMEPAD_LEFT_SHOULDER) -- XINPUT_GAMEPAD_LEFT_SHOULDER
+    end
+end
+
+local RightGripAction = MotionControllerAction:new({
+    name = "Right Grip Action",
+    controllerIndex = 2,
+    handle_name = "/actions/default/in/Grip"
 })
+
+function RightGripAction:Execute(context)
+    if self:IsLocked() then
+        context.gamepad:unpressButton(XINPUT_GAMEPAD_RIGHT_SHOULDER) -- XINPUT_GAMEPAD_RIGHT_SHOULDER
+    end
+end
+
+local LeftTriggerAction = MotionControllerAction:new({
+    name = "Left Trigger Action",
+    controllerIndex = 1,
+    handle_name = "/actions/default/in/Trigger"
+})
+
+function LeftTriggerAction:Execute(context)
+    if self:IsLocked() then
+        context.gamepad:unpressButton(XINPUT_GAMEPAD_LEFT_TRIGGER) -- XINPUT_GAMEPAD_LEFT_TRIGGER
+    end
+end
+
+local RightTriggerAction = MotionControllerAction:new({
+    name = "Right Trigger Action",
+    controllerIndex = 2,
+    handle_name = "/actions/default/in/Trigger"
+})
+
+function RightTriggerAction:Execute(context)
+    if self:IsLocked() then
+        context.gamepad:unpressButton(XINPUT_GAMEPAD_RIGHT_TRIGGER) -- XINPUT_GAMEPAD_RIGHT_TRIGGER
+    end
+end
 
 return {
     LeftMotionControllerGesture = LeftMotionControllerGesture,
     RightMotionControllerGesture = RightMotionControllerGesture,
     HMDGesture = HMDGesture,
-    LeftJoystickState = LeftJoystickState,
-    RightJoystickState = RightJoystickState
+    LeftGripAction = LeftGripAction,
+    RightGripAction = RightGripAction,
+    LeftTriggerAction = LeftTriggerAction,
+    RightTriggerAction = RightTriggerAction
 }
