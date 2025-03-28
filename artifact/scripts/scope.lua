@@ -434,17 +434,19 @@ local function Get_ScopeHmdDistance()
 end
 
 local function Recalculate_FOV(c_pawn)	
-	if Get_ScopeHmdDistance()>=5.5 then
+	if scope_plane_component ~=nil then
+		if Get_ScopeHmdDistance()>=5.5 then
+			--pcall(function()
+			fov= 30*(desiredFOV* (2* math.atan(2.5/Get_ScopeHmdDistance())/(90/180*math.pi)))/94	
+			--end)
+		else 
 		--pcall(function()
-		fov= 30*(desiredFOV* (2* math.atan(2.5/Get_ScopeHmdDistance())/(90/180*math.pi)))/94	
+			fov= 30*(desiredFOV* (2* math.atan(2.5/Get_ScopeHmdDistance())/(90/180*math.pi)))/(94-(5.5-Get_ScopeHmdDistance())*3^2.7)	
 		--end)
-	else 
-	--pcall(function()
-		fov= 30*(desiredFOV* (2* math.atan(2.5/Get_ScopeHmdDistance())/(90/180*math.pi)))/(94-(5.5-Get_ScopeHmdDistance())*3^2.7)	
-	--end)
+		end
+			--print(Get_ScopeHmdDistance())
+			scene_capture_component.FOVAngle = fov
 	end
-		--print(Get_ScopeHmdDistance())
-		scene_capture_component.FOVAngle = fov
 end
 
 
@@ -509,6 +511,7 @@ uevr.sdk.callbacks.on_pre_engine_tick(
             end
         end
         switch_scope_state(c_pawn)
+		
 		Recalculate_FOV(c_pawn)	
     end
 )
