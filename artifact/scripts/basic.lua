@@ -1,8 +1,3 @@
-require(".\\Base\\scope")
-basicInit=true
-if scopeInit then
-	print("scope script loaded")
-end
 local api = uevr.api
 local vr = uevr.params.vr
 

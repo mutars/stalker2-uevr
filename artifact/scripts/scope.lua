@@ -1,8 +1,5 @@
-require(".\\Base\\HolsterScript")
-scopeInit=true
-if HolsterInit then
-	print("HolsterScript loaded")
-end
+require("Trackers")
+
 local api = uevr.api
 local vr = uevr.params.vr
 
