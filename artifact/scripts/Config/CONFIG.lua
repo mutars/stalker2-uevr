@@ -5,3 +5,6 @@
 	 SwapLShoulderLThumb =true --sprinting switch with l shoulder
 	 SitMode=false
 	 
+	 
+	 configInit=true
+	 
