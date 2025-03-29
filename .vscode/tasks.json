@@ -15,6 +15,9 @@
             "presentation": {
                 "reveal": "always",
                 "panel": "new"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/artifact/scripts"
             }
         }
     ]

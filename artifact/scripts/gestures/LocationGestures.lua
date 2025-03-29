@@ -213,8 +213,8 @@ function RightHandRelativeToLeftLocationGesture:EvaluateInternal(context)
 end
 
 return {
-    LeftHandLocationGesture = LeftHandLocationGesture,
-    RightHandLocationGesture = RightHandLocationGesture,
+    LeftHand = LeftHandLocationGesture,
+    RightHand = RightHandLocationGesture,
     LeftHandRelativeToRightLocationGesture = LeftHandRelativeToRightLocationGesture,
     RightHandRelativeToLeftLocationGesture = RightHandRelativeToLeftLocationGesture
 }
