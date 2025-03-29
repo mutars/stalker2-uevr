@@ -244,16 +244,24 @@ void Stalker2VR::on_custom_event(const char *event_name, const char *event_data)
 }
 
 void Stalker2VR::hook() {
-    auto apc = (API::UClass*)API::get()->find_uobject(L"Class /Script/Stalker2.PC");
-    auto obj = apc->get_class_default_object();
-    auto vtable = *(uintptr_t**)obj;
-    // 48 89 5C 24 18 57 48 81 EC 90 00 00 00 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 84 24 80 00 00 00 48 8B FA 48 8B D9 48
-    auto source_of_damage = vtable[307];
-    m_on_get_weapon_forward_hook_id = API::get()->param()->functions->register_inline_hook((void*)source_of_damage, (void*)&on_get_weapon_forward, (void**)&m_original_on_get_weapon_forward);
-    if(m_on_get_weapon_forward_hook_id == -1) {
-        PLUGIN_LOG_ONCE_ERROR("Failed to hook on_get_weapon_forward");
-    }
     const auto mod      = utility::get_executable();
+
+    // auto apc = (API::UClass*)API::get()->find_uobject(L"Class /Script/Stalker2.PC");
+    // auto obj = apc->get_class_default_object();
+    // auto vtable = *(uintptr_t**)obj;
+    //    auto source_of_damage = vtable[307];
+   // 48 89 5C 24 18 57 48 81 EC 90 00 00 00 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 80 00 00 00 48 8B FA 48 8B D9 48 8D 54
+   static auto const get_weapon_origin_pattern = "48 89 5C 24 18 57 48 81 EC 90 00 00 00 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 80 00 00 00 48 8B FA 48 8B D9 48 8D 54";
+   static auto get_weapon_origin_func_addr = utility::scan(mod, get_weapon_origin_pattern);
+
+   if(get_weapon_origin_func_addr) {
+        m_on_get_weapon_forward_hook_id = API::get()->param()->functions->register_inline_hook((void*)get_weapon_origin_func_addr.value(), (void*)&on_get_weapon_forward, (void**)&m_original_on_get_weapon_forward);
+        if(m_on_get_weapon_forward_hook_id == -1) {
+            PLUGIN_LOG_ONCE_ERROR("Failed to hook on_get_weapon_forward");
+        }
+   } else {
+        PLUGIN_LOG_ONCE_ERROR("Failed to find get_weapon_origin function");
+   }
 
 //    const auto func_addr = (uintptr_t )mod + 0x4aebaa0;
     // UMaterialInstanceDynamic::SetScalarParameterValue
