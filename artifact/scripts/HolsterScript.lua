@@ -1,3 +1,5 @@
+require("CONFIG")
+require("Trackers")
 --CONFIG--
 --------	
 	local isRhand = true

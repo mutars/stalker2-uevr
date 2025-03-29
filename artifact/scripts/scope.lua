@@ -1,8 +1,11 @@
+require("Trackers")
+
 local api = uevr.api
 local vr = uevr.params.vr
 
 local emissive_material_amplifier = 2.0 
 local fov = 2.0
+local desiredFOV=60
 
 -- Static variables
 local emissive_mesh_material_name = "Material /Engine/EngineMaterials/EmissiveMeshMaterial.EmissiveMeshMaterial"
@@ -420,6 +423,33 @@ local function switch_scope_state(pawn)
         scene_capture_component:SetVisibility(current_scope_state)
     end
 end
+local function Get_ScopeHmdDistance()
+	local scope_plane_position = scope_plane_component:K2_GetComponentLocation()
+	local hmdPos = hmd_component:K2_GetComponentLocation()
+	local Diff= math.sqrt((hmdPos.x-scope_plane_position.x)^2+(hmdPos.y-scope_plane_position.y)^2+(hmdPos.z-scope_plane_position.z)^2)
+	--if Diff <=2.5 then
+	--	Diff=2.5
+	--end
+	return Diff
+end
+
+local function Recalculate_FOV(c_pawn)	
+	if scope_plane_component ~=nil then
+		if Get_ScopeHmdDistance()>=5.5 then
+			--pcall(function()
+			fov= 30*(desiredFOV* (2* math.atan(2.5/Get_ScopeHmdDistance())/(90/180*math.pi)))/94	
+			--end)
+		else 
+		--pcall(function()
+			fov= 30*(desiredFOV* (2* math.atan(2.5/Get_ScopeHmdDistance())/(90/180*math.pi)))/(94-(5.5-Get_ScopeHmdDistance())*3^2.7)	
+		--end)
+		end
+			--print(Get_ScopeHmdDistance())
+			scene_capture_component.FOVAngle = fov
+	end
+end
+
+
 
 -- Initialize static objects when the script loads
 if not init_static_objects() then
@@ -481,6 +511,8 @@ uevr.sdk.callbacks.on_pre_engine_tick(
             end
         end
         switch_scope_state(c_pawn)
+		
+		Recalculate_FOV(c_pawn)	
     end
 )
 
