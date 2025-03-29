@@ -1,11 +1,12 @@
-require("Trackers")
-
+require(".\\Base\\Trackers\\Trackers")
+require(".\\Config\\CONFIG")
+scopeInit=true
 local api = uevr.api
 local vr = uevr.params.vr
 
 local emissive_material_amplifier = 2.0 
 local fov = 2.0
-local desiredFOV=60
+local desiredFOV=60 --needs to pull from game later
 
 -- Static variables
 local emissive_mesh_material_name = "Material /Engine/EngineMaterials/EmissiveMeshMaterial.EmissiveMeshMaterial"

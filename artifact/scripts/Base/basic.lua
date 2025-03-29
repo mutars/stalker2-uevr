@@ -1,3 +1,7 @@
+require(".\\Base\\Trackers\\Trackers")
+require(".\\Config\\CONFIG")
+basicInit=true
+
 local api = uevr.api
 local vr = uevr.params.vr
 
@@ -6,7 +10,7 @@ local two_hand_aiming = true
 local ignore_aiming_state = true
 
 --Config Recoil
-local isUpRecoilActive= true --on /off
+--local isUpRecoilActive= true --on /off
 -- local variables for Recoil
 local VertDiff=0
 local RotDiff=0

@@ -1,4 +1,5 @@
 --require("UEHelper")
+	TrackersInit=true
 	local api = uevr.api
 	
 	local params = uevr.params
