@@ -1,4 +1,5 @@
-local GestureBase = require("artifact.scripts.gestures.GestureBase")
+local GestureBase = require("gestures.GestureBase")
+local motionControllers = require("gestures.MotionControllerGestures")
 
 -- Base Location Gesture class
 local LocationGestureBase = GestureBase:new({
@@ -28,17 +29,17 @@ local LeftHandLocationGesture = LocationGestureBase:new({
 function LeftHandLocationGesture:new(config)
     config = config or {}
     -- Populate dependencies from fields
-    config.dependencies = {}
-    if config.leftHand then table.insert(config.dependencies, config.leftHand) end
-    if config.hmd then table.insert(config.dependencies, config.hmd) end
     setmetatable(config, self)
     self.__index = self
+    self.leftHand = motionControllers.LeftMotionControllerGesture
+    self.hmd = motionControllers.HMDGesture
+    table.insert(config.dependencies, self.leftHand)
+    table.insert(config.dependencies, self.hmd)
     return config
 end
 
 function LeftHandLocationGesture:EvaluateInternal(context)
-    if not self.leftHand or not self.hmd or
-       not self.leftHand.isActive or not self.hmd.isActive then
+    if not self.leftHand or not self.hmd then
         return false
     end
 
@@ -64,17 +65,17 @@ local RightHandLocationGesture = LocationGestureBase:new({
 function RightHandLocationGesture:new(config)
     config = config or {}
     -- Populate dependencies from fields
-    config.dependencies = {}
-    if config.rightHand then table.insert(config.dependencies, config.rightHand) end
-    if config.hmd then table.insert(config.dependencies, config.hmd) end
     setmetatable(config, self)
     self.__index = self
+    self.rightHand = motionControllers.RightMotionControllerGesture
+    self.hmd = motionControllers.HMDGesture
+    table.insert(config.dependencies, self.rightHand)
+    table.insert(config.dependencies, self.hmd)
     return config
 end
 
 function RightHandLocationGesture:EvaluateInternal(context)
-    if not self.rightHand or not self.hmd or
-       not self.rightHand.isActive or not self.hmd.isActive then
+    if not self.rightHand or not self.hmd then
         return false
     end
 
@@ -101,11 +102,12 @@ local LeftHandRelativeToRightLocationGesture = LocationGestureBase:new({
 function LeftHandRelativeToRightLocationGesture:new(config)
     config = config or {}
     -- Populate dependencies from fields
-    config.dependencies = {}
-    if config.leftHand then table.insert(config.dependencies, config.leftHand) end
-    if config.rightHand then table.insert(config.dependencies, config.rightHand) end
     setmetatable(config, self)
     self.__index = self
+    self.leftHand = motionControllers.LeftMotionControllerGesture
+    self.rightHand = motionControllers.RightMotionControllerGesture
+    table.insert(self.dependencies, self.leftHand)
+    table.insert(self.dependencies, self.rightHand)
     return config
 end
 
@@ -161,17 +163,17 @@ local RightHandRelativeToLeftLocationGesture = LocationGestureBase:new({
 function RightHandRelativeToLeftLocationGesture:new(config)
     config = config or {}
     -- Populate dependencies from fields
-    config.dependencies = {}
-    if config.rightHand then table.insert(config.dependencies, config.rightHand) end
-    if config.leftHand then table.insert(config.dependencies, config.leftHand) end
     setmetatable(config, self)
     self.__index = self
+    self.leftHand = motionControllers.LeftMotionControllerGesture
+    self.rightHand = motionControllers.RightMotionControllerGesture
+    table.insert(self.dependencies, self.leftHand)
+    table.insert(self.dependencies, self.rightHand)
     return config
 end
 
 function RightHandRelativeToLeftLocationGesture:EvaluateInternal(context)
-    if not self.rightHand or not self.leftHand or
-       not self.rightHand.isActive or not self.leftHand.isActive then
+    if not self.rightHand or not self.leftHand then
         return false
     end
 

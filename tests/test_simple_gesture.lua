@@ -4,7 +4,7 @@
 ]]--
 
 local LuaTest = require("tests.luatest")
-local GestureBase = require("artifact.scripts.gestures.GestureBase")
+local GestureBase = require("GestureBase")
 
 -- A simple test gesture for demonstration
 local SimpleGesture = GestureBase:new({

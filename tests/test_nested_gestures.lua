@@ -4,8 +4,8 @@
 ]]--
 
 local LuaTest = require("tests.luatest")
-local GestureBase = require("artifact.scripts.gestures.GestureBase")
-local GestureSet = require("artifact.scripts.gestures.GestureSet")
+local GestureBase = require("GestureBase")
+local GestureSet = require("GestureSet")
 
 -- Create mock gestures that track their evaluation order
 local evaluationOrder = {}

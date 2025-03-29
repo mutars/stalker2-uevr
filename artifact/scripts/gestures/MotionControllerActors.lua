@@ -1,20 +1,8 @@
+local utils = require("common.utils")
+
 local MotionControllerActors = {}
 
 -- Helper functions for finding objects
-local function find_required_object(name)
-    local obj = uevr.api:find_uobject(name)
-    if not obj then
-        error("Cannot find " .. name)
-        return nil
-    end
-
-    return obj
-end
-
-local function find_static_class(name)
-    local c = find_required_object(name)
-    return c:get_class_default_object()
-end
 
 -- Initialize the module
 function MotionControllerActors:new()
@@ -30,14 +18,14 @@ function MotionControllerActors:new()
     instance.hmd_component = nil
     
     -- Required UObject classes
-    instance.game_engine_class = find_required_object("Class /Script/Engine.GameEngine")
-    instance.actor_c = find_required_object("Class /Script/Engine.Actor")
-    instance.motion_controller_component_c = find_required_object("Class /Script/HeadMountedDisplay.MotionControllerComponent")
-    instance.scene_component_c = find_required_object("Class /Script/Engine.SceneComponent")
-    instance.ftransform_c = find_required_object("ScriptStruct /Script/CoreUObject.Transform")
+    instance.game_engine_class = utils.find_required_object("Class /Script/Engine.GameEngine")
+    instance.actor_c = utils.find_required_object("Class /Script/Engine.Actor")
+    instance.motion_controller_component_c = utils.find_required_object("Class /Script/HeadMountedDisplay.MotionControllerComponent")
+    instance.scene_component_c = utils.find_required_object("Class /Script/Engine.SceneComponent")
+    instance.ftransform_c = utils.find_required_object("ScriptStruct /Script/CoreUObject.Transform")
     instance.temp_transform = StructObject.new(instance.ftransform_c)
-    instance.kismet_string_library = find_static_class("Class /Script/Engine.KismetStringLibrary")
-    instance.statics = find_static_class("Class /Script/Engine.GameplayStatics")
+    instance.kismet_string_library = utils.find_static_class("Class /Script/Engine.KismetStringLibrary")
+    instance.statics = utils.find_static_class("Class /Script/Engine.GameplayStatics")
 
     return instance
 end

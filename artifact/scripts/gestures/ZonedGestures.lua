@@ -1,4 +1,4 @@
-local GestureBase = require("artifact.scripts.gestures.GestureBase")
+local GestureBase = require("gestures.GestureBase")
 
 -- Base Body Zone Gesture class
 local BodyZoneGesture = GestureBase:new({

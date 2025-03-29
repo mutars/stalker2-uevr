@@ -102,13 +102,19 @@ function GestureBase:SetExecutionCallback(callback)
     return self -- Allow method chaining
 end
 
+function GestureBase:AddDependency(dependency)
+    table.insert(self.dependencies, dependency)
+    return self -- Allow method chaining
+end
+
 
 -- Create a new instance of the gesture
 function GestureBase:new(config)
     config = config or {}
     setmetatable(config, self)
     self.__index = self
-    
+    config.dependencies = config.dependencies or {}
+
     -- Always generate a new ID for each instance
     global_id_sequence = global_id_sequence + 1
     config.id = global_id_sequence

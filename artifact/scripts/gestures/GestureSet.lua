@@ -70,11 +70,11 @@ function GestureSet:Update(context)
 end
 
 -- Create a new instance of the controller
-function GestureSet:new()
-    local instance = {}
-    setmetatable(instance, self)
+function GestureSet:new(config)
+    config = config or {}
+    setmetatable(config, self)
     self.__index = self
-    return instance
+    return config
 end
 
 return GestureSet

@@ -3,11 +3,13 @@
     Gesture that activates when a motion controller is near the head and grip button is pressed
 ]]--
 
-local GestureBase = require("artifact.scripts.gestures.GestureBase")
+local GestureBase = require("gestures.GestureBase")
+local BodyZones = require("gestures.BodyZones")
+local motionControllers = require("gestures.MotionControllerGestures")
 
--- FlashlightGesture: Activates when controller is near head with grip pressed
+-- FlashlightGesture: Base class for flashlight gestures
 local FlashlightGesture = GestureBase:new({
-    name = "Flashlight Gesture",
+    name = "Flashlight Gesture Base",
     
     -- The grip gesture to check for grip button
     gripGesture = nil,
@@ -17,10 +19,6 @@ local FlashlightGesture = GestureBase:new({
 })
 
 function FlashlightGesture:new(config)
-    if not config.gripGesture or not config.headZone then
-        error("gripGesture and headZone are required for FlashlightGesture")
-    end
-    
     -- Set up dependencies
     config.dependencies = {
         config.gripGesture,
@@ -42,6 +40,21 @@ function FlashlightGesture:EvaluateInternal(context)
     end
 end
 
+-- Create specific instances for Left Hand and Right Hand
+local flashlightGestureRH = FlashlightGesture:new({
+    name = "Flashlight Gesture (RH)",
+    gripGesture = motionControllers.RightGrip,
+    headZone = BodyZones.headZoneRH
+})
+
+local flashlightGestureLH = FlashlightGesture:new({
+    name = "Flashlight Gesture (LH)",
+    gripGesture = motionControllers.LeftGrip,
+    headZone = BodyZones.headZoneLH
+})
+
 return {
-    FlashlightGesture = FlashlightGesture
+    FlashlightGesture = FlashlightGesture,
+    flashlightGestureRH = flashlightGestureRH,
+    flashlightGestureLH = flashlightGestureLH
 }

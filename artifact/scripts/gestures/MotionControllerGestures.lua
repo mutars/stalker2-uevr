@@ -1,4 +1,5 @@
-local GestureBase = require("artifact.scripts.gestures.GestureBase")
+local GestureBase = require("gestures.GestureBase")
+local motionControllerActors = require("gestures.MotionControllerActors")
 
 -- Base Motion Controller Gesture class
 local MotionControllerGesture = GestureBase:new({
@@ -10,18 +11,14 @@ local MotionControllerGesture = GestureBase:new({
     pastRotation = Vector3f.new(0, 0, 0)
 })
 
-function MotionControllerGesture:EvaluateInternal(context)
-    if not context or not context.motionControllers then
-        return false
-    end
-    
+function MotionControllerGesture:EvaluateInternal(context)    
     -- Store past values
     self.pastLocation = Vector3f.new(self.location.x, self.location.y, self.location.z)
     self.pastRotation = Vector3f.new(self.rotation.x, self.rotation.y, self.rotation.z)
     
     -- Get current position and rotation
-    self.location = context.motionControllers:GetLocationByIndex(self.controllerIndex)
-    self.rotation = context.motionControllers:GetRotationByIndex(self.controllerIndex)
+    self.location = motionControllerActors:GetLocationByIndex(self.controllerIndex)
+    self.rotation = motionControllerActors:GetRotationByIndex(self.controllerIndex)
     
     return self.location ~= nil and self.rotation ~= nil
 end
@@ -65,9 +62,6 @@ function MotionControllerAction:InitHandle()
         else
             self.controller = uevr.params.vr.get_right_joystick_source()
         end
-
-        -- self.handle = uevr.params.vr.get_action_handle("/actions/default/in/Trigger")
-        -- self.gripHandle = uevr.params.vr.get_action_handle("/actions/default/in/Grip")
         self.isInitialized = true
     end
 end

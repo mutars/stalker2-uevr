@@ -4,8 +4,8 @@
 ]]--
 
 local LuaTest = require("tests.luatest")
-local GestureBase = require("artifact.scripts.gestures.GestureBase")
-local ZonedGestures = require("artifact.scripts.gestures.ZonedGestures")
+local GestureBase = require("GestureBase")
+local ZonedGestures = require("ZonedGestures")
 
 -- Create a mock location gesture for testing
 local MockLocationGesture = GestureBase:new({
