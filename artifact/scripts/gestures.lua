@@ -45,16 +45,16 @@ gestureSet = gestureSet:new(
 )
 
 uevr.sdk.callbacks.on_pre_engine_tick(
-	function(engine, delta)
+    function(engine, delta)
         motionControllerActors:Update(engine) -- Try to initialize if not already
         -- Update the gesture set with the current engine state
         gestureSet:Update({})
-        gripGestureLH:Execute() -- Execute the left grip gesture to check if it should activate
-        gripGestureRH:Execute() -- Execute the right grip gesture to check if it should activate
-
-
-        -- You can add any additional logic here that needs to run on each tick
-        -- For example, checking if a specific gesture was performed
+        
+        -- Execute all gestures to check their state
+        flashlight.flashlightGestureLH:Execute({}) -- Execute left hand flashlight gesture
+        flashlight.flashlightGestureRH:Execute({}) -- Execute right hand flashlight gesture
+        gripGestureLH:Execute({}) -- Execute the left grip gesture
+        gripGestureRH:Execute({}) -- Execute the right grip gesture
     end
 )
 

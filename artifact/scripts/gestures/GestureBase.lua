@@ -93,7 +93,7 @@ function GestureBase:JustDeactivated()
 end
 
 function GestureBase:SetExecutionCallback(callback)
-    if type(callback) ~= "function" then
+    if callback and type(callback) ~= "function" then
         error("Execution callback must be a function")
     end
     self.executionCallback = callback

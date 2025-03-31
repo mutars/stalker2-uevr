@@ -13,6 +13,7 @@ FlashlightGesture = GestureBase:new({
     gripGesture = nil,
     headZone = nil,
 })
+FlashlightGesture.__index = FlashlightGesture
 
 function FlashlightGesture:new(config)
     -- Set up dependencies
@@ -23,21 +24,23 @@ function FlashlightGesture:new(config)
     if not config.headZone then
         error("headZone is required for FlashlightGesture")
     end
-    local instance = setmetatable(config, FlashlightGesture)
-    instance.__index = FlashlightGesture
+    
+    local instance = GestureBase.new(self, config)
+    
     if not instance.gripGesture or not instance.headZone then
         error("FlashlightGesture requires both gripGesture and headZone to be set")
     end
+    
     instance:AddDependency(instance.gripGesture) -- Ensure gripGesture is a dependency
     instance:AddDependency(instance.headZone) -- Ensure headZone is a dependency
     return instance
 end
 
 function FlashlightGesture:EvaluateInternal(context)
-    if self.gripGesture:isLocked() then
+    if self.gripGesture:IsLocked() then
         return false
     end
-    local isActive = self.gripGesture:JustActivated() and self.headZone:isActive()
+    local isActive = self.gripGesture:JustActivated() and self.headZone:IsActive()
     if isActive then
         self.gripGesture:Lock()
     end

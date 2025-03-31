@@ -14,9 +14,8 @@ function LocationGestureBase:new(config)
     config.location = Vector3f.new(0, 0, 0)
     config.rotation = Vector3f.new(0, 0, 0)
     config.weaponLocation = Vector3f.new(0, 0, 0)
-    setmetatable(config, self)
-    self.__index = self
-    return config
+    local instance = GestureBase.new(self, config)
+    return instance
 end
 
 -- Left Hand Location Gesture
@@ -29,13 +28,13 @@ local LeftHandLocationGesture = LocationGestureBase:new({
 function LeftHandLocationGesture:new(config)
     config = config or {}
     -- Populate dependencies from fields
-    setmetatable(config, self)
-    self.__index = self
-    self.leftHand = motionControllers.LeftMotionControllerGesture
-    self.hmd = motionControllers.HMDGesture
-    table.insert(config.dependencies, self.leftHand)
-    table.insert(config.dependencies, self.hmd)
-    return config
+    config.leftHand = motionControllers.LeftMotionControllerGesture
+    config.hmd = motionControllers.HMDGesture
+
+    local instance = GestureBase.new(self, config)
+    instance:AddDependency(instance.leftHand)
+    instance:AddDependency(instance.hmd)
+    return instance
 end
 
 function LeftHandLocationGesture:EvaluateInternal(context)
@@ -64,14 +63,13 @@ local RightHandLocationGesture = LocationGestureBase:new({
 
 function RightHandLocationGesture:new(config)
     config = config or {}
-    -- Populate dependencies from fields
-    setmetatable(config, self)
-    self.__index = self
-    self.rightHand = motionControllers.RightMotionControllerGesture
-    self.hmd = motionControllers.HMDGesture
-    table.insert(config.dependencies, self.rightHand)
-    table.insert(config.dependencies, self.hmd)
-    return config
+    config.rightHand = motionControllers.RightMotionControllerGesture
+    config.hmd = motionControllers.HMDGesture
+
+    local instance = GestureBase.new(self, config)
+    instance:AddDependency(instance.rightHand)
+    instance:AddDependency(instance.hmd)
+    return instance
 end
 
 function RightHandLocationGesture:EvaluateInternal(context)
@@ -102,13 +100,12 @@ local LeftHandRelativeToRightLocationGesture = LocationGestureBase:new({
 function LeftHandRelativeToRightLocationGesture:new(config)
     config = config or {}
     -- Populate dependencies from fields
-    setmetatable(config, self)
-    self.__index = self
-    self.leftHand = motionControllers.LeftMotionControllerGesture
-    self.rightHand = motionControllers.RightMotionControllerGesture
-    table.insert(self.dependencies, self.leftHand)
-    table.insert(self.dependencies, self.rightHand)
-    return config
+    config.leftHand = motionControllers.LeftMotionControllerGesture
+    config.rightHand = motionControllers.RightMotionControllerGesture
+    local instance = GestureBase.new(self, config)
+    instance:AddDependency(instance.leftHand)
+    instance:AddDependency(instance.rightHand)
+    return instance
 end
 
 function LeftHandRelativeToRightLocationGesture:EvaluateInternal(context)
@@ -163,13 +160,12 @@ local RightHandRelativeToLeftLocationGesture = LocationGestureBase:new({
 function RightHandRelativeToLeftLocationGesture:new(config)
     config = config or {}
     -- Populate dependencies from fields
-    setmetatable(config, self)
-    self.__index = self
-    self.leftHand = motionControllers.LeftMotionControllerGesture
-    self.rightHand = motionControllers.RightMotionControllerGesture
-    table.insert(self.dependencies, self.leftHand)
-    table.insert(self.dependencies, self.rightHand)
-    return config
+    config.leftHand = motionControllers.LeftMotionControllerGesture
+    config.rightHand = motionControllers.RightMotionControllerGesture
+    local instance = GestureBase.new(self, config)
+    instance:AddDependency(instance.leftHand)
+    instance:AddDependency(instance.rightHand)
+    return instance
 end
 
 function RightHandRelativeToLeftLocationGesture:EvaluateInternal(context)
@@ -212,9 +208,14 @@ function RightHandRelativeToLeftLocationGesture:EvaluateInternal(context)
     return true
 end
 
+local LeftHand = LeftHandLocationGesture:new()
+local RightHand = RightHandLocationGesture:new()
+local LeftHandRelativeToRight = LeftHandRelativeToRightLocationGesture:new()
+local RightHandRelativeToLeft = RightHandRelativeToLeftLocationGesture:new()
+
 return {
-    LeftHand = LeftHandLocationGesture,
-    RightHand = RightHandLocationGesture,
-    LeftHandRelativeToRightLocationGesture = LeftHandRelativeToRightLocationGesture,
-    RightHandRelativeToLeftLocationGesture = RightHandRelativeToLeftLocationGesture
+    LeftHand = LeftHand,
+    RightHand = RightHand,
+    LeftHandRelativeToRightLocationGesture = LeftHandRelativeToRight,
+    RightHandRelativeToLeftLocationGesture = RightHandRelativeToLeft
 }

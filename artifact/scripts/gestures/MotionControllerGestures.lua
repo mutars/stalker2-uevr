@@ -84,23 +84,11 @@ local LeftGripAction = MotionControllerAction:new({
     handle_name = "/actions/default/in/Grip"
 })
 
-function LeftGripAction:Execute(context)
-    if self:IsLocked() then
-        context.gamepad:unpressButton(XINPUT_GAMEPAD_LEFT_SHOULDER) -- XINPUT_GAMEPAD_LEFT_SHOULDER
-    end
-end
-
 local RightGripAction = MotionControllerAction:new({
     name = "Right Grip Action",
     controllerIndex = 2,
     handle_name = "/actions/default/in/Grip"
 })
-
-function RightGripAction:Execute(context)
-    if self:IsLocked() then
-        context.gamepad:unpressButton(XINPUT_GAMEPAD_RIGHT_SHOULDER) -- XINPUT_GAMEPAD_RIGHT_SHOULDER
-    end
-end
 
 local LeftTriggerAction = MotionControllerAction:new({
     name = "Left Trigger Action",
@@ -108,23 +96,11 @@ local LeftTriggerAction = MotionControllerAction:new({
     handle_name = "/actions/default/in/Trigger"
 })
 
-function LeftTriggerAction:Execute(context)
-    if self:IsLocked() then
-        context.gamepad:unpressButton(XINPUT_GAMEPAD_LEFT_TRIGGER) -- XINPUT_GAMEPAD_LEFT_TRIGGER
-    end
-end
-
 local RightTriggerAction = MotionControllerAction:new({
     name = "Right Trigger Action",
     controllerIndex = 2,
     handle_name = "/actions/default/in/Trigger"
 })
-
-function RightTriggerAction:Execute(context)
-    if self:IsLocked() then
-        context.gamepad:unpressButton(XINPUT_GAMEPAD_RIGHT_TRIGGER) -- XINPUT_GAMEPAD_RIGHT_TRIGGER
-    end
-end
 
 return {
     LeftMotionControllerGesture = LeftMotionControllerGesture,
