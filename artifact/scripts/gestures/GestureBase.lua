@@ -4,7 +4,7 @@
 ]]--
 local global_id_sequence = 0
 
-local GestureBase = {
+GestureBase = {
     -- Unique identifier for the gesture
     id = nil,
     
@@ -23,9 +23,7 @@ local GestureBase = {
     executionCallback = nil,
     
     -- List of dependencies (other gestures this one depends on)
-    dependencies = {},
-    
-    config = {}
+    dependencies = {}
 }
 
 function GestureBase:Update(visited, context)

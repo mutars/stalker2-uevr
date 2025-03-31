@@ -1,6 +1,6 @@
 local utils = require("common.utils")
 
-local MotionControllerActors = {}
+MotionControllerActors = {}
 
 -- Helper functions for finding objects
 
@@ -23,7 +23,7 @@ function MotionControllerActors:new()
     instance.motion_controller_component_c = utils.find_required_object("Class /Script/HeadMountedDisplay.MotionControllerComponent")
     instance.scene_component_c = utils.find_required_object("Class /Script/Engine.SceneComponent")
     instance.ftransform_c = utils.find_required_object("ScriptStruct /Script/CoreUObject.Transform")
-    instance.temp_transform = StructObject.new(instance.ftransform_c)
+    instance.zero_transform = StructObject.new(instance.ftransform_c)
     instance.kismet_string_library = utils.find_static_class("Class /Script/Engine.KismetStringLibrary")
     instance.statics = utils.find_static_class("Class /Script/Engine.GameplayStatics")
 
@@ -32,26 +32,22 @@ end
 
 -- Spawn an actor at the given location
 function MotionControllerActors:spawn_actor(world_context, actor_class, location, collision_method, owner)
-    self.temp_transform.Translation = location
-    self.temp_transform.Rotation.W = 1.0
-    self.temp_transform.Scale3D = Vector3f.new(1.0, 1.0, 1.0)
+    self.zero_transform.Translation = location
+    self.zero_transform.Rotation.W = 1.0 -- Set rotation to identity
+    self.zero_transform.Scale3D = Vector3f.new(1.0, 1.0, 1.0) -- Default scale
 
-    local actor = self.statics:BeginDeferredActorSpawnFromClass(world_context, actor_class, self.temp_transform, collision_method, owner)
-
+    local actor = self.statics:BeginDeferredActorSpawnFromClass(world_context, actor_class, self.zero_transform, collision_method, owner)
     if actor == nil then
         print("Failed to spawn actor")
         return nil
     end
 
-    self.statics:FinishSpawningActor(actor, self.temp_transform)
-
+    self.statics:FinishSpawningActor(actor, self.zero_transform)
     return actor
 end
 
 -- Get the game world
-function MotionControllerActors:GetWorld()
-    local engine = UEVR_UObjectHook.get_first_object_by_class(self.game_engine_class)
-    
+function MotionControllerActors:GetWorld(engine)
     if not engine then
         return nil
     end
@@ -66,6 +62,8 @@ end
 
 -- Reset all hand actors
 function MotionControllerActors:Reset()
+    self.inited = false
+
     -- We are using pcall on this because for some reason the actors are not always valid
     -- even if exists returns true
     if self.left_hand_actor ~= nil and UEVR_UObjectHook.exists(self.left_hand_actor) then
@@ -117,20 +115,26 @@ function MotionControllerActors:Validate()
         self.hmd_component = nil
     end
     
-    return self.left_hand_actor == nil or self.right_hand_actor == nil or self.hmd_actor == nil
+    local needs_respawn = self.left_hand_actor == nil or self.right_hand_actor == nil or self.hmd_actor == nil
+    if needs_respawn then
+        self.inited = false
+    end
+    return needs_respawn
 end
 
 -- Initialize hand actors
-function MotionControllerActors:Init()
-    local world = self:GetWorld()
+function MotionControllerActors:Init(engine)
+    local world = self:GetWorld(engine)
     if not world then
         print("World is nil")
+        self.inited = false
         return false
     end
 
     local pawn = uevr.api:get_local_pawn(0)
     if not pawn then
         print("Pawn is nil")
+        self.inited = false
         return false
     end
 
@@ -143,6 +147,7 @@ function MotionControllerActors:Init()
 
     if not self.left_hand_actor or not self.right_hand_actor or not self.hmd_actor then
         print("Failed to spawn actors")
+        self.inited = false
         return false
     end
 
@@ -153,6 +158,7 @@ function MotionControllerActors:Init()
 
     if not self.left_hand_component or not self.right_hand_component or not self.hmd_component then
         print("Failed to add components")
+        self.inited = false
         return false
     end
 
@@ -173,7 +179,15 @@ function MotionControllerActors:Init()
         hmdstate:set_permanent(true)
     end
 
+    self.inited = true
     return true
+end
+
+-- Update function to check and reinitialize if needed
+function MotionControllerActors:Update(engine)
+    if not self.inited or self:Validate() then
+        self:Init(engine)
+    end
 end
 
 -- Get hand component by index (0=HMD, 1=Left, 2=Right)
@@ -194,7 +208,7 @@ function MotionControllerActors:GetLocationByIndex(index)
     if component then
         return component:K2_GetComponentLocation()
     end
-    return Vector3f.new(0, 0, 0)
+    return nil
 end
 
 -- Get rotation by index (0=HMD, 1=Left, 2=Right)
@@ -203,7 +217,7 @@ function MotionControllerActors:GetRotationByIndex(index)
     if component then
         return component:K2_GetComponentRotation()
     end
-    return Vector3f.new(0, 0, 0)
+    return nil
 end
 
 -- Legacy functions for compatibility
@@ -219,5 +233,7 @@ function MotionControllerActors:GetHMD()
     return self.hmd_component
 end
 
+local my_controllers = MotionControllerActors:new()
+
 -- Return the module
-return MotionControllerActors
+return my_controllers

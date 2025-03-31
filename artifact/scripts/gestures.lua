@@ -5,18 +5,62 @@
 
 local gestureSet = require("gestures.GestureSet")
 local flashlight = require("gestures.FlashlightGesture")
+local motionControllerActors = require("gestures.MotionControllerActors")
+local gripGestureLH = require("gestures.MotionControllerGestures").LeftGripAction
+local gripGestureRH = require("gestures.MotionControllerGestures").RightGripAction
+
+flashlight.flashlightGestureLH:SetExecutionCallback(function(context)
+    -- Callback for when the left-hand flashlight gesture is executed
+    print("Left Hand Flashlight Gesture Executed")
+    -- You can add additional logic here, such as toggling a flashlight or other actions
+end)
+flashlight.flashlightGestureRH:SetExecutionCallback(function(context)
+    -- Callback for when the right-hand flashlight gesture is executed
+    print("Right Hand Flashlight Gesture Executed")
+    -- You can add additional logic here, such as toggling a flashlight or other actions
+end)
+
+gripGestureLH:SetExecutionCallback(function(context)
+    -- Callback for when the left-hand grip gesture is executed
+    print("Left Hand Grip Gesture Executed")
+    -- You can add additional logic here if needed
+end)
+
+gripGestureRH:SetExecutionCallback(function(context)
+    -- Callback for when the right-hand grip gesture is executed
+    print("Right Hand Grip Gesture Executed")
+    -- You can add additional logic here if needed
+end)
 
 gestureSet = gestureSet:new(
     {
         -- Initialize the gesture set with the flashlight gestures for both hands
         rootGestures = {
             flashlight.flashlightGestureRH,
-            flashlight.flashlightGestureLH
+            flashlight.flashlightGestureLH,
+            gripGestureLH,
+            gripGestureRH,
         }
     }
 )
 
-gestureSet:Update(
-    {
-    }
+uevr.sdk.callbacks.on_pre_engine_tick(
+	function(engine, delta)
+        motionControllerActors:Update(engine) -- Try to initialize if not already
+        -- Update the gesture set with the current engine state
+        gestureSet:Update({})
+        gripGestureLH:Execute() -- Execute the left grip gesture to check if it should activate
+        gripGestureRH:Execute() -- Execute the right grip gesture to check if it should activate
+
+
+        -- You can add any additional logic here that needs to run on each tick
+        -- For example, checking if a specific gesture was performed
+    end
 )
+
+
+uevr.sdk.callbacks.on_script_reset(function()
+    print("Resetting")
+    gestureSet:Reset()
+    motionControllerActors:Reset() -- Reset the motion controller actors
+end)

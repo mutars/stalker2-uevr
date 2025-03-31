@@ -49,9 +49,6 @@ local MotionControllerAction = GestureBase:new({
     handle = nil,
     controller = nil,
     isInitialized = false,
-    
-    actionState = false,
-    pastActionState = false
 })
 
 function MotionControllerAction:InitHandle()
@@ -67,35 +64,15 @@ function MotionControllerAction:InitHandle()
 end
 
 function MotionControllerAction:EvaluateInternal(context)
-    if not context or not self.handle or not self.controller then
-        return false
-    end
-    
     self:InitHandle()
-    
-    -- Store past states
-    self.pastActionState = self.actionState
-    
-    -- Update button states
-    self.actionState = uevr.params.vr.is_action_active(self.handle, self.controller)
-    
-    -- Gesture is considered active if any button is pressed
-    return self.actionState
-end
-
--- Helper functions for state transitions
-function MotionControllerAction:HasActivated()
-    return self.actionState and not self.pastActionState
-end
-
-function MotionControllerAction:HasDeactivated()
-    return not self.actionState and self.pastActionState
+    if not self.isInitialized then
+        return false -- Not initialized yet
+    end
+    return uevr.params.vr.is_action_active(self.handle, self.controller)
 end
 
 function MotionControllerAction:Reset()
     GestureBase.Reset(self)
-    self.actionState = false
-    self.pastActionState = false
     self.handle = nil
     self.controller = nil
     self.isInitialized = false

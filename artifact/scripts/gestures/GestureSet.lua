@@ -9,9 +9,6 @@ local GestureSet = {
     
     -- Whether the controller has been initialized
     initialized = false,
-    
-    -- Last context used for updates
-    lastContext = nil
 }
 
 -- Initialize the controller with a list of root gestures
@@ -50,13 +47,6 @@ end
 
 -- Update all gestures in the graph (depth-first)
 function GestureSet:Update(context)
-    if not self.initialized then
-        return self
-    end
-    
-    self.lastContext = context
-    
-    -- Track visited gestures to avoid updating the same gesture multiple times
     local visited = {}
     
     -- Update all root gestures (which will cascade to dependencies)

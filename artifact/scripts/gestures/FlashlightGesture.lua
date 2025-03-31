@@ -8,53 +8,56 @@ local BodyZones = require("gestures.BodyZones")
 local motionControllers = require("gestures.MotionControllerGestures")
 
 -- FlashlightGesture: Base class for flashlight gestures
-local FlashlightGesture = GestureBase:new({
+FlashlightGesture = GestureBase:new({
     name = "Flashlight Gesture Base",
-    
-    -- The grip gesture to check for grip button
     gripGesture = nil,
-    
-    -- The zone around the head to detect
     headZone = nil,
 })
 
 function FlashlightGesture:new(config)
     -- Set up dependencies
-    config.dependencies = {
-        config.gripGesture,
-        config.headZone
-    }
-
-    setmetatable(config, self)
-    self.__index = self
-    return config
+    config = config or {}
+    if not config.gripGesture then
+        error("gripGesture is required for FlashlightGesture")
+    end
+    if not config.headZone then
+        error("headZone is required for FlashlightGesture")
+    end
+    local instance = setmetatable(config, FlashlightGesture)
+    instance.__index = FlashlightGesture
+    if not instance.gripGesture or not instance.headZone then
+        error("FlashlightGesture requires both gripGesture and headZone to be set")
+    end
+    instance:AddDependency(instance.gripGesture) -- Ensure gripGesture is a dependency
+    instance:AddDependency(instance.headZone) -- Ensure headZone is a dependency
+    return instance
 end
 
 function FlashlightGesture:EvaluateInternal(context)
     if self.gripGesture:isLocked() then
-        return
+        return false
     end
-    self.isActive = self.gripGesture:JustActivated() and self.headZone:isActive()
-    if self.isActive and not self.wasActive then
+    local isActive = self.gripGesture:JustActivated() and self.headZone:isActive()
+    if isActive then
         self.gripGesture:Lock()
     end
+    return isActive
 end
 
 -- Create specific instances for Left Hand and Right Hand
 local flashlightGestureRH = FlashlightGesture:new({
     name = "Flashlight Gesture (RH)",
-    gripGesture = motionControllers.RightGrip,
+    gripGesture = motionControllers.RightGripAction,
     headZone = BodyZones.headZoneRH
 })
 
 local flashlightGestureLH = FlashlightGesture:new({
     name = "Flashlight Gesture (LH)",
-    gripGesture = motionControllers.LeftGrip,
+    gripGesture = motionControllers.LeftGripAction,
     headZone = BodyZones.headZoneLH
 })
 
 return {
-    FlashlightGesture = FlashlightGesture,
     flashlightGestureRH = flashlightGestureRH,
     flashlightGestureLH = flashlightGestureLH
 }

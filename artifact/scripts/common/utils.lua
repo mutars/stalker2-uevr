@@ -12,3 +12,8 @@ local function find_static_class(name)
     local c = find_required_object(name)
     return c:get_class_default_object()
 end
+
+return {
+    find_required_object = find_required_object,
+    find_static_class = find_static_class
+}
