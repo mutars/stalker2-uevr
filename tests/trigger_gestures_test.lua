@@ -18,26 +18,26 @@ TestHelpers.runTest("Left Grip Action", function()
     TestHelpers.handStates.left.gripActive = false
 
     leftGripAction:Update({}, {})
-    assert(not leftGripAction:JustDeactivated(), "Left Grip Action should not be active")
+    assert(not leftGripAction:JustDeactivated(), "Left grip action should not report as just deactivated when never active")
     -- Create a new visited table for first update
     leftGripAction:Update({}, {})
     -- Check the isActive property directly
-    assert(not leftGripAction.isActive, "Left Grip Action should not be active")
-    assert(not leftGripAction:JustDeactivated(), "Left Grip Action should not be recently deactivated")
+    assert(not leftGripAction.isActive, "Left grip action should not be active when grip button is not pressed")
+    assert(not leftGripAction:JustDeactivated(), "Left grip action should not report as just deactivated when never active")
 
     leftGripAction:Execute({})
-    assert(not executed, "Left Grip Action should not have executed")
+    assert(not executed, "Left grip action callback should not execute when grip is not active")
 
     -- Now let's test activation
     TestHelpers.handStates.left.gripActive = true
 
     -- Create a new visited table for second update
     leftGripAction:Update({}, {})
-    assert(leftGripAction.isActive, "Left Grip Action should now be active")
-    assert(leftGripAction:JustActivated(), "Left Grip Action should have just activated")
+    assert(leftGripAction.isActive, "Left grip action should become active when grip button is pressed")
+    assert(leftGripAction:JustActivated(), "Left grip action should report as just activated when grip becomes active")
 
     leftGripAction:Execute({})
-    assert(executed, "Left Grip Action should have executed")
+    assert(executed, "Left grip action callback should execute when grip is active")
 
     leftGripAction:SetExecutionCallback(nil)
     return true
@@ -58,33 +58,31 @@ TestHelpers.runTest("Right Grip Action", function()
     TestHelpers.handStates.right.gripActive = false
 
     rightGripAction:Update({}, {})
-    assert(not rightGripAction:JustDeactivated(), "Right Grip Action should not be active")
+    assert(not rightGripAction:JustDeactivated(), "Right grip action should not report as just deactivated when never active")
     -- Create a new visited table for first update
     rightGripAction:Update({}, {})
     -- Check the isActive property directly
-    assert(not rightGripAction.isActive, "Right Grip Action should not be active")
-    assert(not rightGripAction:JustDeactivated(), "Right Grip Action should not be recently deactivated")
+    assert(not rightGripAction.isActive, "Right grip action should not be active when grip button is not pressed")
+    assert(not rightGripAction:JustDeactivated(), "Right grip action should not report as just deactivated when never active")
 
     rightGripAction:Execute({})
-    assert(not executed, "Right Grip Action should not have executed")
+    assert(not executed, "Right grip action callback should not execute when grip is not active")
 
     -- Now let's test activation
     TestHelpers.handStates.right.gripActive = true
 
     -- Create a new visited table for second update
     rightGripAction:Update({}, {})
-    assert(rightGripAction.isActive, "Right Grip Action should now be active")
-    assert(rightGripAction:JustActivated(), "Right Grip Action should have just activated")
+    assert(rightGripAction.isActive, "Right grip action should become active when grip button is pressed")
+    assert(rightGripAction:JustActivated(), "Right grip action should report as just activated when grip becomes active")
 
     rightGripAction:Execute({})
-    assert(executed, "Right Grip Action should have executed")
+    assert(executed, "Right grip action callback should execute when grip is active")
 
     rightGripAction:SetExecutionCallback(nil)
     return true
 end)
 
-
--- -- Test 1: Both hands near head with grip
 TestHelpers.runTest("Both hands near head with grip", function()
     TestHelpers.resetTestState()
     -- Set up left hand
@@ -116,11 +114,11 @@ TestHelpers.runTest("Both hands near head with grip", function()
     actors:Update(TestHelpers.mockEngine)
     headZoneRH:Update({}, {})
 
-    assert(headZoneRH.isActive, "Right hand head zone should be active")
+    assert(headZoneRH.isActive, "Right hand should be detected in head zone when positioned at head level")
 
     TestHelpers.handStates.right.location.z = 100.0
     headZoneRH:Update({}, {})
-    assert(not headZoneRH.isActive, "Right hand head zone should not be active")
+    assert(not headZoneRH.isActive, "Right hand should not be detected in head zone when far above head level")
     
     -- Reset right hand position
     TestHelpers.handStates.right.location.z = 1.7
@@ -136,11 +134,11 @@ TestHelpers.runTest("Both hands near head with grip", function()
     actors:Update(TestHelpers.mockEngine)
     headZoneLH:Update({}, {})
     
-    assert(headZoneLH.isActive, "Left hand head zone should be active")
+    assert(headZoneLH.isActive, "Left hand should be detected in head zone when positioned at head level")
     
     TestHelpers.handStates.left.location.z = 100.0
     headZoneLH:Update({}, {})
-    assert(not headZoneLH.isActive, "Left hand head zone should not be active")
+    assert(not headZoneLH.isActive, "Left hand should not be detected in head zone when far above head level")
 
     return true
 end)

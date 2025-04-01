@@ -15,9 +15,6 @@ local BodyZoneGesture = GestureBase:new({
 })
 
 function BodyZoneGesture:new(config)
-    if not config.locationGesture then
-        error("locationGesture is required for BodyZoneGesture")
-    end
     config = config or {}
     -- Populate dependencies from fields
     if not config.locationGesture then

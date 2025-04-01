@@ -35,11 +35,11 @@ TestHelpers.runTest("HeadZone test", function()
     actors:Update(TestHelpers.mockEngine)
     headZoneRH:Update({}, {})
 
-    assert(headZoneRH.isActive, "Right hand head zone should be active")
+    assert(headZoneRH.isActive, "Right hand should be detected in head zone when positioned at head level")
 
     TestHelpers.handStates.right.location.z = 100.0
     headZoneRH:Update({}, {})
-    assert(not headZoneRH.isActive, "Right hand head zone should not be active")
+    assert(not headZoneRH.isActive, "Right hand should not be detected in head zone when far above head level")
     
     -- Reset right hand position
     TestHelpers.handStates.right.location.z = 1.7
@@ -55,11 +55,11 @@ TestHelpers.runTest("HeadZone test", function()
     actors:Update(TestHelpers.mockEngine)
     headZoneLH:Update({}, {})
     
-    assert(headZoneLH.isActive, "Left hand head zone should be active")
+    assert(headZoneLH.isActive, "Left hand should be detected in head zone when positioned at head level")
     
     TestHelpers.handStates.left.location.z = 100.0
     headZoneLH:Update({}, {})
-    assert(not headZoneLH.isActive, "Left hand head zone should not be active")
+    assert(not headZoneLH.isActive, "Left hand should not be detected in head zone when far above head level")
 
     return true
 end)
