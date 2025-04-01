@@ -20,13 +20,12 @@ function BodyZoneGesture:new(config)
     end
     config = config or {}
     -- Populate dependencies from fields
-    config.dependencies = {}
-    if config.locationGesture then
-        table.insert(config.dependencies, config.locationGesture)
+    if not config.locationGesture then
+        error("locationGesture is required for BodyZoneGesture")
     end
-    setmetatable(config, self)
-    self.__index = self
-    return config
+    local instance = GestureBase.new(self, config)
+    instance:AddDependency(instance.locationGesture)
+    return instance
 end
 
 function BodyZoneGesture:EvaluateInternal(context)
@@ -58,18 +57,13 @@ local WeaponZoneGesture = GestureBase:new({
 })
 
 function WeaponZoneGesture:new(config)
+    config = config or {}
     if not config.weaponLocationGesture then
         error("weaponLocationGesture is required for WeaponZoneGesture")
     end
-    config = config or {}
-    -- Populate dependencies from fields
-    config.dependencies = {}
-    if config.weaponLocationGesture then
-        table.insert(config.dependencies, config.weaponLocationGesture)
-    end
-    setmetatable(config, self)
-    self.__index = self
-    return config
+    local instance = GestureBase.new(self, config)
+    instance:AddDependency(instance.weaponLocationGesture) -- Ensure weaponLocationGesture is a dependency
+    return instance
 end
 
 function WeaponZoneGesture:EvaluateInternal(context)

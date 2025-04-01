@@ -1,8 +1,13 @@
-package.path = "/workspaces/stalker2-uevr/artifact/scripts/?.lua;/workspaces/stalker2-uevr/artifact/scripts/?/init.lua;" .. package.path
+-- Common test helpers for UEVR Lua tests
+local TestHelpers = {
+    preEngineTickCallback = nil,
+    scriptResetCallback = nil,
+    leftHandComponent = nil,
+    rightHandComponent = nil
+}
 
--- Define minimal UEVR environment
-local preEngineTickCallback = nil
-local scriptResetCallback = nil
+-- Configure package path to include script directories
+package.path = "/workspaces/stalker2-uevr/artifact/scripts/?.lua;/workspaces/stalker2-uevr/artifact/scripts/?/init.lua;" .. package.path
 
 -- Mock UEVR_UObjectHook
 _G.UEVR_UObjectHook = {
@@ -33,7 +38,7 @@ _G.Vector3f = {
 }
 
 -- Hand state variables that can be modified before each test
-local handStates = {
+TestHelpers.handStates = {
     left = {
         location = Vector3f.new(0, 0, 0),
         rotation = Vector3f.new(0, 0, 0),
@@ -104,22 +109,23 @@ package.loaded["common.utils"] = {
     end
 }
 
+
 -- Set up mock UEVR SDK with API
 _G.uevr = {
     sdk = {
         callbacks = {
             on_pre_engine_tick = function(callback)
-                preEngineTickCallback = callback
+                TestHelpers.preEngineTickCallback = callback
                 return true
             end,
             on_script_reset = function(callback)
-                scriptResetCallback = callback
+                TestHelpers.scriptResetCallback = callback
                 return true
             end
         }
     },
     api = {
-                find_uobject = function(path)
+        find_uobject = function(path)
             return {
                 get_full_name = function() return path end,
                 get_class = function() return "MockClass" end,
@@ -147,18 +153,18 @@ _G.uevr = {
             local component = {
                 K2_GetComponentLocation = function(self)
                     if self.MotionSource == "Left" then  -- Left hand
-                        return handStates.left.location
-                    elseif  self.MotionSource == "Right" then
-                        return handStates.right.location
+                        return TestHelpers.handStates.left.location
+                    elseif self.MotionSource == "Right" then
+                        return TestHelpers.handStates.right.location
                     else
-                        return handStates.hmd.location
+                        return TestHelpers.handStates.hmd.location
                     end
                 end,
                 K2_GetComponentRotation = function(self)
                     if actor.Hand == 0 then  -- Left hand
-                        return handStates.left.rotation
+                        return TestHelpers.handStates.left.rotation
                     else  -- Right hand
-                        return handStates.right.rotation
+                        return TestHelpers.handStates.right.rotation
                     end
                 end,
                 MotionSource = "",
@@ -168,9 +174,9 @@ _G.uevr = {
             
             -- Store components for test manipulation
             if actor.Hand == 0 then
-                leftHandComponent = component
+                TestHelpers.leftHandComponent = component
             else
-                rightHandComponent = component
+                TestHelpers.rightHandComponent = component
             end
             
             return component
@@ -190,9 +196,9 @@ _G.uevr = {
             is_action_active = function(handle, controller)
                 if handle == "/actions/default/in/Grip" then
                     if controller == "left_joystick" then
-                        return handStates.left.gripActive
+                        return TestHelpers.handStates.left.gripActive
                     elseif controller == "right_joystick" then
-                        return handStates.right.gripActive
+                        return TestHelpers.handStates.right.gripActive
                     end
                 end
                 return false
@@ -202,7 +208,7 @@ _G.uevr = {
 }
 
 -- Create mock engine for testing with proper GameViewport structure
-local mockEngine = {
+TestHelpers.mockEngine = {
     deltaTime = 0.016,
     GameViewport = {
         World = {
@@ -220,167 +226,37 @@ local mockEngine = {
     }
 }
 
-print("Loading gestures module...")
-
--- Load the gestures module
-local status, err = pcall(function()
-    require("gestures")  -- Load the main gestures module which sets up the callbacks
-end)
-
-if not status then
-    print("Error loading gestures module: " .. tostring(err))
-    return false
-end
-
-if not preEngineTickCallback then
-    print("Error: pre-engine tick callback was not registered")
-    return false
-end
-
-
 -- Reset test state before each test
-local function resetTestState()
+function TestHelpers.resetTestState()
     -- Reset hand states to default positions
-    handStates.left.location = Vector3f.new(0, 0, 0)
-    handStates.left.rotation = Vector3f.new(0, 0, 0)
-    handStates.left.gripActive = false
+    TestHelpers.handStates.left.location = Vector3f.new(0, 0, 0)
+    TestHelpers.handStates.left.rotation = Vector3f.new(0, 0, 0)
+    TestHelpers.handStates.left.gripActive = false
     
-    handStates.right.location = Vector3f.new(0, 0, 0)
-    handStates.right.rotation = Vector3f.new(0, 0, 0)
-    handStates.right.gripActive = false
+    TestHelpers.handStates.right.location = Vector3f.new(0, 0, 0)
+    TestHelpers.handStates.right.rotation = Vector3f.new(0, 0, 0)
+    TestHelpers.handStates.right.gripActive = false
+    
+    TestHelpers.handStates.hmd.location = Vector3f.new(0, 0, 0)
+    TestHelpers.handStates.hmd.rotation = Vector3f.new(0, 0, 0)
 end
 
 -- Run a single test with given hand states
-local function runTest(testName, testFn)
+function TestHelpers.runTest(testName, testFn)
     print("\nRunning test: " .. testName)
-    if  not testFn() then
+    local success, result = pcall(testFn)
+    
+    if not success then
+        print("✗ Test failed: " .. testName .. " with error: " .. tostring(result))
+        return false
+    elseif not result then
         print("✗ Test failed: " .. testName)
+        return false
     else
         print("✓ Test passed: " .. testName)
+        return true
     end
 end
 
--- Example test cases
-print("\nRunning test suite...")
-local flashlight = require("gestures.FlashlightGesture")
 
-runTest("Left Grip Action", function()
-    resetTestState()
-
-    local MotionControllerGestures = require("gestures.MotionControllerGestures")
-    local leftGripAction = MotionControllerGestures.LeftGripAction
-
-    leftGripAction:Reset()
-    local executed = false
-    leftGripAction:SetExecutionCallback(function(gesture, context)
-        executed = true
-    end)
-
-    handStates.left.gripActive = false
-
-    leftGripAction:Update({}, {})
-    assert(not leftGripAction:JustDeactivated(), "Left Grip Action should not be active")
-    -- Create a new visited table for first update
-    leftGripAction:Update({}, {})
-    -- Check the isActive property directly
-    assert(not leftGripAction.isActive, "Left Grip Action should not be active")
-    assert(not leftGripAction:JustDeactivated(), "Left Grip Action should not be recently deactivated")
-
-    leftGripAction:Execute({})
-    assert(not executed, "Left Grip Action should not have executed")
-
-    -- Now let's test activation
-    handStates.left.gripActive = true
-
-    -- Create a new visited table for second update
-    leftGripAction:Update({}, {})
-    assert(leftGripAction.isActive, "Left Grip Action should now be active")
-    assert(leftGripAction:JustActivated(), "Left Grip Action should have just activated")
-
-    leftGripAction:Execute({})
-    assert(executed, "Left Grip Action should have executed")
-
-    leftGripAction:SetExecutionCallback(nil)
-    return true
-end)
-
--- -- Test 1: Both hands near head with grip
-runTest("Both hands near head with grip", function()
-    resetTestState()
-    -- Set up left hand
-    handStates.left.location = Vector3f.new(0.0, 0.0, 1.7)
-    handStates.left.rotation = Vector3f.new(0, 45, 0)
-    handStates.left.gripActive = true
-    
-    -- Set up right hand
-    handStates.right.location = Vector3f.new(-0.0, 0.0, 1.7)
-    handStates.right.rotation = Vector3f.new(0, -45, 0)
-    handStates.right.gripActive = true
-
-    handStates.hmd.location = Vector3f.new(0, 0, 1.7)
-    handStates.hmd.rotation = Vector3f.new(0, 0, 0)
-
-    local MotionControllerGestures = require("gestures.BodyZones")
-    local headZoneRH = MotionControllerGestures.headZoneRH
-    local actors = require("gestures.MotionControllerActors")
-
-    headZoneRH:Reset()
-    local executed = false
-    headZoneRH:SetExecutionCallback(function(gesture, context)
-        print("Left Grip Action Executed")
-        executed = true
-    end)
-
-    actors:Update(mockEngine)
-    headZoneRH:Update({}, {})
-
-    assert(headZoneRH.isActive, "Head zone should be active")
-
-    handStates.right.location.z = 100.0
-    headZoneRH:Update({}, {})
-    assert(not headZoneRH.isActive, "Head zone should not be active")
-
-
-    return true
-
-end)
-
-runTest("Right Grip Action", function()
-    resetTestState()
-
-    local MotionControllerGestures = require("gestures.MotionControllerGestures")
-    local rightGripAction = MotionControllerGestures.RightGripAction
-
-    rightGripAction:Reset()
-    local executed = false
-    rightGripAction:SetExecutionCallback(function(gesture, context)
-        executed = true
-    end)
-
-    handStates.right.gripActive = false
-
-    rightGripAction:Update({}, {})
-    assert(not rightGripAction:JustDeactivated(), "Right Grip Action should not be active")
-    -- Create a new visited table for first update
-    rightGripAction:Update({}, {})
-    -- Check the isActive property directly
-    assert(not rightGripAction.isActive, "Right Grip Action should not be active")
-    assert(not rightGripAction:JustDeactivated(), "Right Grip Action should not be recently deactivated")
-
-    rightGripAction:Execute({})
-    assert(not executed, "Right Grip Action should not have executed")
-
-    -- Now let's test activation
-    handStates.right.gripActive = true
-
-    -- Create a new visited table for second update
-    rightGripAction:Update({}, {})
-    assert(rightGripAction.isActive, "Right Grip Action should now be active")
-    assert(rightGripAction:JustActivated(), "Right Grip Action should have just activated")
-
-    rightGripAction:Execute({})
-    assert(executed, "Right Grip Action should have executed")
-
-    rightGripAction:SetExecutionCallback(nil)
-    return true
-end)
+return TestHelpers
