@@ -20,7 +20,7 @@ TestHelpers.runTest("LH FlashLight Gesture Happy Case", function()
     -- Test right hand head zone
     leftHandFlashLight:Reset()
     local Executed = false
-    leftHandFlashLight:SetExecutionCallback(function(gesture, context)
+    leftHandFlashLight:SetActivationCallback(function(gesture, context)
         print("Left Hand Flashlight Gesture Executed")
         Executed = true
     end)
@@ -49,7 +49,7 @@ TestHelpers.runTest("LH FlashLight Gesture Happy Case", function()
     assert(not leftHandFlashLight.gripGesture:IsLocked(), "Grip gesture should not be locked when out of range")
     assert(not leftHandFlashLight.isActive, "Flashlight gesture should not be active when out of range")
     assert(leftHandFlashLight:JustDeactivated(), "Flashlight gesture should be deactivated when moving out of range")
-    leftHandFlashLight:SetExecutionCallback(nil) -- Clear the callback to avoid side effects in subsequent tests
+    leftHandFlashLight:SetActivationCallback(nil) -- Clear the callback to avoid side effects in subsequent tests
     return true
 end)
 
@@ -68,7 +68,7 @@ TestHelpers.runTest("RH FlashLight Gesture Happy Case", function()
     -- Test right hand head zone
     rightHandFlashLight:Reset()
     local Executed = false
-    rightHandFlashLight:SetExecutionCallback(function(gesture, context)
+    rightHandFlashLight:SetActivationCallback(function(gesture, context)
         print("Right Hand Flashlight Gesture Executed")
         Executed = true
     end)

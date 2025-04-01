@@ -13,8 +13,7 @@ local GestureSet = {
 
 -- Initialize the controller with a list of root gestures
 function GestureSet:Init()
-    self.rootGestures = {}
-    self.initialized = true
+    --TODO
     return self
 end
 

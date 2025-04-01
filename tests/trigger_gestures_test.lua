@@ -11,7 +11,7 @@ TestHelpers.runTest("Left Grip Action", function()
 
     leftGripAction:Reset()
     local executed = false
-    leftGripAction:SetExecutionCallback(function(gesture, context)
+    leftGripAction:SetActivationCallback(function(gesture, context)
         executed = true
     end)
 
@@ -39,7 +39,7 @@ TestHelpers.runTest("Left Grip Action", function()
     leftGripAction:Execute({})
     assert(executed, "Left grip action callback should execute when grip is active")
 
-    leftGripAction:SetExecutionCallback(nil)
+    leftGripAction:SetActivationCallback(nil)
     return true
 end)
 
@@ -51,7 +51,7 @@ TestHelpers.runTest("Right Grip Action", function()
 
     rightGripAction:Reset()
     local executed = false
-    rightGripAction:SetExecutionCallback(function(gesture, context)
+    rightGripAction:SetActivationCallback(function(gesture, context)
         executed = true
     end)
 
@@ -79,7 +79,7 @@ TestHelpers.runTest("Right Grip Action", function()
     rightGripAction:Execute({})
     assert(executed, "Right grip action callback should execute when grip is active")
 
-    rightGripAction:SetExecutionCallback(nil)
+    rightGripAction:SetActivationCallback(nil)
     return true
 end)
 
@@ -106,7 +106,7 @@ TestHelpers.runTest("Both hands near head with grip", function()
     -- Test right hand head zone
     headZoneRH:Reset()
     local rhExecuted = false
-    headZoneRH:SetExecutionCallback(function(gesture, context)
+    headZoneRH:SetActivationCallback(function(gesture, context)
         print("Right Hand Head Zone Executed")
         rhExecuted = true
     end)
@@ -126,7 +126,7 @@ TestHelpers.runTest("Both hands near head with grip", function()
     -- Test left hand head zone
     headZoneLH:Reset()
     local lhExecuted = false
-    headZoneLH:SetExecutionCallback(function(gesture, context)
+    headZoneLH:SetActivationCallback(function(gesture, context)
         print("Left Hand Head Zone Executed")
         lhExecuted = true
     end)

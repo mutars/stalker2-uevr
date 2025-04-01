@@ -20,7 +20,8 @@ GestureBase = {
     -- Whether the gesture is locked in its current state
     isLocked = false,
 
-    executionCallback = nil,
+    activationCallback = nil,
+    deactivationCallback = nil,
     
     -- List of dependencies (other gestures this one depends on)
     dependencies = {}
@@ -41,8 +42,10 @@ function GestureBase:Update(visited, context)
 end
 
 function GestureBase:Execute(context)
-    if self:JustActivated() and self.executionCallback then
-        self.executionCallback(self, context)
+    if self:JustActivated() and self.activationCallback then
+        self.activationCallback(self, context)
+    elseif self:JustDeactivated() and self.deactivationCallback then
+        self.deactivationCallback(self, context)
     end
 end
 
@@ -92,11 +95,20 @@ function GestureBase:JustDeactivated()
     return not self.isActive and self.wasActive
 end
 
-function GestureBase:SetExecutionCallback(callback)
+function GestureBase:SetActivationCallback(callback)
     if callback and type(callback) ~= "function" then
         error("Execution callback must be a function")
     end
-    self.executionCallback = callback
+    self.activationCallback = callback
+    return self -- Allow method chaining
+end
+
+
+function GestureBase:SetDeactivationCallback(callback)
+    if callback and type(callback) ~= "function" then
+        error("Execution callback must be a function")
+    end
+    self.deactivationCallback = callback
     return self -- Allow method chaining
 end
 

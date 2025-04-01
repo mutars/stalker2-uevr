@@ -3,7 +3,8 @@ local TestHelpers = {
     preEngineTickCallback = nil,
     scriptResetCallback = nil,
     leftHandComponent = nil,
-    rightHandComponent = nil
+    rightHandComponent = nil,
+    keyEvents = {}
 }
 
 -- Configure package path to include script directories
@@ -142,6 +143,9 @@ _G.uevr = {
                 end
             }
         end,
+        get_engine = function()
+            return TestHelpers.mockEngine
+        end,
         get_local_pawn = function(index)
             return {
                 K2_GetActorLocation = function()
@@ -180,7 +184,14 @@ _G.uevr = {
             end
             
             return component
-        end
+        end,
+        dispatch_custom_event = function(instance, eventName, params)
+            local key = eventName  .. "_" .. params  
+            if not TestHelpers.keyEvents[key] then
+                TestHelpers.keyEvents[key] = 0
+            end
+            TestHelpers.keyEvents[key] = TestHelpers.keyEvents[key] + 1 
+        end,
     },
     params = {
         vr = {
@@ -239,6 +250,7 @@ function TestHelpers.resetTestState()
     
     TestHelpers.handStates.hmd.location = Vector3f.new(0, 0, 0)
     TestHelpers.handStates.hmd.rotation = Vector3f.new(0, 0, 0)
+    TestHelpers.keyEvents = {}
 end
 
 -- Run a single test with given hand states

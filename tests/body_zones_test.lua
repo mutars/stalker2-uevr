@@ -27,7 +27,7 @@ TestHelpers.runTest("HeadZone test", function()
     -- Test right hand head zone
     headZoneRH:Reset()
     local rhExecuted = false
-    headZoneRH:SetExecutionCallback(function(gesture, context)
+    headZoneRH:SetActivationCallback(function(gesture, context)
         print("Right Hand Head Zone Executed")
         rhExecuted = true
     end)
@@ -47,7 +47,7 @@ TestHelpers.runTest("HeadZone test", function()
     -- Test left hand head zone
     headZoneLH:Reset()
     local lhExecuted = false
-    headZoneLH:SetExecutionCallback(function(gesture, context)
+    headZoneLH:SetActivationCallback(function(gesture, context)
         print("Left Hand Head Zone Executed")
         lhExecuted = true
     end)
