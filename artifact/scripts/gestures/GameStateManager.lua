@@ -5,7 +5,7 @@ local GameStateManager = {
     lastWorldTime = 0,
     worldTimeTick = 0,
     initialized = false,
-    
+
     -- API reference
     api = nil
 }
@@ -36,7 +36,7 @@ end
 -- Check if the player is in a menu
 function GameStateManager:CheckMenuState()
     local worldTime = self:GetWorldTime()
-    
+
     if worldTime == self.lastWorldTime then
         self.worldTimeTick = self.worldTimeTick + 1
         if self.worldTimeTick >= 50 then
@@ -46,21 +46,21 @@ function GameStateManager:CheckMenuState()
         self.inMenu = false
         self.worldTimeTick = 0
     end
-        
+
     self.lastWorldTime = worldTime
 end
 
 -- Check if player is in inventory or PDA
 function GameStateManager:CheckInventoryPDAState()
     local pawn = self:GetLocalPawn()
-    if pawn and pawn.Mesh and pawn.Mesh.AnimScriptInstance and 
+    if pawn and pawn.Mesh and pawn.Mesh.AnimScriptInstance and
        pawn.Mesh.AnimScriptInstance.HandItemData then
         local check1 = pawn.Mesh.AnimScriptInstance.HandItemData.bHasItemInHands
         local check2 = pawn.Mesh.AnimScriptInstance.HandItemData.bIsUsesLeftHand
         local check3 = pawn.Mesh.AnimScriptInstance.HandItemData.bIsUsesRightHand
         if check1 and check2 and check3 then
             self.isInventoryPDA = true
-        else 
+        else
             self.isInventoryPDA = false
         end
     end
@@ -69,7 +69,7 @@ end
 -- Get current world time
 function GameStateManager:GetWorldTime()
     local engine = self.api:get_engine()
-    if engine and engine.GameViewport and engine.GameViewport.World and 
+    if engine and engine.GameViewport and engine.GameViewport.World and
        engine.GameViewport.World.GameState then
         return engine.GameViewport.World.GameState.ReplicatedWorldTimeSeconds
     end
@@ -84,10 +84,10 @@ end
 -- Send a key press (down or up)
 function GameStateManager:SendKeyPress(key_value, key_up)
     local key_up_string = "down"
-    if key_up == true then 
+    if key_up == true then
         key_up_string = "up"
     end
-    
+
     self.api:dispatch_custom_event(key_value, key_up_string)
 end
 

@@ -7,22 +7,22 @@ local global_id_sequence = 0
 GestureBase = {
     -- Unique identifier for the gesture
     id = nil,
-    
+
     -- Name for this gesture (for debugging)
     name = "Generic Gesture",
-    
+
     -- Whether this gesture is currently active/detected
     isActive = false,
-    
+
     -- Previous state for detecting transitions
     wasActive = false,
-    
+
     -- Whether the gesture is locked in its current state
     isLocked = false,
 
-    activationCallback = nil,
-    deactivationCallback = nil,
-    
+    --TODO might be a good idea to have it in different type of classes
+    executionCallBack = nil,
+
     -- List of dependencies (other gestures this one depends on)
     dependencies = {}
 }
@@ -41,10 +41,8 @@ function GestureBase:Update(visited, context)
 end
 
 function GestureBase:Execute(context)
-    if self:JustActivated() and self.activationCallback then
-        self.activationCallback(self, context)
-    elseif self:JustDeactivated() and self.deactivationCallback then
-        self.deactivationCallback(self, context)
+    if self.executionCallBack then
+        self.executionCallBack(self, context)
     end
 end
 
@@ -52,10 +50,10 @@ end
 function GestureBase:Evaluate(context)
     -- Save previous state
     self.wasActive = self.isActive
-    
+
     -- Evaluate current state
     self.isActive = self:EvaluateInternal(context)
-    
+
     -- Return true if state changed
     return self.isActive
 end
@@ -94,20 +92,11 @@ function GestureBase:JustDeactivated()
     return not self.isActive and self.wasActive
 end
 
-function GestureBase:SetActivationCallback(callback)
+function GestureBase:SetExecutionCallback(callback)
     if callback and type(callback) ~= "function" then
         error("Execution callback must be a function")
     end
-    self.activationCallback = callback
-    return self -- Allow method chaining
-end
-
-
-function GestureBase:SetDeactivationCallback(callback)
-    if callback and type(callback) ~= "function" then
-        error("Execution callback must be a function")
-    end
-    self.deactivationCallback = callback
+    self.executionCallBack = callback
     return self -- Allow method chaining
 end
 

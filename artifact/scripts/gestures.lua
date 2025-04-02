@@ -3,27 +3,48 @@
 --     return {x=x, y=y, z=z}
 -- end
 
+local bodyZones = require("gestures.BodyZones")
 local gestureSet = require("gestures.GestureSet")
 local flashlight = require("gestures.FlashlightGesture")
 local motionControllerActors = require("gestures.MotionControllerActors")
-local gameState = require("GameStateManager") -- Ensure gameState is available for context
+local gameState = require("gestures.GameStateManager") -- Ensure gameState is available for context
+local gamepadState = require("gestures.gamepad")
 
-flashlight.flashlightGestureLH:SetActivationCallback(function(gesture, context)
-    gameState:SendKeyDown('L')
-    gesture.gripGesture:Lock()
+
+flashlight.flashlightGestureLH:SetExecutionCallback(function(gesture, context)
+    if gesture:JustActivated() then
+        gameState:SendKeyDown('L')
+        gesture.gripGesture:Lock()
+    elseif gesture:JustDeactivated() then
+        gameState:SendKeyUp('L')
+        gesture.gripGesture:Unlock()
+    end
 end)
-flashlight.flashlightGestureLH:SetDeactivationCallback(function(gesture, context)
-    gameState:SendKeyUp('L')
-    gesture.gripGesture:Unlock()
+
+flashlight.flashlightGestureRH:SetExecutionCallback(function(gesture, context)
+        if gesture:JustActivated() then
+            gameState:SendKeyDown('L')
+            gesture.gripGesture:Lock()
+        elseif gesture:JustDeactivated() then
+            gameState:SendKeyUp('L')
+            gesture.gripGesture:Unlock()
+        end
 end)
-flashlight.flashlightGestureRH:SetActivationCallback(function(gesture, context)
-    gameState:SendKeyDown('L')
-    gesture.gripGesture:Lock()
+
+bodyZones.headZoneLH:SetExecutionCallback(function(gesture, context)
+    if gesture:JustActivated() then
+        local leftController = uevr.params.vr.get_left_joystick_source()
+        uevr.params.vr.trigger_haptic_vibration(0.0, 0.1, 1.0, 100.0, leftController)
+    end
 end)
-flashlight.flashlightGestureRH:SetDeactivationCallback(function(gesture, context)
-    gameState:SendKeyUp('L')
-    gesture.gripGesture:Unlock()
+
+bodyZones.headZoneRH:SetExecutionCallback(function(gesture, context)
+    if gesture:JustActivated() then
+        local rightController = uevr.params.vr.get_right_joystick_source()
+        uevr.params.vr.trigger_haptic_vibration(0.0, 0.1, 1.0, 100.0, rightController)
+    end
 end)
+
 
 gestureSet = gestureSet:new(
     {
@@ -36,6 +57,7 @@ gestureSet = gestureSet:new(
 )
 
 gameState:Init()
+gamepadState:Reset()
 
 uevr.sdk.callbacks.on_pre_engine_tick(
     function(engine, delta)
@@ -43,8 +65,16 @@ uevr.sdk.callbacks.on_pre_engine_tick(
         gameState:Update()
         gestureSet:Update({})
         -- Execute all gestures to check their state
+        bodyZones.headZoneRH:Execute({}) -- Execute right hand head zone gesture
+        bodyZones.headZoneLH:Execute({})
         flashlight.flashlightGestureLH:Execute({}) -- Execute left hand flashlight gesture
         flashlight.flashlightGestureRH:Execute({}) -- Execute right hand flashlight gesture
+    end
+)
+
+uevr.sdk.callbacks.on_xinput_get_state(
+    function(retval, user_index, state)
+        gamepadState:Update(state)
     end
 )
 
@@ -54,4 +84,5 @@ uevr.sdk.callbacks.on_script_reset(function()
     gestureSet:Reset()
     gameState:Reset() -- Reset the game state to initial conditions
     motionControllerActors:Reset() -- Reset the motion controller actors
+    gamepadState:Reset()
 end)
