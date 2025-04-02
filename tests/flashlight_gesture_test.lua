@@ -1,6 +1,3 @@
--- Basic gestures test module
-package.path = "/workspaces/stalker2-uevr/artifact/scripts/?.lua;/workspaces/stalker2-uevr/artifact/scripts/?/init.lua;" .. package.path
-
 local TestHelpers = require("tests.test_helpers")
 local FlashlightGesture = require("gestures.FlashlightGesture")
 print("\nRunning test suite...")
@@ -19,10 +16,15 @@ TestHelpers.runTest("LH FlashLight Gesture Happy Case", function()
 
     -- Test right hand head zone
     leftHandFlashLight:Reset()
-    local Executed = false
+    local Executed = 0
     leftHandFlashLight:SetActivationCallback(function(gesture, context)
         print("Left Hand Flashlight Gesture Executed")
-        Executed = true
+        Executed = Executed + 1
+    end)
+
+    leftHandFlashLight:SetDeactivationCallback(function(gesture, context)
+        print("Left Hand Flashlight Gesture Executed")
+        Executed = Executed - 1
     end)
 
     local actors = require("gestures.MotionControllerActors")
@@ -36,20 +38,27 @@ TestHelpers.runTest("LH FlashLight Gesture Happy Case", function()
     leftHandFlashLight:Update({}, {})
     assert(leftHandFlashLight.isActive, "Flashlight gesture should be active when grip is pressed")
     assert(leftHandFlashLight:JustActivated(), "Flashlight gesture should be newly activated")
-    assert(leftHandFlashLight.gripGesture:IsLocked(), "Grip gesture should be locked when active")
 
     leftHandFlashLight:Execute({})
-    assert(Executed, "Flashlight gesture callback should have executed")
+    assert(Executed == 1, "Flashlight gesture callback should have executed")
 
-    TestHelpers.handStates.left.location.y = 1.0;
     leftHandFlashLight:Update({}, {})
-    Executed = false
     leftHandFlashLight:Execute({})
-    assert(not Executed, "Flashlight gesture should not execute when hand is out of head range")
-    assert(not leftHandFlashLight.gripGesture:IsLocked(), "Grip gesture should not be locked when out of range")
+    assert(Executed == 1, "We execute gesture only once when it just activated")
+
+    TestHelpers.handStates.left.location.y = 6.0;
+    leftHandFlashLight:Update({}, {})
+    leftHandFlashLight:Execute({})
     assert(not leftHandFlashLight.isActive, "Flashlight gesture should not be active when out of range")
     assert(leftHandFlashLight:JustDeactivated(), "Flashlight gesture should be deactivated when moving out of range")
+    assert(Executed == 0, "Deactivating Gesture once")
+
+    leftHandFlashLight:Update({}, {})
+    leftHandFlashLight:Execute({})
+    assert(Executed == 0, "Deactivating Gesture once")
+
     leftHandFlashLight:SetActivationCallback(nil) -- Clear the callback to avoid side effects in subsequent tests
+    leftHandFlashLight:SetDeactivationCallback(nil) -- Clear the callback to avoid side effects in subsequent tests
     return true
 end)
 
@@ -67,37 +76,48 @@ TestHelpers.runTest("RH FlashLight Gesture Happy Case", function()
 
     -- Test right hand head zone
     rightHandFlashLight:Reset()
-    local Executed = false
+    local Executed = 0
     rightHandFlashLight:SetActivationCallback(function(gesture, context)
         print("Right Hand Flashlight Gesture Executed")
-        Executed = true
+        Executed = Executed + 1
+    end)
+
+    rightHandFlashLight:SetDeactivationCallback(function(gesture, context)
+        print("Right Hand Flashlight Gesture Deactivated")
+        Executed = Executed - 1
     end)
 
     local actors = require("gestures.MotionControllerActors")
     actors:Update(TestHelpers.mockEngine)
     rightHandFlashLight:Update({}, {})
 
-    assert(rightHandFlashLight.headZone.isActive, "HMD zone should be active when HMD is in range")
     assert(not rightHandFlashLight.isActive, "Flashlight gesture should not be active initially")
     assert(not rightHandFlashLight:JustActivated(), "Flashlight gesture should not be activated initially")
-    
     TestHelpers.handStates.right.gripActive = true
     actors:Update(TestHelpers.mockEngine)
     rightHandFlashLight:Update({}, {})
     assert(rightHandFlashLight.isActive, "Flashlight gesture should be active when grip is pressed")
     assert(rightHandFlashLight:JustActivated(), "Flashlight gesture should be newly activated")
-    assert(rightHandFlashLight.gripGesture:IsLocked(), "Grip gesture should be locked when active")
 
     rightHandFlashLight:Execute({})
-    assert(Executed, "Flashlight gesture callback should have executed")
+    assert(Executed == 1, "Flashlight gesture callback should have executed once")
 
-    TestHelpers.handStates.right.location.y = 1.0;
     rightHandFlashLight:Update({}, {})
-    Executed = false
     rightHandFlashLight:Execute({})
-    assert(not Executed, "Flashlight gesture should not execute when hand is out of head range")
-    assert(not rightHandFlashLight.gripGesture:IsLocked(), "Grip gesture should not be locked when out of range")
+    assert(Executed == 1, "We execute gesture only once when it just activated")
+
+    TestHelpers.handStates.right.location.y = 10.0;
+    rightHandFlashLight:Update({}, {})
+    rightHandFlashLight:Execute({})
     assert(not rightHandFlashLight.isActive, "Flashlight gesture should not be active when out of range")
     assert(rightHandFlashLight:JustDeactivated(), "Flashlight gesture should be deactivated when moving out of range")
+    assert(Executed == 0, "Deactivating Gesture once")
+
+    rightHandFlashLight:Update({}, {})
+    rightHandFlashLight:Execute({})
+    assert(Executed == 0, "Deactivating Gesture once")
+
+    rightHandFlashLight:SetActivationCallback(nil) -- Clear the callback to avoid side effects in subsequent tests
+    rightHandFlashLight:SetDeactivationCallback(nil) -- Clear the callback to avoid side effects in subsequent tests
     return true
 end)

@@ -37,7 +37,6 @@ function GestureBase:Update(visited, context)
             dep:Update(visited, context)
         end
     end
-    self:Unlock()
     self:Evaluate(context)
 end
 

@@ -31,14 +31,11 @@ function FlashlightGesture:new(config)
 end
 
 function FlashlightGesture:EvaluateInternal(context)
-    if self.gripGesture:IsLocked() then
-        return false
+    local justActivated = not self.gripGesture:IsLocked() and self.gripGesture:JustActivated() and self.headZone.isActive
+    if justActivated then
+        return justActivated
     end
-    local isActive = self.gripGesture:JustActivated() and self.headZone.isActive
-    if isActive then
-        self.gripGesture:Lock()
-    end
-    return isActive
+    return self.wasActive and self.headZone.isActive and self.gripGesture.isActive
 end
 
 -- Create specific instances for Left Hand and Right Hand
