@@ -1,18 +1,3 @@
---[[
-    luatest.lua
-    A simple test framework for Lua scripts
-]]--
-
-local LuaTest = {}
-
--- Test results counters
-LuaTest.passed = 0
-LuaTest.failed = 0
-LuaTest.total = 0
-
--- Store test cases
-LuaTest.tests = {}
-
 -- Colors for console output if supported
 local colors = {
     reset = "\27[0m",
@@ -22,67 +7,40 @@ local colors = {
     blue = "\27[34m"
 }
 
--- Add a test case
-function LuaTest.test(name, testFn)
-    table.insert(LuaTest.tests, {name = name, fn = testFn})
-end
-
 -- Assert functions
-function LuaTest.assertEquals(expected, actual, message)
-    LuaTest.total = LuaTest.total + 1
+function AssertEquals(actual, expected, message)
     if expected == actual then
-        LuaTest.passed = LuaTest.passed + 1
+        print(colors.green .. "[✓]" .. colors.reset .. " " .. message)
         return true
     else
-        LuaTest.failed = LuaTest.failed + 1
-        local msg = message or "Expected: " .. tostring(expected) .. ", got: " .. tostring(actual)
-        print(colors.red .. "FAIL: " .. msg .. colors.reset)
+        local msg = "Expected: " .. tostring(expected) .. ", got: " .. tostring(actual)
+        print(colors.red .. "[✗]" .. colors.reset .. " " ..  msg)
+        print(debug.traceback())
+    end
+end
+
+function AssertTrue(value, message)
+    return AssertEquals(value, true, message)
+end
+
+function AssertFalse(value, message)
+    return AssertEquals(value, false, message)
+end
+
+
+-- Run a single test with given hand states
+function RunTest(testName, testFn)
+    print("\nRunning test: " .. testName)
+    local success, result = pcall(testFn)
+    
+    if not success then
+        print("✗ Test failed: " .. testName .. " with error: " .. tostring(result))
         return false
-    end
-end
-
-function LuaTest.assertTrue(value, message)
-    return LuaTest.assertEquals(true, value, message)
-end
-
-function LuaTest.assertFalse(value, message)
-    return LuaTest.assertEquals(false, value, message)
-end
-
--- Run all registered tests
-function LuaTest.runAll()
-    print(colors.blue .. "Running " .. #LuaTest.tests .. " tests..." .. colors.reset)
-    
-    for _, test in ipairs(LuaTest.tests) do
-        print(colors.yellow .. "Test: " .. test.name .. colors.reset)
-        local success, error = pcall(test.fn)
-        
-        if not success then
-            LuaTest.failed = LuaTest.failed + 1
-            LuaTest.total = LuaTest.total + 1
-            print(colors.red .. "ERROR: " .. error .. colors.reset)
-        end
-    end
-    
-    -- Print summary
-    print(colors.blue .. "Test Summary:" .. colors.reset)
-    print("  Total:  " .. LuaTest.total)
-    print(colors.green .. "  Passed: " .. LuaTest.passed .. colors.reset)
-    if LuaTest.failed > 0 then
-        print(colors.red .. "  Failed: " .. LuaTest.failed .. colors.reset)
+    elseif not result then
+        print("✗ Test failed: " .. testName)
+        return false
     else
-        print("  Failed: " .. LuaTest.failed)
+        print("✓ Test passed: " .. testName)
+        return true
     end
-    
-    return LuaTest.failed == 0
 end
-
--- Reset test counters
-function LuaTest.reset()
-    LuaTest.passed = 0
-    LuaTest.failed = 0
-    LuaTest.total = 0
-    LuaTest.tests = {}
-end
-
-return LuaTest

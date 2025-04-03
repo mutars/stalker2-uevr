@@ -2,13 +2,23 @@
 local TestHelpers = {
     preEngineTickCallback = nil,
     scriptResetCallback = nil,
+    xinputStateCallback = nil,
     leftHandComponent = nil,
     rightHandComponent = nil,
-    keyEvents = {}
+    keyEvents = {},
+    hapticEvents = {}, -- Track haptic feedback events
+    gamepadState = {
+        Gamepad = {
+            wButtons = 0,
+            bLeftTrigger = 0,
+            bRightTrigger = 0,
+            sThumbLX = 0,
+            sThumbLY = 0,
+            sThumbRX = 0,
+            sThumbRY = 0
+        }
+    }
 }
-
--- Configure package path to include script directories
--- package.path = "/workspaces/stalker2-uevr/artifact/scripts/?.lua;/workspaces/stalker2-uevr/artifact/scripts/?/init.lua;" .. package.path
 
 -- Mock UEVR_UObjectHook
 _G.UEVR_UObjectHook = {
@@ -110,7 +120,6 @@ package.loaded["common.utils"] = {
     end
 }
 
-
 -- Set up mock UEVR SDK with API
 _G.uevr = {
     sdk = {
@@ -121,6 +130,10 @@ _G.uevr = {
             end,
             on_script_reset = function(callback)
                 TestHelpers.scriptResetCallback = callback
+                return true
+            end,
+            on_xinput_get_state = function(callback)
+                TestHelpers.xinputStateCallback = callback
                 return true
             end
         }
@@ -213,6 +226,10 @@ _G.uevr = {
                     end
                 end
                 return false
+            end,
+            trigger_haptic_vibration = function(start_delay, duration, frequency, amplitude, controller)
+                TestHelpers.hapticEvents[controller] = (TestHelpers.hapticEvents[controller] or 0) + 1
+                return true
             end
         }
     }
@@ -251,24 +268,20 @@ function TestHelpers.resetTestState()
     TestHelpers.handStates.hmd.location = Vector3f.new(0, 0, 0)
     TestHelpers.handStates.hmd.rotation = Vector3f.new(0, 0, 0)
     TestHelpers.keyEvents = {}
-end
+    TestHelpers.hapticEvents = {} -- Reset haptic events
 
--- Run a single test with given hand states
-function TestHelpers.runTest(testName, testFn)
-    print("\nRunning test: " .. testName)
-    local success, result = pcall(testFn)
-    
-    if not success then
-        print("✗ Test failed: " .. testName .. " with error: " .. tostring(result))
-        return false
-    elseif not result then
-        print("✗ Test failed: " .. testName)
-        return false
-    else
-        print("✓ Test passed: " .. testName)
-        return true
-    end
+    -- Reset gamepad state
+    TestHelpers.gamepadState = {
+        Gamepad = {
+            wButtons = 0,
+            bLeftTrigger = 0,
+            bRightTrigger = 0,
+            sThumbLX = 0,
+            sThumbLY = 0,
+            sThumbRX = 0,
+            sThumbRY = 0
+        }
+    }
 end
-
 
 return TestHelpers

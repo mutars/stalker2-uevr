@@ -14,7 +14,9 @@
             },
             "presentation": {
                 "reveal": "always",
-                "panel": "new"
+                "panel": "shared",
+                "clear": true,
+                "close": false
             },
             "options": {
                 "cwd": "${fileDirname}"

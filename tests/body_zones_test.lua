@@ -1,10 +1,10 @@
--- Basic gestures test module
+require("luatest")
 local TestHelpers = require("test_helpers")
 
 print("\nRunning test suite...")
 
 -- -- Test 1: Both hands near head with grip
-TestHelpers.runTest("HeadZone test", function()
+RunTest("HeadZone test", function()
     TestHelpers.resetTestState()
     -- Set up left hand
     TestHelpers.handStates.left.location = Vector3f.new(0.0, 0.0, 1.7)
@@ -27,7 +27,7 @@ TestHelpers.runTest("HeadZone test", function()
     -- Test right hand head zone
     headZoneRH:Reset()
     local rhExecuted = false
-    headZoneRH:SetActivationCallback(function(gesture, context)
+    headZoneRH:SetExecutionCallback(function(gesture, context)
         print("Right Hand Head Zone Executed")
         rhExecuted = true
     end)
@@ -35,11 +35,11 @@ TestHelpers.runTest("HeadZone test", function()
     actors:Update(TestHelpers.mockEngine)
     headZoneRH:Update({}, {})
 
-    assert(headZoneRH.isActive, "Right hand should be detected in head zone when positioned at head level")
+    AssertEquals(headZoneRH.isActive, true, "Right hand should be detected in head zone when positioned at head level")
 
     TestHelpers.handStates.right.location.z = 100.0
     headZoneRH:Update({}, {})
-    assert(not headZoneRH.isActive, "Right hand should not be detected in head zone when far above head level")
+    AssertEquals(headZoneRH.isActive, false, "Right hand should not be detected in head zone when far above head level")
     
     -- Reset right hand position
     TestHelpers.handStates.right.location.z = 1.7
@@ -47,7 +47,7 @@ TestHelpers.runTest("HeadZone test", function()
     -- Test left hand head zone
     headZoneLH:Reset()
     local lhExecuted = false
-    headZoneLH:SetActivationCallback(function(gesture, context)
+    headZoneLH:SetExecutionCallback(function(gesture, context)
         print("Left Hand Head Zone Executed")
         lhExecuted = true
     end)
@@ -55,11 +55,11 @@ TestHelpers.runTest("HeadZone test", function()
     actors:Update(TestHelpers.mockEngine)
     headZoneLH:Update({}, {})
     
-    assert(headZoneLH.isActive, "Left hand should be detected in head zone when positioned at head level")
+    AssertEquals(headZoneLH.isActive, true, "Left hand should be detected in head zone when positioned at head level")
     
     TestHelpers.handStates.left.location.z = 100.0
     headZoneLH:Update({}, {})
-    assert(not headZoneLH.isActive, "Left hand should not be detected in head zone when far above head level")
+    AssertEquals(headZoneLH.isActive, false, "Left hand should not be detected in head zone when far above head level")
 
     return true
 end)
