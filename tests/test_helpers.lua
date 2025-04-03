@@ -8,7 +8,7 @@ local TestHelpers = {
 }
 
 -- Configure package path to include script directories
-package.path = "/workspaces/stalker2-uevr/artifact/scripts/?.lua;/workspaces/stalker2-uevr/artifact/scripts/?/init.lua;" .. package.path
+-- package.path = "/workspaces/stalker2-uevr/artifact/scripts/?.lua;/workspaces/stalker2-uevr/artifact/scripts/?/init.lua;" .. package.path
 
 -- Mock UEVR_UObjectHook
 _G.UEVR_UObjectHook = {

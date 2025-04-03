@@ -1,5 +1,5 @@
 -- Basic gestures test module
-local TestHelpers = require("tests.test_helpers")
+local TestHelpers = require("test_helpers")
 
 print("\nRunning test suite...")
 

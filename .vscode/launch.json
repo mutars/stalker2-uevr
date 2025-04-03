@@ -1,14 +1,14 @@
 {
     "version": "0.2.0",
     "configurations": [
-        {
-            "name": "Lua Debug",
-            "type": "lua",
-            "request": "launch",
-            "program": "${file}",
-            "cwd": "${workspaceFolder}/artifact/scripts",
-            "stopOnEntry": true,
-            "console": "integratedTerminal",
+      {
+        "type": "lua-local",
+        "request": "launch",
+        "name": "Release",
+        "cwd": "${fileDirname}",
+        "env": {
+          "LUA_PATH": "${workspaceFolder}/artifact/scripts/?.lua;;"
         }
+      }
     ]
 }

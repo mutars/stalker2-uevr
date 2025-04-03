@@ -1,7 +1,4 @@
--- Basic gestures test module
-package.path = "/workspaces/stalker2-uevr/artifact/scripts/?.lua;/workspaces/stalker2-uevr/artifact/scripts/?/init.lua;" .. package.path
-
-local TestHelpers = require("tests.test_helpers")
+local TestHelpers = require("test_helpers")
 local gestures = require("gestures")
 print("\nRunning test suite...")
 

@@ -17,7 +17,7 @@
                 "panel": "new"
             },
             "options": {
-                "cwd": "${workspaceFolder}/artifact/scripts"
+                "cwd": "${fileDirname}"
             }
         }
     ]
