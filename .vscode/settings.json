@@ -19,5 +19,9 @@
     ],
     "terminal.integrated.env.linux": {
         "LUA_PATH": "${workspaceFolder}/artifact/scripts/?.lua;${workspaceFolder}/artifact/scripts/?/?.lua;${workspaceFolder}/tests/?.lua;;"
-    }
+    },
+    "terminal.integrated.env.windows": {
+        "LUA_PATH": "${workspaceFolder}/artifact/scripts/?.lua;${workspaceFolder}/artifact/scripts/?/?.lua;${workspaceFolder}/tests/?.lua;;"
+    },
+    "lua-local.interpreter": "lua5.3"
 }

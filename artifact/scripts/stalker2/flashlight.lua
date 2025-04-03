@@ -3,9 +3,9 @@
     Gesture that activates when a motion controller is near the head and grip button is pressed
 ]]--
 
-local GestureBase = require("gestures.GestureBase")
-local BodyZones = require("gestures.BodyZones")
-local motionControllers = require("gestures.MotionControllerGestures")
+local GestureBase = require("gestures.gesturebase")
+local BodyZones = require("gestures.bodyzone")
+local motionControllers = require("gestures.motioncontrollergestures")
 
 -- FlashlightGesture: Base class for flashlight gestures
 FlashlightGesture = GestureBase:new({

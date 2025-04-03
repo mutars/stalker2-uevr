@@ -1,4 +1,4 @@
-local MotionControllerGestures = require("gestures.MotionControllerGestures")
+local MotionControllerGestures = require("gestures.motioncontrollergestures")
 
 -- XInputState class to manage controller state
 GamepadState = {

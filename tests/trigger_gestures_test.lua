@@ -7,7 +7,7 @@ print("\nRunning test suite...")
 RunTest("Left Grip Action", function()
     TestHelpers.resetTestState()
 
-    local MotionControllerGestures = require("gestures.MotionControllerGestures")
+    local MotionControllerGestures = require("gestures.motioncontrollergestures")
     local leftGripAction = MotionControllerGestures.LeftGripAction
 
     leftGripAction:Reset()
@@ -34,7 +34,7 @@ end)
 RunTest("Right Grip Action", function()
     TestHelpers.resetTestState()
 
-    local MotionControllerGestures = require("gestures.MotionControllerGestures")
+    local MotionControllerGestures = require("gestures.motioncontrollergestures")
     local rightGripAction = MotionControllerGestures.RightGripAction
 
     rightGripAction:Reset()
@@ -73,10 +73,10 @@ RunTest("Both hands near head with grip", function()
     TestHelpers.handStates.hmd.location = Vector3f.new(0, 0, 1.7)
     TestHelpers.handStates.hmd.rotation = Vector3f.new(0, 0, 0)
 
-    local MotionControllerGestures = require("gestures.BodyZones")
+    local MotionControllerGestures = require("gestures.bodyzone")
     local headZoneRH = MotionControllerGestures.headZoneRH
     local headZoneLH = MotionControllerGestures.headZoneLH
-    local actors = require("gestures.MotionControllerActors")
+    local actors = require("gestures.motioncontrolleractors")
 
     -- Test right hand head zone
     headZoneRH:Reset()

@@ -1,5 +1,5 @@
-local ZonedGestures = require("gestures.ZonedGestures")
-local LocationGestures = require("gestures.LocationGestures")
+local ZonedGestures = require("gestures.basezones")
+local LocationGestures = require("gestures.locationgesture")
 
 -- Body Zone Instances
 local rightShoulderZoneRH = ZonedGestures.BodyZoneGesture:new({

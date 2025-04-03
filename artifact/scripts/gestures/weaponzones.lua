@@ -1,5 +1,5 @@
-local ZonedGestures = require("gestures.ZonedGestures")
-local LocationGestures = require("gestures.LocationGestures")
+local ZonedGestures = require("gestures.basezones")
+local LocationGestures = require("gestures.locationgesture")
 
 -- Weapon Zone Instances
 local reloadZoneRH = ZonedGestures.WeaponZoneGesture:new({

@@ -1,4 +1,4 @@
-local GestureBase = require("gestures.GestureBase")
+local GestureBase = require("gestures.gesturebase")
 
 -- Base Body Zone Gesture class
 local BodyZoneGesture = GestureBase:new({

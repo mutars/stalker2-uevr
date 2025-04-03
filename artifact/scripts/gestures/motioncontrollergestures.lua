@@ -1,5 +1,5 @@
-local GestureBase = require("gestures.GestureBase")
-local motionControllerActors = require("gestures.MotionControllerActors")
+local GestureBase = require("gestures.gesturebase")
+local motionControllerActors = require("gestures.motioncontrolleractors")
 
 -- Base Motion Controller Gesture class
 local MotionControllerGesture = GestureBase:new({

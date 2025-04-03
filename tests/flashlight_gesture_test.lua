@@ -1,6 +1,6 @@
 require("luatest")
 local TestHelpers = require("test_helpers")
-local FlashlightGesture = require("gestures.FlashlightGesture")
+local FlashlightGesture = require("stalker2.flashlight")
 print("\nRunning test suite...")
 
 -- -- Test 1: Both hands near head with grip
@@ -23,7 +23,7 @@ RunTest("LH FlashLight Gesture Happy Case", function()
         Executed = Executed + 1
     end)
 
-    local actors = require("gestures.MotionControllerActors")
+    local actors = require("gestures.motioncontrolleractors")
     actors:Update(TestHelpers.mockEngine)
     leftHandFlashLight:Update({}, {})
 
@@ -78,7 +78,7 @@ RunTest("RH FlashLight Gesture Happy Case", function()
         Executed = Executed + 1
     end)
 
-    local actors = require("gestures.MotionControllerActors")
+    local actors = require("gestures.motioncontrolleractors")
     actors:Update(TestHelpers.mockEngine)
     rightHandFlashLight:Update({}, {})
 

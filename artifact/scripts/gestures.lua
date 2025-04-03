@@ -3,12 +3,12 @@
 --     return {x=x, y=y, z=z}
 -- end
 
-local bodyZones = require("gestures.BodyZones")
-local gestureSet = require("gestures.GestureSet")
-local flashlight = require("gestures.FlashlightGesture")
-local motionControllerActors = require("gestures.MotionControllerActors")
-local gameState = require("gestures.GameStateManager") -- Ensure gameState is available for context
-local gamepadState = require("gestures.gamepad")
+local bodyZones = require("gestures.bodyzone")
+local gestureSet = require("gestures.gestureset")
+local flashlight = require("stalker2.flashlight")
+local motionControllerActors = require("gestures.motioncontrolleractors")
+local gameState = require("stalker2.gamestate") -- Ensure gameState is available for context
+local gamepadState = require("stalker2.gamepad")
 
 
 flashlight.flashlightGestureLH:SetExecutionCallback(function(gesture, context)
