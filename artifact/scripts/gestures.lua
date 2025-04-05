@@ -34,40 +34,40 @@ end)
 
 primaryWeapon.primaryWeaponGestureLH:SetExecutionCallback(function(gesture, context)
     if gesture:JustActivated() then
-        gameState:SendKeyDown('1') -- Use key 1 to switch to primary weapon
+        gameState:SendKeyDown('3') -- Use key 1 to switch to primary weapon
         gesture.gripGesture:Lock()
     elseif gesture:JustDeactivated() then
-        gameState:SendKeyUp('1')
+        gameState:SendKeyUp('3')
         gesture.gripGesture:Unlock()
     end
 end)
 
 primaryWeapon.primaryWeaponGestureRH:SetExecutionCallback(function(gesture, context)
     if gesture:JustActivated() then
-        gameState:SendKeyDown('1') -- Use key 1 to switch to primary weapon
+        gameState:SendKeyDown('3') -- Use key 1 to switch to primary weapon
         gesture.gripGesture:Lock()
     elseif gesture:JustDeactivated() then
-        gameState:SendKeyUp('1')
+        gameState:SendKeyUp('3')
         gesture.gripGesture:Unlock()
     end
 end)
 
 secondaryWeapon.secondaryWeaponGestureLH:SetExecutionCallback(function(gesture, context)
     if gesture:JustActivated() then
-        gameState:SendKeyDown('2') -- Use key 2 to switch to secondary weapon
+        gameState:SendKeyDown('4') -- Use key 2 to switch to secondary weapon
         gesture.gripGesture:Lock()
     elseif gesture:JustDeactivated() then
-        gameState:SendKeyUp('2')
+        gameState:SendKeyUp('4')
         gesture.gripGesture:Unlock()
     end
 end)
 
 secondaryWeapon.secondaryWeaponGestureRH:SetExecutionCallback(function(gesture, context)
     if gesture:JustActivated() then
-        gameState:SendKeyDown('2') -- Use key 2 to switch to secondary weapon
+        gameState:SendKeyDown('4') -- Use key 2 to switch to secondary weapon
         gesture.gripGesture:Lock()
     elseif gesture:JustDeactivated() then
-        gameState:SendKeyUp('2')
+        gameState:SendKeyUp('4')
         gesture.gripGesture:Unlock()
     end
 end)
