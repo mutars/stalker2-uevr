@@ -38,6 +38,7 @@ function GestureBase:Update(visited, context)
         end
     end
     self:Evaluate(context)
+    self:Execute(context)
 end
 
 function GestureBase:Execute(context)

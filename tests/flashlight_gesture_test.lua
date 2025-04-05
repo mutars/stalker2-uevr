@@ -35,24 +35,15 @@ RunTest("LH FlashLight Gesture Happy Case", function()
     leftHandFlashLight:Update({}, {})
     AssertEquals(leftHandFlashLight.isActive, true, "Flashlight gesture should be active when grip is pressed")
     AssertEquals(leftHandFlashLight:JustActivated(), true, "Flashlight gesture should be newly activated")
-
-    leftHandFlashLight:Execute({})
-    AssertEquals(Executed, 1, "Flashlight gesture callback should have executed")
-
     leftHandFlashLight:Update({}, {})
-    leftHandFlashLight:Execute({})
-    AssertEquals(Executed, 2, "callback executing irrsepective of gesture state callback should handle this case internally")
 
     TestHelpers.handStates.left.location.y = 6.0;
     leftHandFlashLight:Update({}, {})
-    leftHandFlashLight:Execute({})
     AssertEquals(leftHandFlashLight.isActive, false, "Flashlight gesture should not be active when out of range")
     AssertEquals(leftHandFlashLight:JustDeactivated(), true, "Flashlight gesture should be deactivated when moving out of range")
-    AssertEquals(Executed, 3, "callback executing irrsepective of gesture state callback should handle this case internally")
 
     leftHandFlashLight:Update({}, {})
-    leftHandFlashLight:Execute({})
-    AssertEquals(Executed, 4, "callback executing irrsepective of gesture state callback should handle this case internally")
+    AssertEquals(Executed, 5, "callback executing irrsepective of gesture state callback should handle this case internally")
 
     leftHandFlashLight:SetExecutionCallback(nil) -- Clear the callback to avoid side effects in subsequent tests
     return true
@@ -91,23 +82,14 @@ RunTest("RH FlashLight Gesture Happy Case", function()
     AssertEquals(rightHandFlashLight.isActive, true, "Flashlight gesture should be active when grip is pressed")
     AssertEquals(rightHandFlashLight:JustActivated(), true, "Flashlight gesture should be newly activated")
 
-    rightHandFlashLight:Execute({})
-    AssertEquals(Executed, 1, "Flashlight gesture callback should have executed once")
-
     rightHandFlashLight:Update({}, {})
-    rightHandFlashLight:Execute({})
-    AssertEquals(Executed, 2, "callback executing irrsepective of gesture state callback should handle this case internally")
 
     TestHelpers.handStates.right.location.y = 10.0;
     rightHandFlashLight:Update({}, {})
-    rightHandFlashLight:Execute({})
     AssertEquals(rightHandFlashLight.isActive, false, "Flashlight gesture should not be active when out of range")
     AssertEquals(rightHandFlashLight:JustDeactivated(), true, "Flashlight gesture should be deactivated when moving out of range")
-    AssertEquals(Executed, 3, "callback executing irrsepective of gesture state callback should handle this case internally")
-
     rightHandFlashLight:Update({}, {})
-    rightHandFlashLight:Execute({})
-    AssertEquals(Executed, 4, "callback executing irrsepective of gesture state callback should handle this case internally")
+    AssertEquals(Executed, 5, "callback executing irrsepective of gesture state callback should handle this case internally")
 
     rightHandFlashLight:SetExecutionCallback(nil) -- Clear the callback to avoid side effects in subsequent tests
     return true
