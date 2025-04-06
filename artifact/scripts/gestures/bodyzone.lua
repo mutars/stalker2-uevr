@@ -10,7 +10,7 @@ local rightShoulderZoneRH = ZonedGestures.BodyZoneGesture:new({
     minY = 10,
     maxY = 30,
     minZ = -10,
-    maxZ = 20
+    maxZ = 15
 })
 
 local rightShoulderZoneLH = ZonedGestures.BodyZoneGesture:new({
@@ -21,7 +21,7 @@ local rightShoulderZoneLH = ZonedGestures.BodyZoneGesture:new({
     minY = 10,
     maxY = 30,
     minZ = -10,
-    maxZ = 20
+    maxZ = 15
 })
 
 local leftShoulderZoneRH = ZonedGestures.BodyZoneGesture:new({
@@ -32,7 +32,7 @@ local leftShoulderZoneRH = ZonedGestures.BodyZoneGesture:new({
     minY = -30,
     maxY = -10,
     minZ = -10,
-    maxZ = 20
+    maxZ = 15
 })
 
 local leftShoulderZoneLH = ZonedGestures.BodyZoneGesture:new({
@@ -43,7 +43,7 @@ local leftShoulderZoneLH = ZonedGestures.BodyZoneGesture:new({
     minY = -30,
     maxY = -10,
     minZ = -10,
-    maxZ = 20
+    maxZ = 15
 })
 
 local headZoneRH = ZonedGestures.BodyZoneGesture:new({
@@ -71,111 +71,111 @@ local headZoneLH = ZonedGestures.BodyZoneGesture:new({
 local rightHipZoneRH = ZonedGestures.BodyZoneGesture:new({
     name = "Right Hip Zone (RH)",
     locationGesture = LocationGestures.RightHand,
-    minX = -100,
-    maxX = -60,
+    minX = -10,
+    maxX = 10,
     minY = 22,
     maxY = 50,
-    minZ = -10,
-    maxZ = 10
+    minZ = -100,
+    maxZ = -60
 })
 
 local rightHipZoneLH = ZonedGestures.BodyZoneGesture:new({
     name = "Right Hip Zone (LH)",
     locationGesture = LocationGestures.LeftHand,
-    minX = -100,
-    maxX = -60,
+    minX = -10,
+    maxX = 10,
     minY = 22,
     maxY = 50,
-    minZ = -10,
-    maxZ = 10
+    minZ = -100,
+    maxZ = -60
 })
 
 local leftHipZoneRH = ZonedGestures.BodyZoneGesture:new({
     name = "Left Hip Zone (RH)",
     locationGesture = LocationGestures.RightHand,
-    minX = -100,
-    maxX = -50,
+    minX = -10,
+    maxX = 30,
     minY = -30,
     maxY = 5,
-    minZ = -10,
-    maxZ = 30
+    minZ = -100,
+    maxZ = -50
 })
 
 local leftHipZoneLH = ZonedGestures.BodyZoneGesture:new({
     name = "Left Hip Zone (LH)",
     locationGesture = LocationGestures.LeftHand,
-    minX = -100,
-    maxX = -50,
+    minX = -10,
+    maxX = 30,
     minY = -30,
     maxY = 5,
-    minZ = -10,
-    maxZ = 30
+    minZ = -100,
+    maxZ = -50
 })
 
 local leftChestZoneRH = ZonedGestures.BodyZoneGesture:new({
     name = "Left Chest Zone (RH)",
     locationGesture = LocationGestures.RightHand,
-    minX = -40,
-    maxX = -25,
+    minX = 0,
+    maxX = 10,
     minY = -15,
     maxY = -5,
-    minZ = 0,
-    maxZ = 10
+    minZ = -40,
+    maxZ = -25
 })
 
 local leftChestZoneLH = ZonedGestures.BodyZoneGesture:new({
     name = "Left Chest Zone (LH)",
     locationGesture = LocationGestures.LeftHand,
-    minX = -40,
-    maxX = -25,
+    minX = 0,
+    maxX = 10,
     minY = -15,
     maxY = -5,
-    minZ = 0,
-    maxZ = 10
+    minZ = -40,
+    maxZ = -25
 })
 
 local rightChestZoneRH = ZonedGestures.BodyZoneGesture:new({
     name = "Right Chest Zone (RH)",
     locationGesture = LocationGestures.RightHand,
-    minX = -40,
-    maxX = -25,
+    minX = 0,
+    maxX = 10,
     minY = 5,
     maxY = 15,
-    minZ = 0,
-    maxZ = 10
+    minZ = 40,
+    maxZ = -25
 })
 
 local rightChestZoneLH = ZonedGestures.BodyZoneGesture:new({
     name = "Right Chest Zone (LH)",
     locationGesture = LocationGestures.LeftHand,
-    minX = -40,
-    maxX = -25,
+    minX = 0,
+    maxX = 10,
     minY = 5,
     maxY = 15,
-    minZ = 0,
-    maxZ = 10
+    minZ = 40,
+    maxZ = -25
 })
 
 local lowerBackZoneRH = ZonedGestures.BodyZoneGesture:new({
     name = "Lower Back Zone (RH)",
     locationGesture = LocationGestures.RightHand,
-    minX = -100,
-    maxX = -50,
+    minX = -30,
+    maxX = -15,
     minY = -20,
     maxY = 20,
-    minZ = -30,
-    maxZ = -15
+    minZ = -100,
+    maxZ = -50
 })
 
 local lowerBackZoneLH = ZonedGestures.BodyZoneGesture:new({
     name = "Lower Back Zone (LH)",
     locationGesture = LocationGestures.LeftHand,
-    minX = -100,
-    maxX = -50,
+    minX = -30,
+    maxX = -15,
     minY = -20,
     maxY = 20,
-    minZ = -30,
-    maxZ = -15
+    minZ = -100,
+    maxZ = -50
 })
 
 return {

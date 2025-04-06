@@ -3,52 +3,21 @@
     Gesture that activates when a motion controller is near the head and grip button is pressed
 ]]--
 
-local GestureBase = require("gestures.gesturebase")
+local GripGesture = require("stalker2.gripgesture")
 local BodyZones = require("gestures.bodyzone")
 local motionControllers = require("gestures.motioncontrollergestures")
 
--- FlashlightGesture: Base class for flashlight gestures
-FlashlightGesture = GestureBase:new({
-    name = "Flashlight Gesture Base",
-    gripGesture = nil,
-    headZone = nil,
-})
-
-function FlashlightGesture:new(config)
-    -- Set up dependencies
-    config = config or {}
-    if not config.gripGesture then
-        error("gripGesture is required for FlashlightGesture")
-    end
-    if not config.headZone then
-        error("headZone is required for FlashlightGesture")
-    end
-    
-    local instance = GestureBase.new(self, config)
-    instance:AddDependency(instance.gripGesture) -- Ensure gripGesture is a dependency
-    instance:AddDependency(instance.headZone) -- Ensure headZone is a dependency
-    return instance
-end
-
-function FlashlightGesture:EvaluateInternal(context)
-    local justActivated = not self.gripGesture:IsLocked() and self.gripGesture:JustActivated() and self.headZone.isActive
-    if justActivated then
-        return justActivated
-    end
-    return self.wasActive and self.headZone.isActive and self.gripGesture.isActive
-end
-
--- Create specific instances for Left Hand and Right Hand
-local flashlightGestureRH = FlashlightGesture:new({
+-- Create specific instances directly from GripGesture
+local flashlightGestureRH = GripGesture:new({
     name = "Flashlight Gesture (RH)",
     gripGesture = motionControllers.RightGripAction,
-    headZone = BodyZones.headZoneRH
+    zone = BodyZones.headZoneRH
 })
 
-local flashlightGestureLH = FlashlightGesture:new({
+local flashlightGestureLH = GripGesture:new({
     name = "Flashlight Gesture (LH)",
     gripGesture = motionControllers.LeftGripAction,
-    headZone = BodyZones.headZoneLH
+    zone = BodyZones.headZoneLH
 })
 
 return {
