@@ -10,6 +10,19 @@ local gameState = require("stalker2.gamestate")
 local GestureSet = require("gestures.gestureset")
 
 
+local function createKeyPresExecutionCB(key)
+    return function(gesture, context)
+        if gesture:JustActivated() then
+            gameState:SendKeyDown(key)
+            gesture.gripGesture:Lock()
+        elseif gesture:JustDeactivated() then
+            gameState:SendKeyUp(key)
+            gesture.gripGesture:Unlock()
+        end
+    end
+end
+
+
 -- Create left-hand gesture instances
 local flashlightGestureLH = GripGesture:new({
     name = "Flashlight Gesture (LH)",
@@ -35,78 +48,39 @@ local secondaryWeaponGestureLH = GripGesture:new({
     zone = BodyZones.rightShoulderZoneLH  -- Left hand on right shoulder
 })
 
+local sidearmWeaponGestureLH = GripGesture:new({
+    name = "Sidearm Weapon Gesture (LH)",
+    gripGesture = motionControllers.LeftGripAction,
+    zone = BodyZones.leftHipZoneLH
+})
 
-flashlightGestureLH:SetExecutionCallback(function(gesture, context)
-    if gesture:JustActivated() then
-        gameState:SendKeyDown('L')
-        gesture.gripGesture:Lock()
-    elseif gesture:JustDeactivated() then
-        gameState:SendKeyUp('L')
-        gesture.gripGesture:Unlock()
-    end
-end)
+local meleeWeaponGestureLH = GripGesture:new({
+    name = "Melee Weapon Gesture (LH)",
+    gripGesture = motionControllers.RightGripAction,
+    zone = BodyZones.rightHipZoneLH
+})
 
-flashlightGestureRH:SetExecutionCallback(function(gesture, context)
-    if gesture:JustActivated() then
-        gameState:SendKeyDown('L')
-        gesture.gripGesture:Lock()
-    elseif gesture:JustDeactivated() then
-        gameState:SendKeyUp('L')
-        gesture.gripGesture:Unlock()
-    end
-end)
+local boltActionGestureLH = GripGesture:new({
+    name = "Bolt Action Gesture (LH)",
+    gripGesture = motionControllers.LeftGripAction,
+    zone = BodyZones.leftChestZoneLH
+})
 
+local grenadeGestureLH = GripGesture:new({
+    name = "Grenade Gesture (LH)",
+    gripGesture = motionControllers.LeftGripAction,
+    zone = BodyZones.rightChestZoneLH
+})
 
-primaryWeaponGestureLH:SetExecutionCallback(function(gesture, context)
-    if gesture:JustActivated() then
-        gameState:SendKeyDown('3') -- Use key 1 to switch to primary weapon
-        gesture.gripGesture:Lock()
-    elseif gesture:JustDeactivated() then
-        gameState:SendKeyUp('3')
-        gesture.gripGesture:Unlock()
-    end
-end)
+flashlightGestureLH:SetExecutionCallback(createKeyPresExecutionCB('L'))
+flashlightGestureRH:SetExecutionCallback(createKeyPresExecutionCB('L'))
+primaryWeaponGestureLH:SetExecutionCallback(createKeyPresExecutionCB('3'))
+secondaryWeaponGestureLH:SetExecutionCallback(createKeyPresExecutionCB('4'))
+sidearmWeaponGestureLH:SetExecutionCallback(createKeyPresExecutionCB('2'))
+meleeWeaponGestureLH:SetExecutionCallback(createKeyPresExecutionCB('1'))
+boltActionGestureLH:SetExecutionCallback(createKeyPresExecutionCB('6'))
+grenadeGestureLH:SetExecutionCallback(createKeyPresExecutionCB('5'))
 
-
-secondaryWeaponGestureLH:SetExecutionCallback(function(gesture, context)
-    if gesture:JustActivated() then
-        gameState:SendKeyDown('4') -- Use key 2 to switch to secondary weapon
-        gesture.gripGesture:Lock()
-    elseif gesture:JustDeactivated() then
-        gameState:SendKeyUp('4')
-        gesture.gripGesture:Unlock()
-    end
-end)
-
-
-BodyZones.headZoneLH:SetExecutionCallback(function(gesture, context)
-    if gesture:JustActivated() then
-        local leftController = uevr.params.vr.get_left_joystick_source()
-        uevr.params.vr.trigger_haptic_vibration(0.0, 0.1, 1.0, 100.0, leftController)
-    end
-end)
-
-
-BodyZones.headZoneRH:SetExecutionCallback(function(gesture, context)
-    if gesture:JustActivated() then
-        local rightController = uevr.params.vr.get_right_joystick_source()
-        uevr.params.vr.trigger_haptic_vibration(0.0, 0.1, 1.0, 100.0, rightController)
-    end
-end)
-
-BodyZones.leftShoulderZoneLH:SetExecutionCallback(function(gesture, context)
-    if gesture:JustActivated() then
-        local leftController = uevr.params.vr.get_left_joystick_source()
-        uevr.params.vr.trigger_haptic_vibration(0.0, 0.1, 1.0, 100.0, leftController)
-    end
-end)
-
-BodyZones.rightShoulderZoneLH:SetExecutionCallback(function(gesture, context)
-    if gesture:JustActivated() then
-        local leftController = uevr.params.vr.get_left_joystick_source()
-        uevr.params.vr.trigger_haptic_vibration(0.0, 0.1, 1.0, 100.0, leftController)
-    end
-end)
 
 local gestureSetLH = GestureSet:new(
     {
@@ -115,7 +89,11 @@ local gestureSetLH = GestureSet:new(
             flashlightGestureLH,
             flashlightGestureRH,
             primaryWeaponGestureLH,
-            secondaryWeaponGestureLH
+            secondaryWeaponGestureLH,
+            sidearmWeaponGestureLH,
+            meleeWeaponGestureLH,
+            boltActionGestureLH,
+            grenadeGestureLH
         }
     }
 )

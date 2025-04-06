@@ -7,6 +7,7 @@ local motionControllerActors = require("gestures.motioncontrolleractors")
 local gameState = require("stalker2.gamestate") -- Ensure gameState is available for context
 local gamepadState = require("stalker2.gamepad")
 local gestureSet = require("stalker2.gesturepresetlh")
+local haptics = require("stalker2.haptics")
 
 
 gameState:Init()
