@@ -1,107 +1,32 @@
 local BodyZones = require("gestures.bodyzone")
 
-local function trigger_haptic(left)
-    if left then
-        local leftController = uevr.params.vr.get_left_joystick_source()
-        uevr.params.vr.trigger_haptic_vibration(0.0, 0.1, 1.0, 100.0, leftController)
-    else
-        local rightController = uevr.params.vr.get_right_joystick_source()
-        uevr.params.vr.trigger_haptic_vibration(0.0, 0.1, 1.0, 100.0, rightController)
+local function createHapticCB(left)
+    return function(gesture, context)
+        if left then
+            local leftController = uevr.params.vr.get_left_joystick_source()
+            uevr.params.vr.trigger_haptic_vibration(0.0, 0.1, 1.0, 100.0, leftController)
+        else
+            local rightController = uevr.params.vr.get_right_joystick_source()
+            uevr.params.vr.trigger_haptic_vibration(0.0, 0.1, 1.0, 100.0, rightController)
+        end
     end
+
 end
 
-BodyZones.headZoneLH:SetExecutionCallback(function(gesture, context)
-    if gesture:JustActivated() then
-        trigger_haptic(true)
-    end
-end)
+BodyZones.headZoneLH:SetExecutionCallback(createHapticCB(true))
+BodyZones.leftShoulderZoneLH:SetExecutionCallback(createHapticCB(true))
+BodyZones.rightShoulderZoneLH:SetExecutionCallback(createHapticCB(true))
+BodyZones.rightHipZoneLH:SetExecutionCallback(createHapticCB(true))
+BodyZones.leftHipZoneLH:SetExecutionCallback(createHapticCB(true))
+BodyZones.leftChestZoneLH:SetExecutionCallback(createHapticCB(true))
+BodyZones.rightChestZoneLH:SetExecutionCallback(createHapticCB(true))
+BodyZones.lowerBackZoneLH:SetExecutionCallback(createHapticCB(true))
 
-BodyZones.leftShoulderZoneLH:SetExecutionCallback(function(gesture, context)
-    if gesture:JustActivated() then
-        trigger_haptic(true)
-    end
-end)
-
-BodyZones.rightShoulderZoneLH:SetExecutionCallback(function(gesture, context)
-    if gesture:JustActivated() then
-        trigger_haptic(true)
-    end
-end)
-
-BodyZones.rightHipZoneLH:SetExecutionCallback(function(gesture, context)
-    if gesture:JustActivated() then
-        trigger_haptic(true)
-    end
-end)
-
-BodyZones.leftHipZoneLH:SetExecutionCallback(function(gesture, context)
-    if gesture:JustActivated() then
-        trigger_haptic(true)
-    end
-end)
-
-BodyZones.leftChestZoneLH:SetExecutionCallback(function(gesture, context)
-    if gesture:JustActivated() then
-        trigger_haptic(true)
-    end
-end)
-
-BodyZones.rightChestZoneLH:SetExecutionCallback(function(gesture, context)
-    if gesture:JustActivated() then
-        trigger_haptic(true)
-    end
-end)
-
-BodyZones.lowerBackZoneLH:SetExecutionCallback(function(gesture, context)
-    if gesture:JustActivated() then
-        trigger_haptic(true)
-    end
-end)
-
-BodyZones.headZoneRH:SetExecutionCallback(function(gesture, context)
-    if gesture:JustActivated() then
-        trigger_haptic(false)
-    end
-end)
-
-BodyZones.leftShoulderZoneRH:SetExecutionCallback(function(gesture, context)
-    if gesture:JustActivated() then
-        trigger_haptic(false)
-    end
-end)
-
-BodyZones.rightShoulderZoneRH:SetExecutionCallback(function(gesture, context)
-    if gesture:JustActivated() then
-        trigger_haptic(false)
-    end
-end)
-
-BodyZones.rightHipZoneRH:SetExecutionCallback(function(gesture, context)
-    if gesture:JustActivated() then
-        trigger_haptic(false)
-    end
-end)
-
-BodyZones.leftHipZoneRH:SetExecutionCallback(function(gesture, context)
-    if gesture:JustActivated() then
-        trigger_haptic(false)
-    end
-end)
-
-BodyZones.leftChestZoneRH:SetExecutionCallback(function(gesture, context)
-    if gesture:JustActivated() then
-        trigger_haptic(false)
-    end
-end)
-
-BodyZones.rightChestZoneRH:SetExecutionCallback(function(gesture, context)
-    if gesture:JustActivated() then
-        trigger_haptic(false)
-    end
-end)
-
-BodyZones.lowerBackZoneRH:SetExecutionCallback(function(gesture, context)
-    if gesture:JustActivated() then
-        trigger_haptic(false)
-    end
-end)
+BodyZones.headZoneRH:SetExecutionCallback(createHapticCB(false))
+BodyZones.leftShoulderZoneRH:SetExecutionCallback(createHapticCB(false))
+BodyZones.rightShoulderZoneRH:SetExecutionCallback(createHapticCB(false))
+BodyZones.rightHipZoneRH:SetExecutionCallback(createHapticCB(false))
+BodyZones.leftHipZoneRH:SetExecutionCallback(createHapticCB(false))
+BodyZones.leftChestZoneRH:SetExecutionCallback(createHapticCB(false))
+BodyZones.rightChestZoneRH:SetExecutionCallback(createHapticCB(false))
+BodyZones.lowerBackZoneRH:SetExecutionCallback(createHapticCB(false))

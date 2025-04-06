@@ -54,10 +54,10 @@ local sidearmWeaponGestureLH = GripGesture:new({
     zone = BodyZones.leftHipZoneLH
 })
 
-local meleeWeaponGestureLH = GripGesture:new({
+local meleeWeaponGestureRH = GripGesture:new({
     name = "Melee Weapon Gesture (LH)",
     gripGesture = motionControllers.RightGripAction,
-    zone = BodyZones.rightHipZoneLH
+    zone = BodyZones.rightHipZoneRH
 })
 
 local boltActionGestureLH = GripGesture:new({
@@ -77,7 +77,7 @@ flashlightGestureRH:SetExecutionCallback(createKeyPresExecutionCB('L'))
 primaryWeaponGestureLH:SetExecutionCallback(createKeyPresExecutionCB('3'))
 secondaryWeaponGestureLH:SetExecutionCallback(createKeyPresExecutionCB('4'))
 sidearmWeaponGestureLH:SetExecutionCallback(createKeyPresExecutionCB('2'))
-meleeWeaponGestureLH:SetExecutionCallback(createKeyPresExecutionCB('1'))
+meleeWeaponGestureRH:SetExecutionCallback(createKeyPresExecutionCB('1'))
 boltActionGestureLH:SetExecutionCallback(createKeyPresExecutionCB('6'))
 grenadeGestureLH:SetExecutionCallback(createKeyPresExecutionCB('5'))
 
@@ -91,7 +91,7 @@ local gestureSetLH = GestureSet:new(
             primaryWeaponGestureLH,
             secondaryWeaponGestureLH,
             sidearmWeaponGestureLH,
-            meleeWeaponGestureLH,
+            meleeWeaponGestureRH,
             boltActionGestureLH,
             grenadeGestureLH
         }

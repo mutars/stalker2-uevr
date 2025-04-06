@@ -141,7 +141,7 @@ local rightChestZoneRH = ZonedGestures.BodyZoneGesture:new({
     maxX = 10,
     minY = 5,
     maxY = 15,
-    minZ = 40,
+    minZ = -40,
     maxZ = -25
 })
 
@@ -152,7 +152,7 @@ local rightChestZoneLH = ZonedGestures.BodyZoneGesture:new({
     maxX = 10,
     minY = 5,
     maxY = 15,
-    minZ = 40,
+    minZ = -40,
     maxZ = -25
 })
 
