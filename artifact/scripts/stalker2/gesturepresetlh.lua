@@ -72,6 +72,30 @@ local grenadeGestureLH = GripGesture:new({
     zone = BodyZones.rightChestZoneLH
 })
 
+local inventoryGestureRH = GripGesture:new({
+    name = "Inventory Gesture (RH)",
+    gripGesture = motionControllers.RightGripAction,
+    zone = BodyZones.leftShoulderZoneRH
+})
+
+local dpadLeftGestureRH = GripGesture:new({
+    name = "D-Pad Left Gesture (RH)",
+    gripGesture = motionControllers.RightGripAction,
+    zone = BodyZones.rightShoulderZoneRH
+})
+
+local scannerGestureRH = GripGesture:new({
+    name = "Scanner Gesture (RH)",
+    gripGesture = motionControllers.RightGripAction,
+    zone = BodyZones.leftChestZoneRH
+})
+
+local pdaGestureRH = GripGesture:new({
+    name = "PDA Gesture (RH)",
+    gripGesture = motionControllers.RightGripAction,
+    zone = BodyZones.rightChestZoneRH
+})
+
 flashlightGestureLH:SetExecutionCallback(createKeyPresExecutionCB('L'))
 flashlightGestureRH:SetExecutionCallback(createKeyPresExecutionCB('L'))
 primaryWeaponGestureLH:SetExecutionCallback(createKeyPresExecutionCB('3'))
@@ -80,6 +104,11 @@ sidearmWeaponGestureLH:SetExecutionCallback(createKeyPresExecutionCB('2'))
 meleeWeaponGestureRH:SetExecutionCallback(createKeyPresExecutionCB('1'))
 boltActionGestureLH:SetExecutionCallback(createKeyPresExecutionCB('6'))
 grenadeGestureLH:SetExecutionCallback(createKeyPresExecutionCB('5'))
+
+inventoryGestureRH:SetExecutionCallback(createKeyPresExecutionCB('I'))
+-- dpadLeftGestureRH:SetExecutionCallback(createKeyPresExecutionCB('D'))
+scannerGestureRH:SetExecutionCallback(createKeyPresExecutionCB('7'))
+pdaGestureRH:SetExecutionCallback(createKeyPresExecutionCB('M'))
 
 
 local gestureSetLH = GestureSet:new(
@@ -93,7 +122,10 @@ local gestureSetLH = GestureSet:new(
             sidearmWeaponGestureLH,
             meleeWeaponGestureRH,
             boltActionGestureLH,
-            grenadeGestureLH
+            grenadeGestureLH,
+            inventoryGestureRH,
+            scannerGestureRH,
+            pdaGestureRH
         }
     }
 )
