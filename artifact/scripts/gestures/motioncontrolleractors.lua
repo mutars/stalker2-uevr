@@ -27,8 +27,6 @@ function MotionControllerActors:new()
     instance.kismet_string_library = utils.find_static_class("Class /Script/Engine.KismetStringLibrary")
     instance.statics = utils.find_static_class("Class /Script/Engine.GameplayStatics")
 
-
-
     return instance
 end
 

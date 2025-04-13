@@ -1,3 +1,4 @@
+local utils = require("common.utils")
 local GestureBase = require("gestures.gesturebase")
 local motionControllers = require("gestures.motioncontrollergestures")
 
@@ -14,6 +15,7 @@ function LocationGestureBase:new(config)
     config.location = Vector3f.new(0, 0, 0)
     config.rotation = Vector3f.new(0, 0, 0)
     config.weaponLocation = Vector3f.new(0, 0, 0)
+    config.kismet_math_library = utils.find_static_class("Class /Script/Engine.KismetMathLibrary")
     local instance = GestureBase.new(self, config)
     return instance
 end
@@ -114,38 +116,10 @@ function LeftHandRelativeToRightLocationGesture:EvaluateInternal(context)
         return false
     end
 
-    -- Calculate right-hand-relative position with rotations
-    local rotZ = self.rightHand.rotation.y
-    local rotX = self.rightHand.rotation.z
-    local rotY = self.rightHand.rotation.x
-    
-    local dx = self.leftHand.location.x - self.rightHand.location.x
-    local dy = self.leftHand.location.y - self.rightHand.location.y
-    local dz = self.leftHand.location.z - self.rightHand.location.z
-
-    -- Calculate all transformations first
-    local newX, newY, newZ = dx, dy, dz
-
-    -- Yaw (Z rotation)
-    newX = dx * math.cos(-rotZ/180*math.pi) - dy * math.sin(-rotZ/180*math.pi)
-    newY = dx * math.sin(-rotZ/180*math.pi) + dy * math.cos(-rotZ/180*math.pi)
-    newZ = dz
-
-    -- Roll (X rotation)
-    local tempY = newY
-    newY = tempY * math.cos(rotX/180*math.pi) - newZ * math.sin(rotX/180*math.pi)
-    newZ = tempY * math.sin(rotX/180*math.pi) + newZ * math.cos(rotX/180*math.pi)
-
-    -- Pitch (Y rotation)
-    local tempX = newX
-    newX = tempX * math.cos(-rotY/180*math.pi) - newZ * math.sin(-rotY/180*math.pi)
-    newZ = tempX * math.sin(-rotY/180*math.pi) + newZ * math.cos(-rotY/180*math.pi)
-
-    -- Atomic assignment of final position
-    self.weaponLocation.x = newX
-    self.weaponLocation.y = newY
-    self.weaponLocation.z = newZ
-    
+    local right_hand_rotation_q = self.kismet_math_library:Conv_RotatorToQuaternion(self.rightHand.rotation)
+    local right_hand_rotation_inv_q = self.kismet_math_library:Quat_Inversed(right_hand_rotation_q)
+    local location_diff = self.leftHand.location - self.rightHand.location
+    self.weaponLocation = self.kismet_math_library:Quat_RotateVector(right_hand_rotation_inv_q, location_diff)
     return true
 end
 
@@ -173,38 +147,10 @@ function RightHandRelativeToLeftLocationGesture:EvaluateInternal(context)
         return false
     end
 
-    -- Calculate left-hand-relative position with rotations
-    local rotZ = self.leftHand.rotation.y
-    local rotX = self.leftHand.rotation.z
-    local rotY = self.leftHand.rotation.x
-    
-    local dx = self.rightHand.location.x - self.leftHand.location.x
-    local dy = self.rightHand.location.y - self.leftHand.location.y
-    local dz = self.rightHand.location.z - self.leftHand.location.z
-
-    -- Calculate all transformations first
-    local newX, newY, newZ = dx, dy, dz
-
-    -- Yaw (Z rotation)
-    newX = dx * math.cos(-rotZ/180*math.pi) - dy * math.sin(-rotZ/180*math.pi)
-    newY = dx * math.sin(-rotZ/180*math.pi) + dy * math.cos(-rotZ/180*math.pi)
-    newZ = dz
-
-    -- Roll (X rotation)
-    local tempY = newY
-    newY = tempY * math.cos(rotX/180*math.pi) - newZ * math.sin(rotX/180*math.pi)
-    newZ = tempY * math.sin(rotX/180*math.pi) + newZ * math.cos(rotX/180*math.pi)
-
-    -- Pitch (Y rotation)
-    local tempX = newX
-    newX = tempX * math.cos(-rotY/180*math.pi) - newZ * math.sin(-rotY/180*math.pi)
-    newZ = tempX * math.sin(-rotY/180*math.pi) + newZ * math.cos(-rotY/180*math.pi)
-
-    -- Atomic assignment of final position
-    self.weaponLocation.x = newX
-    self.weaponLocation.y = newY
-    self.weaponLocation.z = newZ
-    
+    local left_hand_rotation_q = self.kismet_math_library:Conv_RotatorToQuaternion(self.leftHand.rotation)
+    local left_hand_rotation_inv_q = self.kismet_math_library:Quat_Inversed(left_hand_rotation_q)
+    local location_diff = self.rightHand.location - self.leftHand.location
+    self.weaponLocation = self.kismet_math_library:Quat_RotateVector(left_hand_rotation_inv_q, location_diff)    
     return true
 end
 

@@ -4,7 +4,8 @@
 ]]--
 
 local GripGesture = require("stalker2.gripgesture")
-local BodyZones = require("gestures.bodyzone")
+local BodyZones = require("gestures.bodyzonesitting")
+local WeaponZones = require("gestures.weaponzones")
 local motionControllers = require("gestures.motioncontrollergestures")
 local gameState = require("stalker2.gamestate")
 local GestureSet = require("gestures.gestureset")
@@ -96,6 +97,18 @@ local pdaGestureRH = GripGesture:new({
     zone = BodyZones.rightChestZoneRH
 })
 
+local reloadGestureLH = GripGesture:new({
+    name = "Reload Gesture (LH)",
+    gripGesture = motionControllers.RightGripAction,
+    zone = WeaponZones.reloadZoneLH
+})
+
+local modeSwitchZoneLH = GripGesture:new({
+    name = "Mode Switch Gesture (LH)",
+    gripGesture = motionControllers.RightGripAction,
+    zone = WeaponZones.modeSwitchZoneLH
+})
+
 flashlightGestureLH:SetExecutionCallback(createKeyPresExecutionCB('L'))
 flashlightGestureRH:SetExecutionCallback(createKeyPresExecutionCB('L'))
 primaryWeaponGestureLH:SetExecutionCallback(createKeyPresExecutionCB('3'))
@@ -109,6 +122,8 @@ inventoryGestureRH:SetExecutionCallback(createKeyPresExecutionCB('I'))
 -- dpadLeftGestureRH:SetExecutionCallback(createKeyPresExecutionCB('D'))
 scannerGestureRH:SetExecutionCallback(createKeyPresExecutionCB('7'))
 pdaGestureRH:SetExecutionCallback(createKeyPresExecutionCB('M'))
+reloadGestureLH:SetExecutionCallback(createKeyPresExecutionCB('R'))
+modeSwitchZoneLH:SetExecutionCallback(createKeyPresExecutionCB('B'))
 
 
 local gestureSetLH = GestureSet:new(
@@ -119,13 +134,15 @@ local gestureSetLH = GestureSet:new(
             flashlightGestureRH,
             primaryWeaponGestureLH,
             secondaryWeaponGestureLH,
-            sidearmWeaponGestureLH,
-            meleeWeaponGestureRH,
+            -- sidearmWeaponGestureLH,
+            -- meleeWeaponGestureRH,
             boltActionGestureLH,
             grenadeGestureLH,
             inventoryGestureRH,
             scannerGestureRH,
-            pdaGestureRH
+            pdaGestureRH,
+            reloadGestureLH,
+            modeSwitchZoneLH
         }
     }
 )

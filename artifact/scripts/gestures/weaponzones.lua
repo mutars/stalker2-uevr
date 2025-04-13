@@ -4,7 +4,7 @@ local LocationGestures = require("gestures.locationgesture")
 -- Weapon Zone Instances
 local reloadZoneRH = ZonedGestures.WeaponZoneGesture:new({
     name = "Weapon Reload Zone (RH)",
-    weaponLocationGesture = LocationGestures.RightHand,
+    weaponLocationGesture = LocationGestures.LeftHandRelativeToRightLocationGesture,
     minX = -15,
     maxX = 20,
     minY = -12,
@@ -15,7 +15,7 @@ local reloadZoneRH = ZonedGestures.WeaponZoneGesture:new({
 
 local reloadZoneLH = ZonedGestures.WeaponZoneGesture:new({
     name = "Weapon Reload Zone (LH)",
-    weaponLocationGesture = LocationGestures.LeftHand,
+    weaponLocationGesture = LocationGestures.RightHandRelativeToLeftLocationGesture,
     minX = -15,
     maxX = 20,
     minY = -12,
@@ -26,7 +26,7 @@ local reloadZoneLH = ZonedGestures.WeaponZoneGesture:new({
 
 local modeSwitchZoneRH = ZonedGestures.WeaponZoneGesture:new({
     name = "Weapon Mode Switch Zone (RH)",
-    weaponLocationGesture = LocationGestures.RightHand,
+    weaponLocationGesture = LocationGestures.LeftHandRelativeToRightLocationGesture,
     minX = -5,
     maxX = 10,
     minY = -12,
@@ -37,7 +37,7 @@ local modeSwitchZoneRH = ZonedGestures.WeaponZoneGesture:new({
 
 local modeSwitchZoneLH = ZonedGestures.WeaponZoneGesture:new({
     name = "Weapon Mode Switch Zone (LH)",
-    weaponLocationGesture = LocationGestures.LeftHand,
+    weaponLocationGesture = LocationGestures.RightHandRelativeToLeftLocationGesture,
     minX = -5,
     maxX = 10,
     minY = -12,
@@ -48,7 +48,7 @@ local modeSwitchZoneLH = ZonedGestures.WeaponZoneGesture:new({
 
 local barrelZoneRH = ZonedGestures.WeaponZoneGesture:new({
     name = "Weapon Barrel Zone (RH)",
-    weaponLocationGesture = LocationGestures.RightHand,
+    weaponLocationGesture = LocationGestures.LeftHandRelativeToRightLocationGesture,
     minX = 15,
     maxX = 45,
     minY = -15,
@@ -59,7 +59,7 @@ local barrelZoneRH = ZonedGestures.WeaponZoneGesture:new({
 
 local barrelZoneLH = ZonedGestures.WeaponZoneGesture:new({
     name = "Weapon Barrel Zone (LH)",
-    weaponLocationGesture = LocationGestures.LeftHand,
+    weaponLocationGesture = LocationGestures.RightHandRelativeToLeftLocationGesture,
     minX = 15,
     maxX = 45,
     minY = -15,
