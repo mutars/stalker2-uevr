@@ -3,7 +3,10 @@
     Left-handed gesture presets using the GripGesture base class
 ]]--
 
+require("Config.CONFIG")
 local GripGesture = require("stalker2.gripgesture")
+local TwoHandedAimGesture = require("stalker2.twohandedaim")
+
 local BodyZones = require("gestures.bodyzonesitting")
 local WeaponZones = require("gestures.weaponzones")
 local motionControllers = require("gestures.motioncontrollergestures")
@@ -20,6 +23,16 @@ local function createKeyPresExecutionCB(key)
             gameState:SendKeyUp(key)
             gesture.gripGesture:Unlock()
         end
+    end
+end
+
+local function twoHandedAimingCB(gesture, context)
+    if gesture:JustActivated() then
+        two_hand_aiming = true
+        gesture.rightGripGesture:Lock()
+    elseif gesture:JustDeactivated() then
+        two_hand_aiming = false
+        gesture.rightGripGesture:Unlock()
     end
 end
 
@@ -109,6 +122,13 @@ local modeSwitchZoneLH = GripGesture:new({
     zone = WeaponZones.modeSwitchZoneLH
 })
 
+local twoHandedAimGestureLH = TwoHandedAimGesture:new({
+    name = "Two-Handed Aim Gesture (LH)",
+    leftGripGesture = motionControllers.LeftGripAction,
+    rightGripGesture = motionControllers.RightGripAction,
+    zone = WeaponZones.barrelZoneLH
+})
+
 flashlightGestureLH:SetExecutionCallback(createKeyPresExecutionCB('L'))
 flashlightGestureRH:SetExecutionCallback(createKeyPresExecutionCB('L'))
 primaryWeaponGestureLH:SetExecutionCallback(createKeyPresExecutionCB('3'))
@@ -125,19 +145,22 @@ pdaGestureRH:SetExecutionCallback(createKeyPresExecutionCB('M'))
 reloadGestureLH:SetExecutionCallback(createKeyPresExecutionCB('R'))
 modeSwitchZoneLH:SetExecutionCallback(createKeyPresExecutionCB('B'))
 
+twoHandedAimGestureLH:SetExecutionCallback(twoHandedAimingCB)
+
 
 local gestureSetLH = GestureSet:new(
     {
         -- Initialize the gesture set with the flashlight and primary weapon gestures for both hands
         rootGestures = {
+            twoHandedAimGestureLH,
             flashlightGestureLH,
             flashlightGestureRH,
             primaryWeaponGestureLH,
             secondaryWeaponGestureLH,
             -- sidearmWeaponGestureLH,
             -- meleeWeaponGestureRH,
-            boltActionGestureLH,
-            grenadeGestureLH,
+            -- boltActionGestureLH,
+            -- grenadeGestureLH,
             inventoryGestureRH,
             scannerGestureRH,
             pdaGestureRH,

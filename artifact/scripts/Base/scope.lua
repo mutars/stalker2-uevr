@@ -1,5 +1,5 @@
 require(".\\Base\\Trackers\\Trackers")
-require(".\\Config\\CONFIG")
+require("Config.CONFIG")
 scopeInit=true
 local api = uevr.api
 local vr = uevr.params.vr

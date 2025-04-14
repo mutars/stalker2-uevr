@@ -1,12 +1,11 @@
 require(".\\Base\\Trackers\\Trackers")
-require(".\\Config\\CONFIG")
+require("Config.CONFIG")
 basicInit=true
 
 local api = uevr.api
 local vr = uevr.params.vr
 
 local dominant_hand = 0
-local two_hand_aiming = true
 local ignore_aiming_state = true
 
 --Config Recoil
@@ -339,7 +338,7 @@ uevr.sdk.callbacks.on_pre_engine_tick(function(engine, delta)
             weapon_mesh.bCastDynamicShadow = false
             weapon_mesh.bCastStaticShadow = false
             -- smg/pistols considered one-handed if you want 2-handed aim with smg use is_using_two_handed_w(pawn)
-            is_using_two_handed_weapon = is_using_two_handed_weapon_alt(pawn)
+            is_using_two_handed_weapon = is_using_two_handed_w(pawn)
         end
     end
 end)

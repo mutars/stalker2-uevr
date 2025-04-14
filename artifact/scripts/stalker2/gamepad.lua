@@ -27,6 +27,21 @@ function GamepadState:Update(state)
     if self.rightGripAction:IsLocked() then
         self:unpressButton(XINPUT_GAMEPAD_RIGHT_SHOULDER)
     end
+    local LTrigger= state.Gamepad.bLeftTrigger
+	local RTrigger= state.Gamepad.bRightTrigger
+	local rShoulder = self:isButtonPressed(XINPUT_GAMEPAD_RIGHT_SHOULDER)
+	local lShoulder = self:isButtonPressed(XINPUT_GAMEPAD_LEFT_SHOULDER)
+    if lShoulder then
+        self:setLeftTrigger(255)
+    else
+        self:setLeftTrigger(0)
+    end
+    self:unpressButton(XINPUT_GAMEPAD_RIGHT_SHOULDER)
+    self:unpressButton(XINPUT_GAMEPAD_LEFT_SHOULDER)
+    self:setRightTrigger(LTrigger)
+
+
+
 end
 
 -- Reset key state variables (does not modify gamepad state)

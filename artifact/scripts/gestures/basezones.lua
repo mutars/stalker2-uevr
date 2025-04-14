@@ -34,9 +34,8 @@ function BodyZoneGesture:EvaluateInternal(context)
     local x = self.locationGesture.location.x
     local y = self.locationGesture.location.y
     local z = self.locationGesture.location.z
-    local maxX = self.maxX + (SitMode and 20.0 or 0.0)
 
-    return x >= self.minX and x <= maxX and
+    return x >= self.minX and x <= self.maxX and
            y >= self.minY and y <= self.maxY and
            z >= self.minZ and z <= self.maxZ
 end

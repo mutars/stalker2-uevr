@@ -5,7 +5,8 @@
 	 isUpRecoilActive= true
 	 SwapLShoulderLThumb =true --sprinting switch with l shoulder
 	 SitMode=false
-	 
+	 two_hand_aiming = true
+
 	 
 	 configInit=true
 	 

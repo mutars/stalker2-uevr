@@ -8,6 +8,7 @@ local gameState = require("stalker2.gamestate") -- Ensure gameState is available
 local gamepadState = require("stalker2.gamepad")
 local gestureSet = require("stalker2.gesturepresetlh")
 local haptics = require("stalker2.haptics")
+require("Base.basic")
 
 
 gameState:Init()
