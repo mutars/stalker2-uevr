@@ -37,7 +37,11 @@ function GamepadState:Update(state)
         self:setLeftTrigger(0)
     end
     self:unpressButton(XINPUT_GAMEPAD_RIGHT_SHOULDER)
-    self:unpressButton(XINPUT_GAMEPAD_LEFT_SHOULDER)
+    if RTrigger > 125 then
+        self:pressButton(XINPUT_GAMEPAD_LEFT_SHOULDER)
+    else
+        self:unpressButton(XINPUT_GAMEPAD_LEFT_SHOULDER)
+    end
     self:setRightTrigger(LTrigger)
 
 

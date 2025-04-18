@@ -202,18 +202,15 @@ void Stalker2VR::on_pre_engine_tick(uevr::API::UGameEngine* engine, float delta)
     }
 }
 
-using StaticLoadObject_t = uevr::API::UObject* (*)(uevr::API::UClass* ObjectClass, uevr::API::UObject* InOuter, const wchar_t *inName,const wchar_t *Filename, int32_t LoadFlags, struct UPackageMap* Sandbox, bool bAllowObjectReconciliation, const struct FLinkerInstancingContext* InstancingContext);
-
 void Stalker2VR::load_asset() {
     auto mod = utility::get_executable();
     // StaticLoadObject
-    static const auto func_signature = "40 55 53 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 A8 FE FF FF 48 81 EC 58 02 00 00 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 48";
+    static const auto func_signature = "40 55 53 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 58 FE FF FF 48 81 EC A8 02 00 00 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 98";
     static auto static_load_asset_func = utility::scan(mod, func_signature);
     if(!static_load_asset_func) {
         PLUGIN_LOG_ONCE_ERROR("Failed to find StaticLoadObject function");
         return;
     }
-//    auto static_load_asset_func_addr = (uintptr_t)mod + 0x2e1f3b0;
     auto func = (StaticLoadObject_t)static_load_asset_func.value();
     auto static_mesh_cl = API::get()->find_uobject<API::UClass>(L"Class /Script/Engine.StaticMesh");
 

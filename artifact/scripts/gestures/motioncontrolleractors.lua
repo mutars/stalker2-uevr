@@ -133,7 +133,7 @@ function MotionControllerActors:Init(engine)
 
     local pawn = uevr.api:get_local_pawn(0)
     if not pawn then
-        print("Pawn is nil")
+        -- print("Pawn is nil")
         self.inited = false
         return false
     end

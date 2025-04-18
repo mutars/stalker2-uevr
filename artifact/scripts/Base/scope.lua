@@ -314,7 +314,7 @@ local function spawn_scope(game_engine, pawn)
     end
 
     if not pawn then
-        print("pawn is nil")
+        -- print("pawn is nil")
         return
     end
 

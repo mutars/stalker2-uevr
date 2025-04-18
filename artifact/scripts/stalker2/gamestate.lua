@@ -5,6 +5,7 @@ local GameStateManager = {
     lastWorldTime = 0,
     worldTimeTick = 0,
     initialized = false,
+    last_level = nil,
 
     -- API reference
     api = nil
@@ -17,6 +18,7 @@ function GameStateManager:Init()
     self.isInventoryPDA = false
     self.lastWorldTime = 0
     self.worldTimeTick = 0
+    self.last_level = nil
     self.initialized = true
     print("GameStateManager initialized")
 end
@@ -79,6 +81,21 @@ end
 -- Get local player pawn
 function GameStateManager:GetLocalPawn()
     return self.api:get_local_pawn(0)
+end
+
+function GameStateManager:IsLevelChanged(engine)
+    local viewport = engine.GameViewport
+    if viewport then
+        local world = viewport.World
+        if world then
+            local level = world.PersistentLevel
+            if self.last_level ~= level then
+                self.last_level = level
+                return true
+            end
+        end
+    end
+    return false
 end
 
 -- Send a key press (down or up)
