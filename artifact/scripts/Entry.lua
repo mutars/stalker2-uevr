@@ -2,11 +2,20 @@
 -- Vector3f.new = function(self, x, y, z)
 --     return {x=x, y=y, z=z}
 -- end
-
+require("Config.CONFIG")
 local motionControllerActors = require("gestures.motioncontrolleractors")
 local gameState = require("stalker2.gamestate") -- Ensure gameState is available for context
 local gamepadState = require("stalker2.gamepad")
-local gestureSet = require("stalker2.gesturepresetlh")
+local gestureSet = nil
+if isRhand and SitMode then
+    gestureSet = require("presets.sittingRH")
+elseif isRhand and not SitMode then
+    gestureSet = require("presets.standingRH")
+elseif not isRhand and SitMode then
+    gestureSet = require("presets.sittingLH")
+else
+    gestureSet = require("presets.standingLH")
+end
 local haptics = require("stalker2.haptics")
 require("Base.basic")
 require("Base.scope")

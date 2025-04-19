@@ -1,3 +1,4 @@
+require("Config.CONFIG")
 local MotionControllerGestures = require("gestures.motioncontrollergestures")
 
 -- XInputState class to manage controller state
@@ -18,9 +19,7 @@ function GamepadState:new()
     return instance
 end
 
--- Update state from XInput
-function GamepadState:Update(state)
-    self.gamepadState = state
+function GamepadState:UpdateLH(state)
     if self.leftGripAction:IsLocked() then
         self:unpressButton(XINPUT_GAMEPAD_LEFT_SHOULDER)
     end
@@ -43,9 +42,37 @@ function GamepadState:Update(state)
         self:unpressButton(XINPUT_GAMEPAD_LEFT_SHOULDER)
     end
     self:setRightTrigger(LTrigger)
+end
 
+function GamepadState:UpdateRH(state)
+    if self.leftGripAction:IsLocked() then
+        self:unpressButton(XINPUT_GAMEPAD_LEFT_SHOULDER)
+    end
+    if self.rightGripAction:IsLocked() then
+        self:unpressButton(XINPUT_GAMEPAD_RIGHT_SHOULDER)
+    end
+    local LTrigger= state.Gamepad.bLeftTrigger
+	local rShoulder = self:isButtonPressed(XINPUT_GAMEPAD_RIGHT_SHOULDER)
+    if rShoulder then
+        self:setLeftTrigger(255)
+    else
+        self:setLeftTrigger(0)
+    end
+    if LTrigger > 125 then
+        self:pressButton(XINPUT_GAMEPAD_LEFT_SHOULDER)
+    else
+        self:unpressButton(XINPUT_GAMEPAD_LEFT_SHOULDER)
+    end
+end
 
-
+-- Update state from XInput
+function GamepadState:Update(state)
+    self.gamepadState = state
+    if isRhand then
+        self:UpdateRH(state)
+    else
+        self:UpdateLH(state)
+    end
 end
 
 -- Reset key state variables (does not modify gamepad state)

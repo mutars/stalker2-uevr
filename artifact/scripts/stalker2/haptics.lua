@@ -1,4 +1,10 @@
-local BodyZones = require("gestures.bodyzonesitting")
+require("Config.CONFIG")
+if not HapticFeedback then
+    print("Haptic feedback is disabled in the configuration.")
+    return
+end
+
+local BodyZones = require("gestures.bodyzonesitting") and SitMode or require("gestures.bodyzone")
 local WeaponZones = require("gestures.weaponzones")
 
 local function HapticLeftCB(gesture, context)

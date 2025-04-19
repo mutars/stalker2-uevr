@@ -9,8 +9,11 @@ local function find_required_object(name)
 end
 
 local function find_static_class(name)
-    local c = find_required_object(name)
-    return c:get_class_default_object()
+    local cl = find_required_object(name)
+    if cl and cl.get_class_default_object then
+        return cl:get_class_default_object()
+    end
+    return nil
 end
 
 return {

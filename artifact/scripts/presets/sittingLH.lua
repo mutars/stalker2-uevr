@@ -13,7 +13,6 @@ local motionControllers = require("gestures.motioncontrollergestures")
 local gameState = require("stalker2.gamestate")
 local GestureSet = require("gestures.gestureset")
 
-
 local function createKeyPresExecutionCB(key)
     return function(gesture, context)
         if gesture:JustActivated() then
@@ -80,10 +79,10 @@ local boltActionGestureLH = GripGesture:new({
     zone = BodyZones.leftChestZoneLH
 })
 
-local grenadeGestureLH = GripGesture:new({
-    name = "Grenade Gesture (LH)",
-    gripGesture = motionControllers.LeftGripAction,
-    zone = BodyZones.rightChestZoneLH
+local grenadeGestureRH = GripGesture:new({
+    name = "Grenade Gesture (RH)",
+    gripGesture = motionControllers.RightGripAction,
+    zone = BodyZones.rightChestZoneRH
 })
 
 local inventoryGestureRH = GripGesture:new({
@@ -104,10 +103,10 @@ local scannerGestureRH = GripGesture:new({
     zone = BodyZones.leftChestZoneRH
 })
 
-local pdaGestureRH = GripGesture:new({
-    name = "PDA Gesture (RH)",
-    gripGesture = motionControllers.RightGripAction,
-    zone = BodyZones.rightChestZoneRH
+local pdaGestureLH = GripGesture:new({
+    name = "PDA Gesture (LH)",
+    gripGesture = motionControllers.LeftGripAction,
+    zone = BodyZones.rightChestZoneLH
 })
 
 local reloadGestureLH = GripGesture:new({
@@ -136,12 +135,12 @@ secondaryWeaponGestureLH:SetExecutionCallback(createKeyPresExecutionCB('4'))
 sidearmWeaponGestureLH:SetExecutionCallback(createKeyPresExecutionCB('2'))
 meleeWeaponGestureRH:SetExecutionCallback(createKeyPresExecutionCB('1'))
 boltActionGestureLH:SetExecutionCallback(createKeyPresExecutionCB('6'))
-grenadeGestureLH:SetExecutionCallback(createKeyPresExecutionCB('5'))
+grenadeGestureRH:SetExecutionCallback(createKeyPresExecutionCB('5'))
 
 inventoryGestureRH:SetExecutionCallback(createKeyPresExecutionCB('I'))
 -- dpadLeftGestureRH:SetExecutionCallback(createKeyPresExecutionCB('D'))
 scannerGestureRH:SetExecutionCallback(createKeyPresExecutionCB('7'))
-pdaGestureRH:SetExecutionCallback(createKeyPresExecutionCB('M'))
+pdaGestureLH:SetExecutionCallback(createKeyPresExecutionCB('M'))
 reloadGestureLH:SetExecutionCallback(createKeyPresExecutionCB('R'))
 modeSwitchZoneLH:SetExecutionCallback(createKeyPresExecutionCB('B'))
 
@@ -160,10 +159,10 @@ local gestureSetLH = GestureSet:new(
             -- sidearmWeaponGestureLH,
             -- meleeWeaponGestureRH,
             -- boltActionGestureLH,
-            -- grenadeGestureLH,
+            grenadeGestureRH,
             inventoryGestureRH,
             scannerGestureRH,
-            pdaGestureRH,
+            pdaGestureLH,
             reloadGestureLH,
             modeSwitchZoneLH
         }
