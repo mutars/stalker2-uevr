@@ -1,4 +1,4 @@
-	 isRhand = false
+	 isRhand = true
 	 HapticFeedback = true
 	 isLeftHandModeTriggerSwitchOnly = true
 	 --Recoil on /off:
@@ -7,6 +7,5 @@
 	 SitMode=true
 	 two_hand_aiming = false
 
-	 
+
 	 configInit=true
-	 

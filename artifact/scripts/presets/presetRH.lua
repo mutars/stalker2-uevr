@@ -7,7 +7,7 @@ require("Config.CONFIG")
 local GripGesture = require("stalker2.gripgesture")
 local TwoHandedAimGesture = require("stalker2.twohandedaim")
 
-local BodyZones = require("gestures.bodyzone")
+local BodyZones = SitMode and require("gestures.bodyzonesitting") or require("gestures.bodyzones")
 local WeaponZones = require("gestures.weaponzones")
 local motionControllers = require("gestures.motioncontrollergestures")
 local gameState = require("stalker2.gamestate")
@@ -111,13 +111,13 @@ local pdaGestureRH = GripGesture:new({
 
 local reloadGestureRH = GripGesture:new({
     name = "Reload Gesture (RH)",
-    gripGesture = motionControllers.RightGripAction,
+    gripGesture = motionControllers.LeftGripAction,
     zone = WeaponZones.reloadZoneRH
 })
 
 local modeSwitchZoneRH = GripGesture:new({
     name = "Mode Switch Gesture (RH)",
-    gripGesture = motionControllers.RightGripAction,
+    gripGesture = motionControllers.LeftGripAction,
     zone = WeaponZones.modeSwitchZoneRH
 })
 
@@ -147,7 +147,29 @@ modeSwitchZoneRH:SetExecutionCallback(createKeyPresExecutionCB('B'))
 twoHandedAimGestureRH:SetExecutionCallback(twoHandedAimingCB)
 
 
-local gestureSetRH = GestureSet:new(
+local SitmodeSetRH = GestureSet:new(
+    {
+        -- Initialize the gesture set with the flashlight and primary weapon gestures for both hands
+        rootGestures = {
+            twoHandedAimGestureRH,
+            flashlightGestureLH,
+            flashlightGestureRH,
+            primaryWeaponGestureRH,
+            secondaryWeaponGestureRH,
+            -- sidearmWeaponGestureRH,
+            -- meleeWeaponGestureLH,
+            -- boltActionGestureRH,
+            grenadeGestureLH,
+            inventoryGestureLH,
+            scannerGestureLH,
+            pdaGestureRH,
+            reloadGestureRH,
+            modeSwitchZoneRH
+        }
+    }
+)
+
+local StandModeSetRH = GestureSet:new(
     {
         -- Initialize the gesture set with the flashlight and primary weapon gestures for both hands
         rootGestures = {
@@ -169,4 +191,4 @@ local gestureSetRH = GestureSet:new(
     }
 )
 
-return gestureSetRH
+return SitMode and SitmodeSetRH or StandModeSetRH

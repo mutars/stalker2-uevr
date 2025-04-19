@@ -7,7 +7,7 @@ require("Config.CONFIG")
 local GripGesture = require("stalker2.gripgesture")
 local TwoHandedAimGesture = require("stalker2.twohandedaim")
 
-local BodyZones = require("gestures.bodyzonesitting")
+local BodyZones = SitMode and require("gestures.bodyzonesitting") or require("gestures.bodyzone")
 local WeaponZones = require("gestures.weaponzones")
 local motionControllers = require("gestures.motioncontrollergestures")
 local gameState = require("stalker2.gamestate")
@@ -147,7 +147,7 @@ modeSwitchZoneLH:SetExecutionCallback(createKeyPresExecutionCB('B'))
 twoHandedAimGestureLH:SetExecutionCallback(twoHandedAimingCB)
 
 
-local gestureSetLH = GestureSet:new(
+local SitModeSetLH = GestureSet:new(
     {
         -- Initialize the gesture set with the flashlight and primary weapon gestures for both hands
         rootGestures = {
@@ -169,4 +169,27 @@ local gestureSetLH = GestureSet:new(
     }
 )
 
-return gestureSetLH
+
+local StandModeSetLH = GestureSet:new(
+    {
+        -- Initialize the gesture set with the flashlight and primary weapon gestures for both hands
+        rootGestures = {
+            twoHandedAimGestureLH,
+            flashlightGestureLH,
+            flashlightGestureRH,
+            primaryWeaponGestureLH,
+            secondaryWeaponGestureLH,
+            sidearmWeaponGestureLH,
+            meleeWeaponGestureRH,
+            boltActionGestureLH,
+            grenadeGestureRH,
+            inventoryGestureRH,
+            scannerGestureRH,
+            pdaGestureLH,
+            reloadGestureLH,
+            modeSwitchZoneLH
+        }
+    }
+)
+
+return SitMode and StandModeSetLH or SitModeSetLH

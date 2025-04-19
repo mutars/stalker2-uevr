@@ -4,7 +4,7 @@ if not HapticFeedback then
     return
 end
 
-local BodyZones = require("gestures.bodyzonesitting") and SitMode or require("gestures.bodyzone")
+local BodyZones = SitMode and require("gestures.bodyzonesitting") or require("gestures.bodyzone")
 local WeaponZones = require("gestures.weaponzones")
 
 local function HapticLeftCB(gesture, context)
