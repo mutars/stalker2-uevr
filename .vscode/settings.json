@@ -1,0 +1,27 @@
+{
+    "Lua.runtime.version": "Lua 5.4",
+    "Lua.runtime.path": [
+        "${workspaceFolder}/artifact/scripts/?/?.lua",
+        "${workspaceFolder}/artifact/scripts/?.lua",
+        "${workspaceFolder}/artifact/scripts/?/init.lua",
+        "./?.lua",
+        "./?/init.lua"
+    ],
+    "Lua.diagnostics.globals": [
+        "UEVR_UObjectHook",
+        "Vector3f",
+        "StructObject",
+        "uevr"
+    ],
+    "Lua.workspace.library": [
+        "${workspaceFolder}/artifact/scripts",
+        "${workspaceFolder}/tests"
+    ],
+    "terminal.integrated.env.linux": {
+        "LUA_PATH": "${workspaceFolder}/artifact/scripts/?.lua;${workspaceFolder}/artifact/scripts/?/?.lua;${workspaceFolder}/tests/?.lua;;"
+    },
+    "terminal.integrated.env.windows": {
+        "LUA_PATH": "${workspaceFolder}/artifact/scripts/?.lua;${workspaceFolder}/artifact/scripts/?/?.lua;${workspaceFolder}/tests/?.lua;;"
+    },
+    "lua-local.interpreter": "lua5.3"
+}

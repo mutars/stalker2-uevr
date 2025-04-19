@@ -1,0 +1,19 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "(Windows) Attach",
+        "type": "cppvsdbg",
+        "request": "attach",
+      },
+      {
+        "type": "lua-local",
+        "request": "launch",
+        "name": "Release",
+        "cwd": "${fileDirname}",
+        "env": {
+          "LUA_PATH": "${workspaceFolder}/artifact/scripts/?.lua;;"
+        }
+      }
+    ]
+}

@@ -1,5 +1,5 @@
 require(".\\Base\\Trackers\\Trackers")
-require(".\\Config\\CONFIG")
+require("Config.CONFIG")
 HolsterInit=true
 if TrackersInit and configInit then
 	print("Trackers  loaded")

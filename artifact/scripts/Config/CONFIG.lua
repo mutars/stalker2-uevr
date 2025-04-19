@@ -4,8 +4,8 @@
 	 --Recoil on /off:
 	 isUpRecoilActive= true
 	 SwapLShoulderLThumb =true --sprinting switch with l shoulder
-	 SitMode=false
-	 
-	 
+	 SitMode=true
+	 two_hand_aiming = false
+
+
 	 configInit=true
-	 

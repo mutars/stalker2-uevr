@@ -16,14 +16,14 @@ A plugin for UEVR (Unreal Engine VR) that enhances the VR experience in S.T.A.L.
   
    |      VR Button         | Zone                          | Action                         |
    |----------------|-------------------------------|-----------------------------|
-   |   Press Right Grip   |   Rigth Shoulder      |    Primary Slot Weapon    |
+   |   Press Left Grip   |   Rigth Shoulder      |    Primary Slot Weapon    |
    |      |   Left Shoulder   |    2nd Primary Slot Weapon   |
    |      |   Right Hip Area     |   Sidearm Slot Weapon    |
    |      |   Left Lower Area       |   Melee Slot Weapon    |
    |      |   Left Chest  |    Nail   |
    |                     |  Right Chest  |     Grenade Slot  |
    |      |   Top Head, if AimMethod Head  |    Toggle Flashlight   |
-   |   Press Left Grip   |   Left Shoulder  |  Open Inventory      |
+   |   Press Right Grip   |   Left Shoulder  |  Open Inventory      |
    |                     |   Right Shoulder |   Simulates Dpad Left aka QuickSlot for item usage  |
    |                     |   Left Chest |  Scanner  |
    |                     |   Right Chest |      PDA    |
