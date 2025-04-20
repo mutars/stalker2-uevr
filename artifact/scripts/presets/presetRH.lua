@@ -7,7 +7,7 @@ require("Config.CONFIG")
 local GripGesture = require("stalker2.gripgesture")
 local TwoHandedAimGesture = require("stalker2.twohandedaim")
 
-local BodyZones = SitMode and require("gestures.bodyzonesitting") or require("gestures.bodyzones")
+local BodyZones = SitMode and require("gestures.bodyzonesitting") or require("gestures.bodyzone")
 local WeaponZones = require("gestures.weaponzones")
 local motionControllers = require("gestures.motioncontrollergestures")
 local gameState = require("stalker2.gamestate")
