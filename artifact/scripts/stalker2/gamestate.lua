@@ -119,12 +119,15 @@ function GameStateManager:SendKeyUp(key_value)
 end
 
 -- Get current equipped weapon
-function GameStateManager:GetCurrentWeapon()
+function GameStateManager:GetEquippedWeapon()
     local pawn = self:GetLocalPawn()
-    if pawn and pawn.Inventory then
-        return pawn.Inventory:GetPrimaryWeapon()
-    end
-    return nil
+    if not pawn then return nil end
+    local sk_mesh = pawn.Mesh
+    if not sk_mesh then return nil end
+    local anim_instance = sk_mesh.AnimScriptInstance
+    if not anim_instance then return nil end
+    local weapon_mesh = anim_instance.WeaponData.WeaponMesh
+    return weapon_mesh
 end
 
 -- Get game engine

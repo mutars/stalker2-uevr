@@ -40,10 +40,6 @@ public:
     virtual ~Stalker2VR();
 
     void on_initialize() override;
-    void on_pre_engine_tick(uevr::API::UGameEngine* engine, float delta) override;
-
-    void on_custom_event(const char *event_name, const char *event_data) override;
-
 private:
     static SDK::FTransform *on_get_weapon_forward(void *actor, SDK::FTransform *out_transform, int8_t type);
     static void on_set_scalar_value(void *materialInstance, uevr::API::FName name, float value);
@@ -60,7 +56,6 @@ private:
     using set_scalar_value_mci_t = decltype(Stalker2VR::on_set_scalar_value_mci);
     set_scalar_value_mci_t* m_original_set_scalar_value_mci{};
 
-    void load_asset();
     bool m_scope_asset_loaded{false};
     
     // Throttle interval in seconds 

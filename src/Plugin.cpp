@@ -192,53 +192,53 @@ void Stalker2VR::on_initialize() {
     // Asset loading moved to on_pre_engine_tick for stability
 }
 
-using StaticLoadObject_t = uevr::API::UObject* (*)(uevr::API::UClass* ObjectClass, uevr::API::UObject* InOuter, const wchar_t *inName,const wchar_t *Filename, int32_t LoadFlags, struct UPackageMap* Sandbox, bool bAllowObjectReconciliation, const struct FLinkerInstancingContext* InstancingContext);
+// using StaticLoadObject_t = uevr::API::UObject* (*)(uevr::API::UClass* ObjectClass, uevr::API::UObject* InOuter, const wchar_t *inName,const wchar_t *Filename, int32_t LoadFlags, struct UPackageMap* Sandbox, bool bAllowObjectReconciliation, const struct FLinkerInstancingContext* InstancingContext);
 
-void Stalker2VR::on_pre_engine_tick(uevr::API::UGameEngine* engine, float delta) {
-    static unsigned int monotonic = 0;
-    if(!m_scope_asset_loaded || (monotonic++ > 50 && (monotonic = 0, level_changed(engine)))) {
-        std::cout << "Level changed" << std::endl;
-        load_asset();
-    }
-}
+// void Stalker2VR::on_pre_engine_tick(uevr::API::UGameEngine* engine, float delta) {
+//     static unsigned int monotonic = 0;
+//     if(!m_scope_asset_loaded || (monotonic++ > 50 && (monotonic = 0, level_changed(engine)))) {
+//         std::cout << "Level changed" << std::endl;
+//         load_asset();
+//     }
+// }
 
-void Stalker2VR::load_asset() {
-    auto mod = utility::get_executable();
-    // StaticLoadObject
-    static const auto func_signature = "40 55 53 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 58 FE FF FF 48 81 EC A8 02 00 00 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 98";
-    static auto static_load_asset_func = utility::scan(mod, func_signature);
-    if(!static_load_asset_func) {
-        PLUGIN_LOG_ONCE_ERROR("Failed to find StaticLoadObject function");
-        return;
-    }
-    auto func = (StaticLoadObject_t)static_load_asset_func.value();
-    auto static_mesh_cl = API::get()->find_uobject<API::UClass>(L"Class /Script/Engine.StaticMesh");
+// void Stalker2VR::load_asset() {
+//     auto mod = utility::get_executable();
+//     // StaticLoadObject
+//     static const auto func_signature = "40 55 53 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 58 FE FF FF 48 81 EC A8 02 00 00 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 98";
+//     static auto static_load_asset_func = utility::scan(mod, func_signature);
+//     if(!static_load_asset_func) {
+//         PLUGIN_LOG_ONCE_ERROR("Failed to find StaticLoadObject function");
+//         return;
+//     }
+//     auto func = (StaticLoadObject_t)static_load_asset_func.value();
+//     auto static_mesh_cl = API::get()->find_uobject<API::UClass>(L"Class /Script/Engine.StaticMesh");
 
-    if(!static_mesh_cl) {
-        PLUGIN_LOG_ONCE_ERROR("Failed to find StaticMesh class");
-        return;
-    }
+//     if(!static_mesh_cl) {
+//         PLUGIN_LOG_ONCE_ERROR("Failed to find StaticMesh class");
+//         return;
+//     }
 
-    auto cylinder = func(static_mesh_cl, nullptr, L"/Engine/BasicShapes/Cylinder.Cylinder", nullptr, 0, nullptr, true, nullptr);
+//     auto cylinder = func(static_mesh_cl, nullptr, L"/Engine/BasicShapes/Cylinder.Cylinder", nullptr, 0, nullptr, true, nullptr);
 
-    if(!cylinder) {
-        PLUGIN_LOG_ONCE_ERROR("Failed to load cylinder");
-        return;
-    }
-    PLUGIN_LOG_ONCE("Loaded cylinder");
-    m_scope_asset_loaded = true;
-}
+//     if(!cylinder) {
+//         PLUGIN_LOG_ONCE_ERROR("Failed to load cylinder");
+//         return;
+//     }
+//     PLUGIN_LOG_ONCE("Loaded cylinder");
+//     m_scope_asset_loaded = true;
+// }
 
-void Stalker2VR::on_custom_event(const char *event_name, const char *event_data) {
-    static std::chrono::steady_clock::time_point last_load_asset_time{};
-    const auto current_time = std::chrono::steady_clock::now();
+// void Stalker2VR::on_custom_event(const char *event_name, const char *event_data) {
+//     static std::chrono::steady_clock::time_point last_load_asset_time{};
+//     const auto current_time = std::chrono::steady_clock::now();
 
-    // Check if enough time has passed since the last event (1 second)
-    if (event_name == std::string("LoadAsset") && (current_time - last_load_asset_time) >= std::chrono::seconds(1)) {
-        last_load_asset_time = current_time;
-        m_scope_asset_loaded = false;
-    }
-}
+//     // Check if enough time has passed since the last event (1 second)
+//     if (event_name == std::string("LoadAsset") && (current_time - last_load_asset_time) >= std::chrono::seconds(1)) {
+//         last_load_asset_time = current_time;
+//         m_scope_asset_loaded = false;
+//     }
+// }
 
 void Stalker2VR::hook() {
     const auto mod      = utility::get_executable();
