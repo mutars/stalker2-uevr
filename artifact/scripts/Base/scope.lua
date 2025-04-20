@@ -1,195 +1,150 @@
 require(".\\Base\\Trackers\\Trackers")
+require("common.assetloader")
 require("Config.CONFIG")
-scopeInit=true
+local utils = require("common.utils")
+local GameState = require("stalker2.gamestate")
 local api = uevr.api
 local vr = uevr.params.vr
 
-local emissive_material_amplifier = 2.0 
+local emissive_material_amplifier = 2.0
 local fov = 2.0
 local desiredFOV=60 --needs to pull from game later
 
--- Static variables
 local emissive_mesh_material_name = "Material /Engine/EngineMaterials/EmissiveMeshMaterial.EmissiveMeshMaterial"
-local ftransform_c = nil
-local flinearColor_c = nil
-local hitresult_c = nil
-local game_engine_class = nil
-local Statics = nil
-local Kismet = nil
-local KismetMaterialLibrary = nil
-local AssetRegistryHelpers = nil
-local actor_c = nil
-local staic_mesh_component_c = nil
-local staic_mesh_c = nil
-local scene_capture_component_c = nil
-local MeshC = nil
-local StaticMeshC = nil
-local CameraManager_c = nil
 
 
--- Instance variables
-local scope_actor = nil
-local scope_plane_component = nil
-local scene_capture_component = nil
-local render_target = nil
-local reusable_hit_result = nil
-local temp_vec3 = Vector3d.new(0, 0, 0)
-local temp_vec3f = Vector3f.new(0, 0, 0)
-local zero_color = nil
-local zero_transform = nil
+local ScopeController = {
+    ftransform_c = nil,
+    flinearColor_c = nil,
+    hitresult_c = nil,
+    game_engine_class = nil,
+    Statics = nil,
+    Kismet = nil,
+    KismetMaterialLibrary = nil,
+    AssetRegistryHelpers = nil,
+    actor_c = nil,
+    staic_mesh_component_c = nil,
+    staic_mesh_c = nil,
+    scene_capture_component_c = nil,
+    MeshC = nil,
+    StaticMeshC = nil,
+    CameraManager_c = nil,
 
-local function find_required_object(name)
-    local obj = uevr.api:find_uobject(name)
-    if not obj then
-        error("Cannot find " .. name)
-        return nil
-    end
-    return obj
+    -- Instance variables
+    scope_actor = nil,
+    scope_plane_component = nil,
+    scene_capture_component = nil,
+    render_target = nil,
+    reusable_hit_result = nil,
+    temp_vec3 = Vector3d.new(0, 0, 0),
+    temp_vec3f = Vector3f.new(0, 0, 0),
+    zero_color = nil,
+    zero_transform = nil,
+
+    -- state variables
+    current_weapon = nil,
+    scope_mesh = nil,
+}
+
+function ScopeController:new()
+    local instance = {}
+    setmetatable(instance, self)
+    self.__index = self
+    self:InitStatic()
+    return instance
 end
 
-local function find_required_object_no_cache(class, full_name)
-    local matches = class:get_objects_matching(false)
-    for i, obj in ipairs(matches) do
-        if obj ~= nil and obj:get_full_name() == full_name then
-            return obj
-        end
-    end
-    return nil
-end
-
-local find_static_class = function(name)
-    local c = find_required_object(name)
-    return c:get_class_default_object()
-end
-
-local function init_static_objects()
+function ScopeController:InitStatic()
     -- Try to initialize all required objects
-    ftransform_c = find_required_object("ScriptStruct /Script/CoreUObject.Transform")
-    if not ftransform_c then return false end
-    
-    flinearColor_c = find_required_object("ScriptStruct /Script/CoreUObject.LinearColor")
-    if not flinearColor_c then return false end
-    
-    hitresult_c = find_required_object("ScriptStruct /Script/Engine.HitResult")
-    if not hitresult_c then return false end
-    
-    game_engine_class = find_required_object("Class /Script/Engine.GameEngine")
-    if not game_engine_class then return false end
-    
-    Statics = find_static_class("Class /Script/Engine.GameplayStatics")
-    if not Statics then return false end
-    
-    Kismet = find_static_class("Class /Script/Engine.KismetRenderingLibrary")
-    if not Kismet then return false end
-    
-    KismetMaterialLibrary = find_static_class("Class /Script/Engine.KismetMaterialLibrary")
-    if not KismetMaterialLibrary then return false end
-    
-    AssetRegistryHelpers = find_static_class("Class /Script/AssetRegistry.AssetRegistryHelpers")
-    if not AssetRegistryHelpers then return false end
-    
-    actor_c = find_required_object("Class /Script/Engine.Actor")
-    if not actor_c then return false end
-    
-    staic_mesh_component_c = find_required_object("Class /Script/Engine.StaticMeshComponent")
-    if not staic_mesh_component_c then return false end
+    self.ftransform_c = utils.find_required_object("ScriptStruct /Script/CoreUObject.Transform")
+    if not self.ftransform_c then return false end
 
-    staic_mesh_c = find_required_object("Class /Script/Engine.StaticMesh")
-    if not staic_mesh_c then return false end
-    
-    scene_capture_component_c = find_required_object("Class /Script/Engine.SceneCaptureComponent2D")
-    if not scene_capture_component_c then return false end
-    
-    MeshC = api:find_uobject("Class /Script/Engine.SkeletalMeshComponent")
-    if not MeshC then return false end
-    
-    StaticMeshC = api:find_uobject("Class /Script/Engine.StaticMeshComponent")
-    if not StaticMeshC then return false end
+    self.flinearColor_c = utils.find_required_object("ScriptStruct /Script/CoreUObject.LinearColor")
+    if not self.flinearColor_c then return false end
 
-    CameraManager_c = find_required_object("Class /Script/Stalker2.CameraManager")
-    if not CameraManager_c then return false end
+    self.hitresult_c = utils.find_required_object("ScriptStruct /Script/Engine.HitResult")
+    if not self.hitresult_c then return false end
+
+    self.game_engine_class = utils.find_required_object("Class /Script/Engine.GameEngine")
+    if not self.game_engine_class then return false end
+
+    self.Statics = utils.find_static_class("Class /Script/Engine.GameplayStatics")
+    if not self.Statics then return false end
+
+    self.Kismet = utils.find_static_class("Class /Script/Engine.KismetRenderingLibrary")
+    if not self.Kismet then return false end
+
+    self.KismetMaterialLibrary = utils.find_static_class("Class /Script/Engine.KismetMaterialLibrary")
+    if not self.KismetMaterialLibrary then return false end
+
+    self.AssetRegistryHelpers = utils.find_static_class("Class /Script/AssetRegistry.AssetRegistryHelpers")
+    if not self.AssetRegistryHelpers then return false end
+
+    self.actor_c = utils.find_required_object("Class /Script/Engine.Actor")
+    if not self.actor_c then return false end
+
+    self.staic_mesh_component_c = utils.find_required_object("Class /Script/Engine.StaticMeshComponent")
+    if not self.staic_mesh_component_c then return false end
+
+    self.staic_mesh_c = utils.find_required_object("Class /Script/Engine.StaticMesh")
+    if not self.staic_mesh_c then return false end
+
+    self.scene_capture_component_c = utils.find_required_object("Class /Script/Engine.SceneCaptureComponent2D")
+    if not self.scene_capture_component_c then return false end
+
+    self.MeshC = utils.find_required_object("Class /Script/Engine.SkeletalMeshComponent")
+    if not self.MeshC then return false end
+
+    self.StaticMeshC = utils.find_required_object("Class /Script/Engine.StaticMeshComponent")
+    if not self.StaticMeshC then return false end
+
+    self.CameraManager_c = utils.find_required_object("Class /Script/Stalker2.CameraManager")
+    if not self.CameraManager_c then return false end
 
     -- Initialize reusable objects
-    reusable_hit_result = StructObject.new(hitresult_c)
-    if not reusable_hit_result then return false end
-    
-    zero_color = StructObject.new(flinearColor_c)
-    if not zero_color then return false end
-    
-    zero_transform = StructObject.new(ftransform_c)
-    if not zero_transform then return false end
-    zero_transform.Rotation.W = 1.0
-    zero_transform.Scale3D = temp_vec3:set(1.0, 1.0, 1.0)
+    self.reusable_hit_result = StructObject.new(self.hitresult_c)
+    if not self.reusable_hit_result then return false end
+
+    self.zero_color = StructObject.new(self.flinearColor_c)
+    if not self.zero_color then return false end
+
+    self.zero_transform = StructObject.new(self.ftransform_c)
+    if not self.zero_transform then return false end
+    self.zero_transform.Rotation.W = 1.0
+    self.zero_transform.Scale3D = self.temp_vec3:set(1.0, 1.0, 1.0)
 
     return true
 end
 
-local function reset_static_objects()
-    ftransform_c = nil
-    flinearColor_c = nil
-    hitresult_c = nil
-    game_engine_class = nil
-    Statics = nil
-    Kismet = nil
-    KismetMaterialLibrary = nil
-    AssetRegistryHelpers = nil
-    actor_c = nil
-    staic_mesh_component_c = nil
-    staic_mesh_c = nil
-    scene_capture_component_c = nil
-    MeshC = nil
-    StaticMeshC = nil
-    CameraManager_c = nil
-
-    
-    reusable_hit_result = nil
-    zero_color = nil
-    zero_transform = nil
+function ScopeController:ResetStatic()
+    self.ftransform_c = nil
+    self.flinearColor_c = nil
+    self.hitresult_c = nil
+    self.game_engine_class = nil
+    self.Statics = nil
+    self.Kismet = nil
+    self.KismetMaterialLibrary = nil
+    self.AssetRegistryHelpers = nil
+    self.actor_c = nil
+    self.staic_mesh_component_c = nil
+    self.staic_mesh_c = nil
+    self.scene_capture_component_c = nil
+    self.MeshC = nil
+    self.StaticMeshC = nil
+    self.CameraManager_c = nil
+    self.reusable_hit_result = nil
+    self.zero_color = nil
+    self.zero_transform = nil
 end
 
-local function validate_object(object)
-    if object == nil or not UEVR_UObjectHook.exists(object) then
-        return nil
-    else
-        return object
-    end
-end
-
-local function destroy_actor(actor)
-    if actor ~= nil and not UEVR_UObjectHook.exists(actor) then
-        pcall(function() 
-            if actor.K2_DestroyActor ~= nil then
-                actor:K2_DestroyActor()
-            end
-        end)
-    end
-    return nil
-end
-
-
-local function spawn_actor(world_context, actor_class, location, collision_method, owner)
-
-    local actor = Statics:BeginDeferredActorSpawnFromClass(world_context, actor_class, zero_transform, collision_method, owner)
-
-    if actor == nil then
-        print("Failed to spawn actor")
-        return nil
-    end
-
-    Statics:FinishSpawningActor(actor, zero_transform)
-    print("Spawned actor")
-
-    return actor
-end
-
-local function get_scope_mesh(parent_mesh)
+function ScopeController:get_scope_mesh(parent_mesh)
     if not parent_mesh then return nil end
 
     local child_components = parent_mesh.AttachChildren
     if not child_components then return nil end
 
     for _, component in ipairs(child_components) do
-        if component:is_a(StaticMeshC) and string.find(component:get_fname():to_string(), "scope") then
+        if component:is_a(self.StaticMeshC) and string.find(component:get_fname():to_string(), "scope") then
             return component
         end
     end
@@ -198,34 +153,24 @@ local function get_scope_mesh(parent_mesh)
 end
 
 
-local function get_equipped_weapon(pawn)
-    if not pawn then return nil end
-    local sk_mesh = pawn.Mesh
-    if not sk_mesh then return nil end
-    local anim_instance = sk_mesh.AnimScriptInstance
-    if not anim_instance then return nil end
-    local weapon_mesh = anim_instance.WeaponData.WeaponMesh
-    return weapon_mesh
-end
-
-local function get_render_target(world)
-    render_target = validate_object(render_target)
-    if render_target == nil then
-        render_target = Kismet:CreateRenderTarget2D(world, 512, 512, 6, zero_color, false)
+function ScopeController:get_render_target(world)
+    self.render_target = utils.validate_object(self.render_target)
+    if self.render_target == nil then
+        self.render_target = self.Kismet:CreateRenderTarget2D(world, 512, 512, 6, self.zero_color, false)
         -- render_target.bHDR = 0;
         -- render_target.SRGB = 0;
     end
-    return render_target
+    return self.render_target
 end
 
-local function spawn_scope_plane(world, owner, pos, rt)
-    local local_scope_mesh = scope_actor:AddComponentByClass(staic_mesh_component_c, false, zero_transform, false)
+function ScopeController:spawn_scope_plane(world, owner, pos, rt)
+    local local_scope_mesh = self.scope_actor:AddComponentByClass(self.staic_mesh_component_c, false, self.zero_transform, false)
     if local_scope_mesh == nil then
         print("Failed to spawn scope mesh")
         return
     end
 
-    local wanted_mat = api:find_uobject(emissive_mesh_material_name)
+    local wanted_mat = utils.find_required_object(emissive_mesh_material_name)
     if wanted_mat == nil then
         print("Failed to find material")
         return
@@ -236,71 +181,57 @@ local function spawn_scope_plane(world, owner, pos, rt)
     --     --wanted_mat.MaterialDomain = 0
     --     --wanted_mat.ShadingModel = 0
 
-    local plane = find_required_object_no_cache(staic_mesh_c, "StaticMesh /Engine/BasicShapes/Cylinder.Cylinder")
-    -- local plane = find_required_object("StaticMesh /Engine/BasicShapes/Cylinder.Cylinder")
-    -- local plane = find_required_object_no_cache("StaticMesh /Engine/BasicShapes/Cylinder.Cylinder")
+    local plane = utils.find_required_object_no_cache(self.staic_mesh_c, "StaticMesh /Engine/BasicShapes/Cylinder.Cylinder")
 
     if plane == nil then
         print("Failed to find plane mesh")
-        api:dispatch_custom_event("LoadAsset", "StaticMesh /Engine/BasicShapes/Cylinder.Cylinder")
-        return
+        -- api:dispatch_custom_event("LoadAsset", "StaticMesh /Engine/BasicShapes/Cylinder.Cylinder")
+        local fAssetData = CreateAssetData("/Engine/BasicShapes/Cylinder", "/Engine/BasicShapes", "Cylinder", "/Script/Engine", "StaticMesh")
+        plane =  GetLoadedAsset(fAssetData)
+        if plane == nil then
+            print("Failed to load asset plane mesh")
+            return
+        end
     end
     local_scope_mesh:SetStaticMesh(plane)
-    local_scope_mesh:SetVisibility(flase)
+    local_scope_mesh:SetVisibility(false)
     -- local_scope_mesh:SetHiddenInGame(false)
     local_scope_mesh:SetCollisionEnabled(0)
 
     local dynamic_material = local_scope_mesh:CreateDynamicMaterialInstance(0, wanted_mat, "ScopeMaterial")
 
     dynamic_material:SetTextureParameterValue("LinearColor", rt)
-    local color = StructObject.new(flinearColor_c)
+    local color = StructObject.new(self.flinearColor_c)
     color.R = emissive_material_amplifier
     color.G = emissive_material_amplifier
     color.B = emissive_material_amplifier
     color.A = emissive_material_amplifier
     dynamic_material:SetVectorParameterValue("Color", color)
-    scope_plane_component = local_scope_mesh
+    self.scope_plane_component = local_scope_mesh
 end
 
--- local function create_emissive_mat(component, materialSocketName)
---     -- local wanted_mat = api:find_uobject(emissive_mesh_material_name)
---     -- if wanted_mat == nil then
---     --     print("Failed to find material")
---     --     return
---     -- end
---     -- wanted_mat.BlendMode = 0
---     -- wanted_mat.TwoSided = 1
---     local index = component:GetMaterialIndex(materialSocketName)
---     -- local dynamic_material = component:CreateDynamicMaterialInstance(index, wanted_mat, "ScopeMaterial")
---     local materials = component:GetMaterials()
---     local materal = materials[index]
---     materal:SetTextureParameterValue("SightMask ", render_target)
---     material.ShadingModel = 0
---     material.BlendMode = 0
---     -- dynamic_material:SetTextureParameterValue("LinearColor", render_target)
--- end
-
-local function spawn_scene_capture_component(world, owner, pos, fov, rt)
-    scene_capture_component = scope_actor:AddComponentByClass(scene_capture_component_c, false, zero_transform, false)
-    if scene_capture_component == nil then
+function ScopeController:spawn_scene_capture_component(world, owner, pos, fov, rt)
+    local local_scene_capture_component = self.scope_actor:AddComponentByClass(self.scene_capture_component_c, false, self.zero_transform, false)
+    if local_scene_capture_component == nil then
         print("Failed to spawn scene capture")
         return
     end
-    scene_capture_component.TextureTarget = rt
-    scene_capture_component.FOVAngle = fov
+    local_scene_capture_component.TextureTarget = rt
+    local_scene_capture_component.FOVAngle = fov
     -- scene_capture_component.bCacheVolumetricCloudsShadowMaps = 1;
     -- scene_capture_component.bCachedDistanceFields = 1;
     -- scene_capture_component.bUseRayTracingIfEnabled = 0;
-    scene_capture_component.PrimitiveRenderMode = 2; -- 0 - legacy, 1 - other
+    local_scene_capture_component.PrimitiveRenderMode = 2; -- 0 - legacy, 1 - other
     -- scene_capture_component.CaptureSource = 1;
     -- scene_capture_component.bAlwaysPersistRenderingState = true;
     -- scene_capture_component.bEnableVolumetricCloudsCapture = false;
     -- scene_capture_component.bCaptureEveryFrame = 0;
 
-    scene_capture_component:SetVisibility(false)
+    local_scene_capture_component:SetVisibility(false)
+    self.scene_capture_component = local_scene_capture_component
 end
 
-local function spawn_scope(game_engine, pawn)
+function ScopeController:spawn_scope(game_engine, pawn)
     local viewport = game_engine.GameViewport
     if viewport == nil then
         print("Viewport is nil")
@@ -318,54 +249,50 @@ local function spawn_scope(game_engine, pawn)
         return
     end
 
-    local rt = get_render_target(world)
+    local rt = self:get_render_target(world)
 
     if rt == nil then
         print("Failed to get render target destroying actors")
-        rt = nil
-        scope_actor = destroy_actor(scope_actor)
-        scope_plane_component = nil
-        scene_capture_component = nil
+        self.scope_actor = utils.destroy_actor(self.scope_actor)
+        self.scope_plane_component = nil
+        self.scene_capture_component = nil
         return
     end
 
     local pawn_pos = pawn:K2_GetActorLocation()
-    if not validate_object(scope_actor) then
-        scope_actor = destroy_actor(scope_actor)
-        scope_plane_component = nil
-        scene_capture_component = nil
-        scope_actor = spawn_actor(world, actor_c, temp_vec3:set(0, 0, 0), 1, nil)
-        if scope_actor == nil then
+    if not utils.validate_object(self.scope_actor) then
+        self.scope_actor = utils.destroy_actor(self.scope_actor)
+        self.scope_plane_component = nil
+        self.scene_capture_component = nil
+        self.scope_actor = utils.spawn_actor(world, self.actor_c, self.temp_vec3:set(0, 0, 0), 1, nil)
+        if self.scope_actor == nil then
             print("Failed to spawn scope actor")
             return
         end
     end
 
-    if not validate_object(scope_plane_component) then
+    if not utils.validate_object(self.scope_plane_component) then
         print("scope_plane_component is invalid -- recreating")
-        spawn_scope_plane(world, nil, pawn_pos, rt)
+        self:spawn_scope_plane(world, nil, pawn_pos, rt)
     end
 
-    if not validate_object(scene_capture_component) then
+    if not utils.validate_object(self.scene_capture_component) then
         print("spawn_scene_capture_component is invalid -- recreating")
-        spawn_scene_capture_component(world, nil, pawn_pos, fov, rt)
+        self:spawn_scene_capture_component(world, nil, pawn_pos, fov, rt)
     end
 
 end
 
 
-local scope_mesh = nil
-local last_scope_state = false
-
-local function attach_components_to_weapon(weapon_mesh)
+function ScopeController:attach_components_to_weapon(weapon_mesh)
     if not weapon_mesh then return end
-    
+
     -- Attach scene capture to weapon
-    if scene_capture_component ~= nil then
+    if self.scene_capture_component ~= nil then
         -- scene_capture:DetachFromParent(true, false)
         -- "AimSocket"
-        print("Attaching scene_capture_component to weapon:" .. weapon_mesh:get_fname():to_string())
-        scene_capture_component:K2_AttachToComponent(
+        -- print("Attaching scene_capture_component to weapon:" .. weapon_mesh:get_fname():to_string())
+        self.scene_capture_component:K2_AttachToComponent(
             weapon_mesh,
             "Muzzle",
             2, -- Location rule
@@ -373,34 +300,34 @@ local function attach_components_to_weapon(weapon_mesh)
             0, -- Scale rule
             true -- Weld simulated bodies
         )
-        scene_capture_component:K2_SetRelativeRotation(temp_vec3:set(0, 0, 90), false, reusable_hit_result, false)
-        scene_capture_component:SetVisibility(false)
+        self.scene_capture_component:K2_SetRelativeRotation(self.temp_vec3:set(0, 0, 90), false, self.reusable_hit_result, false)
+        self.scene_capture_component:SetVisibility(false)
     end
-    
+
     -- Attach plane to weapon
-    if scope_plane_component then
-        scope_mesh = get_scope_mesh(weapon_mesh)
-        if scope_mesh == nil then
+    if self.scope_plane_component then
+        self.scope_mesh = self:get_scope_mesh(weapon_mesh)
+        if self.scope_mesh == nil then
             print("Failed to find scope mesh")
             return
         end
         -- OpticCutoutSocket
-        scope_plane_component:K2_AttachToComponent(
-            scope_mesh,
+        self.scope_plane_component:K2_AttachToComponent(
+            self.scope_mesh,
             "AimSocket",
             2, -- Location rule
             2, -- Rotation rule
             2, -- Scale rule
             true -- Weld simulated bodies
         )
-        scope_plane_component:K2_SetRelativeRotation(temp_vec3:set(0, 90, 90), false, reusable_hit_result, false)
-        scope_plane_component:K2_SetRelativeLocation(temp_vec3:set(0.25, 0, 0), false, reusable_hit_result, false)
-        scope_plane_component:SetWorldScale3D(temp_vec3:set(0.025, 0.025, 0.00001))
-        scope_plane_component:SetVisibility(false)
+        self.scope_plane_component:K2_SetRelativeRotation(self.temp_vec3:set(0, 90, 90), false, self.reusable_hit_result, false)
+        self.scope_plane_component:K2_SetRelativeLocation(self.temp_vec3:set(0.25, 0, 0), false, self.reusable_hit_result, false)
+        self.scope_plane_component:SetWorldScale3D(self.temp_vec3:set(0.025, 0.025, 0.00001))
+        self.scope_plane_component:SetVisibility(false)
     end
 end
 
-local function is_scope_active(pawn)
+function ScopeController:is_scope_active(pawn)
     if not pawn then return false end
     local optical_scope = pawn.PlayerOpticScopeComponent
     if not optical_scope then return false end
@@ -411,21 +338,21 @@ local function is_scope_active(pawn)
     return false
 end
 
-local function switch_scope_state(pawn)
-    local current_scope_state = is_scope_active(pawn)
+function ScopeController:switch_scope_state(pawn)
+    local current_scope_state = self:is_scope_active(pawn)
     -- if current_scope_state == last_scope_state then
     --     return
     -- end
-    last_scope_state = current_scope_state
-    if scope_plane_component ~= nil then
-        scope_plane_component:SetVisibility(current_scope_state)
+    if self.scope_plane_component ~= nil then
+        self.scope_plane_component:SetVisibility(current_scope_state)
     end
-    if scene_capture_component ~= nil then
-        scene_capture_component:SetVisibility(current_scope_state)
+    if self.scene_capture_component ~= nil then
+        self.scene_capture_component:SetVisibility(current_scope_state)
     end
 end
-local function Get_ScopeHmdDistance()
-	local scope_plane_position = scope_plane_component:K2_GetComponentLocation()
+
+function ScopeController:Get_ScopeHmdDistance()
+	local scope_plane_position = self.scope_plane_component:K2_GetComponentLocation()
 	local hmdPos = hmd_component:K2_GetComponentLocation()
 	local Diff= math.sqrt((hmdPos.x-scope_plane_position.x)^2+(hmdPos.y-scope_plane_position.y)^2+(hmdPos.z-scope_plane_position.z)^2)
 	--if Diff <=2.5 then
@@ -434,96 +361,78 @@ local function Get_ScopeHmdDistance()
 	return Diff
 end
 
-local function Recalculate_FOV(c_pawn)	
-	if scope_plane_component ~=nil then
-		if Get_ScopeHmdDistance()>=5.5 then
+function ScopeController:Recalculate_FOV(c_pawn)
+	if self.scene_capture_component ~=nil then
+		if self:Get_ScopeHmdDistance()>=5.5 then
 			--pcall(function()
-			fov= 30*(desiredFOV* (2* math.atan(2.5/Get_ScopeHmdDistance())/(90/180*math.pi)))/94	
+			fov= 30*(desiredFOV* (2* math.atan(2.5/self:Get_ScopeHmdDistance())/(90/180*math.pi)))/94
 			--end)
-		else 
+		else
 		--pcall(function()
-			fov= 30*(desiredFOV* (2* math.atan(2.5/Get_ScopeHmdDistance())/(90/180*math.pi)))/(94-(5.5-Get_ScopeHmdDistance())*3^2.7)	
+			fov= 30*(desiredFOV* (2* math.atan(2.5/self:Get_ScopeHmdDistance())/(90/180*math.pi)))/(94-(5.5-self:Get_ScopeHmdDistance())*3^2.7)
 		--end)
 		end
 			--print(Get_ScopeHmdDistance())
-			scene_capture_component.FOVAngle = fov
+        self.scene_capture_component.FOVAngle = fov
 	end
 end
 
 
+function ScopeController:Update(engine)
+    local c_pawn = api:get_local_pawn(0)
+    local weapon_mesh = GameState:GetEquippedWeapon()
+    if weapon_mesh then
+        -- fix_materials(weapon_mesh)
+        local weapon_changed = not self.current_weapon or weapon_mesh.AnimScriptInstance ~= self.current_weapon.AnimScriptInstance
+        local scope_changed = (not self.scope_mesh or not self.scope_mesh.AttachParent) and self:is_scope_active(c_pawn)
+        if weapon_changed or scope_changed then
+            print("Weapon changed")
+            print("Previous weapon: " .. (self.current_weapon and self.current_weapon:get_fname():to_string() or "none"))
+            print("New weapon: " .. weapon_mesh:get_fname():to_string())
 
--- Initialize static objects when the script loads
-if not init_static_objects() then
-    print("Failed to initialize static objects")
+            -- Update current weapon reference
+            self.current_weapon = weapon_mesh
+
+            -- Attempt to attach components
+            self:spawn_scope(engine, c_pawn)
+            self:attach_components_to_weapon(weapon_mesh)
+        end
+    else
+        -- Weapon was removed/unequipped
+        if self.current_weapon then
+            print("Weapon unequipped")
+            self.current_weapon = nil
+            self.scope_mesh = nil
+        end
+    end
+    self:switch_scope_state(c_pawn)
+    self:Recalculate_FOV(c_pawn)
 end
 
-local current_weapon = nil
-local last_level = nil
+function ScopeController:Reset()
+    self.scope_actor = utils.destroy_actor(self.scope_actor)
+    self.scope_plane_component = nil
+    self.scene_capture_component = nil
+    self.render_target = nil
+    self.scope_mesh = nil
+    self.current_weapon = nil
+end
+
+
+local scope_controller = ScopeController:new()
 
 uevr.sdk.callbacks.on_pre_engine_tick(
 	function(engine, delta)
-        local viewport = engine.GameViewport
-        if viewport then
-            local world = viewport.World
-    
-            if world then
-                local level = world.PersistentLevel
-    
-                if last_level ~= level then
-                    print("Level changed .. Reseting")
-                    destroy_actor(scope_actor)
-                    scope_plane_component = nil
-                    scene_capture_component = nil
-                    render_target = nil
-                    scope_mesh = nil
-                    reset_static_objects()
-                    init_static_objects()
-                end
-                last_level = level
-            end
+        if GameState:IsLevelChanged(engine) then
+            scope_controller:Reset()
         end
-
-        -- reset_scope_actor_if_deleted()
-        local c_pawn = api:get_local_pawn(0)
-        local weapon_mesh = get_equipped_weapon(c_pawn)
-        if weapon_mesh then
-            -- fix_materials(weapon_mesh)
-            local weapon_changed = not current_weapon or weapon_mesh.AnimScriptInstance ~= current_weapon.AnimScriptInstance
-            local scope_changed = (not scope_mesh or not scope_mesh.AttachParent) and is_scope_active(c_pawn)
-            if weapon_changed or scope_changed then
-                print("Weapon changed")
-                print("Previous weapon: " .. (current_weapon and current_weapon:get_fname():to_string() or "none"))
-                print("New weapon: " .. weapon_mesh:get_fname():to_string())
-                
-                -- Update current weapon reference
-                current_weapon = weapon_mesh
-                
-                -- Attempt to attach components
-                spawn_scope(engine, c_pawn)
-                attach_components_to_weapon(weapon_mesh)
-            end
-        else
-            -- Weapon was removed/unequipped
-            if current_weapon then
-                print("Weapon unequipped")
-                current_weapon = nil
-                scope_mesh = nil
-                last_scope_state = false
-            end
-        end
-        switch_scope_state(c_pawn)
-		
-		Recalculate_FOV(c_pawn)	
+        scope_controller:Update(engine)
     end
 )
 
 
 uevr.sdk.callbacks.on_script_reset(function()
     print("Resetting")
-    destroy_actor(scope_actor)
-    scope_plane_component = nil
-    scene_capture_component = nil
-    render_target = nil
-    scope_mesh = nil
-    reset_static_objects()
+    scope_controller:Reset()
+    scope_controller:ResetStatic()
 end)

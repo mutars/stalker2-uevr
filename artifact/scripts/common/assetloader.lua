@@ -50,8 +50,20 @@ local function getAssetDataFromPath(pathStr)
 	return fAssetData
 end
 
-function GetLoadedAsset(pathStr)
-	local fAssetData = getAssetDataFromPath(pathStr)
+function CreateAssetData(PackageName, PackagePath, AssetName, AssetPackageName, AssetClassAssetName)
+	local fAssetData = get_struct_object("ScriptStruct /Script/CoreUObject.AssetData")
+	fAssetData.PackageName = fname_from_string(PackageName)
+	fAssetData.PackagePath = fname_from_string(PackagePath)
+	fAssetData.AssetName = fname_from_string(AssetName)
+	local AssetClass = get_struct_object("ScriptStruct /Script/CoreUObject.TopLevelAssetPath")
+	AssetClass = fname_from_string(AssetPackageName)
+	AssetClass = fname_from_string(AssetClassAssetName)
+	fAssetData.AssetClass = AssetClass
+	return fAssetData
+end
+
+function GetLoadedAsset(fAssetData)
+	-- local fAssetData = getAssetDataFromPath(pathStr)
 	local assetRegistryHelper = find_first_of("Class /Script/AssetRegistry.AssetRegistryHelpers",  true)
 	if not assetRegistryHelper:IsAssetLoaded(fAssetData) then
 		local fSoftObjectPath = assetRegistryHelper:ToSoftObjectPath(fAssetData)
