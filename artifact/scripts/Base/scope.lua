@@ -218,14 +218,28 @@ function ScopeController:spawn_scene_capture_component(world, owner, pos, fov, r
     end
     local_scene_capture_component.TextureTarget = rt
     local_scene_capture_component.FOVAngle = fov
-    -- scene_capture_component.bCacheVolumetricCloudsShadowMaps = 1;
-    -- scene_capture_component.bCachedDistanceFields = 1;
-    -- scene_capture_component.bUseRayTracingIfEnabled = 0;
-    local_scene_capture_component.PrimitiveRenderMode = 2; -- 0 - legacy, 1 - other
-    -- scene_capture_component.CaptureSource = 1;
-    -- scene_capture_component.bAlwaysPersistRenderingState = true;
-    -- scene_capture_component.bEnableVolumetricCloudsCapture = false;
-    -- scene_capture_component.bCaptureEveryFrame = 0;
+    -- local_scene_capture_component.bCacheVolumetricCloudsShadowMaps = 1;
+    -- local_scene_capture_component.bCachedDistanceFields = 1;
+    local_scene_capture_component.bUseRayTracingIfEnabled = false;
+    -- local_scene_capture_component.PrimitiveRenderMode = 2; -- 0 - legacy, 1 - other
+    -- local_scene_capture_component.CaptureSource = 1;
+    local_scene_capture_component.bAlwaysPersistRenderingState = true;
+    -- local_scene_capture_component.bEnableVolumetricCloudsCapture = false;
+    -- local_scene_capture_component.bCaptureEveryFrame = 0;
+
+    -- post processing
+    local_scene_capture_component.PostProcessSettings.bOverride_MotionBlurAmount = true
+    local_scene_capture_component.PostProcessSettings.MotionBlurAmount = 0.0 -- Disable motion blur
+    local_scene_capture_component.PostProcessSettings.bOverride_ScreenSpaceReflectionIntensity = true
+    local_scene_capture_component.PostProcessSettings.ScreenSpaceReflectionIntensity = 0.0 -- Disable screen space reflections
+    local_scene_capture_component.PostProcessSettings.bOverride_AmbientOcclusionIntensity = true
+    local_scene_capture_component.PostProcessSettings.AmbientOcclusionIntensity = 0.0 -- Disable ambient occlusion
+    local_scene_capture_component.PostProcessSettings.bOverride_BloomIntensity = true
+    local_scene_capture_component.PostProcessSettings.BloomIntensity = 0.0
+    local_scene_capture_component.PostProcessSettings.bOverride_LensFlareIntensity = true
+    local_scene_capture_component.PostProcessSettings.LensFlareIntensity = 0.0 -- Disable lens flares
+    local_scene_capture_component.PostProcessSettings.bOverride_VignetteIntensity = true
+    local_scene_capture_component.PostProcessSettings.VignetteIntensity = 0.0 -- Disable vignette
 
     local_scene_capture_component:SetVisibility(false)
     self.scene_capture_component = local_scene_capture_component
@@ -301,6 +315,7 @@ function ScopeController:attach_components_to_weapon(weapon_mesh)
             true -- Weld simulated bodies
         )
         self.scene_capture_component:K2_SetRelativeRotation(self.temp_vec3:set(0, 0, 90), false, self.reusable_hit_result, false)
+        self.scene_capture_component:K2_SetRelativeLocation(self.temp_vec3:set(0.5, 0, 0), false, self.reusable_hit_result, false)
         self.scene_capture_component:SetVisibility(false)
     end
 
