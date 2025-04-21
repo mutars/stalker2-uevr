@@ -5,8 +5,8 @@
 require("Config.CONFIG")
 local motionControllerActors = require("gestures.motioncontrolleractors")
 local gameState = require("stalker2.gamestate") -- Ensure gameState is available for context
-local gamepadState = require("stalker2.gamepad")
 local gestureSet = isRhand and require("presets.presetRH") or require("presets.presetLH")
+local gamepadState = require("stalker2.gamepad")
 local haptics = require("stalker2.haptics")
 require("Base.basic")
 require("Base.scope")

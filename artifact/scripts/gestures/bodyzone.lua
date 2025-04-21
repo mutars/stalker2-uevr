@@ -9,8 +9,8 @@ local rightShoulderZoneRH = ZonedGestures.BodyZoneGesture:new({
     maxX = 20,
     minY = 10,
     maxY = 30,
-    minZ = -10,
-    maxZ = 15
+    minZ = -20,
+    maxZ = -5
 })
 
 local rightShoulderZoneLH = ZonedGestures.BodyZoneGesture:new({
@@ -20,8 +20,8 @@ local rightShoulderZoneLH = ZonedGestures.BodyZoneGesture:new({
     maxX = 20,
     minY = 10,
     maxY = 30,
-    minZ = -10,
-    maxZ = 15
+    minZ = -20,
+    maxZ = -5
 })
 
 local leftShoulderZoneRH = ZonedGestures.BodyZoneGesture:new({
@@ -31,8 +31,8 @@ local leftShoulderZoneRH = ZonedGestures.BodyZoneGesture:new({
     maxX = 20,
     minY = -30,
     maxY = -10,
-    minZ = -10,
-    maxZ = 15
+    minZ = -20,
+    maxZ = -5
 })
 
 local leftShoulderZoneLH = ZonedGestures.BodyZoneGesture:new({
@@ -42,8 +42,8 @@ local leftShoulderZoneLH = ZonedGestures.BodyZoneGesture:new({
     maxX = 20,
     minY = -30,
     maxY = -10,
-    minZ = -10,
-    maxZ = 15
+    minZ = -20,
+    maxZ = -5
 })
 
 local headZoneRH = ZonedGestures.BodyZoneGesture:new({
@@ -118,9 +118,9 @@ local leftChestZoneRH = ZonedGestures.BodyZoneGesture:new({
     minX = 0,
     maxX = 10,
     minY = -15,
-    maxY = -5,
-    minZ = -40,
-    maxZ = -25
+    maxY = -1,
+    minZ = -35,
+    maxZ = -15
 })
 
 local leftChestZoneLH = ZonedGestures.BodyZoneGesture:new({
@@ -129,9 +129,9 @@ local leftChestZoneLH = ZonedGestures.BodyZoneGesture:new({
     minX = 0,
     maxX = 10,
     minY = -15,
-    maxY = -5,
-    minZ = -40,
-    maxZ = -25
+    maxY = -1,
+    minZ = -35,
+    maxZ = -15
 })
 
 local rightChestZoneRH = ZonedGestures.BodyZoneGesture:new({
@@ -139,10 +139,10 @@ local rightChestZoneRH = ZonedGestures.BodyZoneGesture:new({
     locationGesture = LocationGestures.RightHand,
     minX = 0,
     maxX = 10,
-    minY = 5,
+    minY = 1,
     maxY = 15,
-    minZ = -40,
-    maxZ = -25
+    minZ = -35,
+    maxZ = -15
 })
 
 local rightChestZoneLH = ZonedGestures.BodyZoneGesture:new({
@@ -150,10 +150,10 @@ local rightChestZoneLH = ZonedGestures.BodyZoneGesture:new({
     locationGesture = LocationGestures.LeftHand,
     minX = 0,
     maxX = 10,
-    minY = 5,
+    minY = 1,
     maxY = 15,
-    minZ = -40,
-    maxZ = -25
+    minZ = -35,
+    maxZ = -15
 })
 
 local lowerBackZoneRH = ZonedGestures.BodyZoneGesture:new({

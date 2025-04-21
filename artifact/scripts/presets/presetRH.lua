@@ -28,10 +28,10 @@ end
 local function twoHandedAimingCB(gesture, context)
     if gesture:JustActivated() then
         two_hand_aiming = true
-        gesture.rightGripGesture:Lock()
+        gesture.leftGripGesture:Lock()
     elseif gesture:JustDeactivated() then
         two_hand_aiming = false
-        gesture.rightGripGesture:Unlock()
+        gesture.leftGripGesture:Unlock()
     end
 end
 
@@ -191,4 +191,8 @@ local StandModeSetRH = GestureSet:new(
     }
 )
 
-return SitMode and SitmodeSetRH or StandModeSetRH
+if SitMode then
+    return  SitmodeSetRH
+else
+    return StandModeSetRH
+end

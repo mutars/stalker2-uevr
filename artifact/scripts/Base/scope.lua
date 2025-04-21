@@ -218,14 +218,14 @@ function ScopeController:spawn_scene_capture_component(world, owner, pos, fov, r
     end
     local_scene_capture_component.TextureTarget = rt
     local_scene_capture_component.FOVAngle = fov
-    -- local_scene_capture_component.bCacheVolumetricCloudsShadowMaps = 1;
+    local_scene_capture_component.bCacheVolumetricCloudsShadowMaps = true;
     -- local_scene_capture_component.bCachedDistanceFields = 1;
     local_scene_capture_component.bUseRayTracingIfEnabled = false;
     -- local_scene_capture_component.PrimitiveRenderMode = 2; -- 0 - legacy, 1 - other
     -- local_scene_capture_component.CaptureSource = 1;
     local_scene_capture_component.bAlwaysPersistRenderingState = true;
-    -- local_scene_capture_component.bEnableVolumetricCloudsCapture = false;
-    -- local_scene_capture_component.bCaptureEveryFrame = 0;
+    local_scene_capture_component.bEnableVolumetricCloudsCapture = false;
+    local_scene_capture_component.bCaptureEveryFrame = 0;
 
     -- post processing
     local_scene_capture_component.PostProcessSettings.bOverride_MotionBlurAmount = true

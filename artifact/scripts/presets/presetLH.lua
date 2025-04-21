@@ -156,9 +156,9 @@ local SitModeSetLH = GestureSet:new(
             flashlightGestureRH,
             primaryWeaponGestureLH,
             secondaryWeaponGestureLH,
-            -- sidearmWeaponGestureLH,
-            -- meleeWeaponGestureRH,
-            -- boltActionGestureLH,
+            sidearmWeaponGestureLH,
+            meleeWeaponGestureRH,
+            boltActionGestureLH,
             grenadeGestureRH,
             inventoryGestureRH,
             scannerGestureRH,
@@ -192,4 +192,8 @@ local StandModeSetLH = GestureSet:new(
     }
 )
 
-return SitMode and StandModeSetLH or SitModeSetLH
+if SitMode then
+    return SitModeSetLH
+else
+    return StandModeSetLH
+end
