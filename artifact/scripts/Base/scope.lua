@@ -329,14 +329,14 @@ function ScopeController:attach_components_to_weapon(weapon_mesh)
         -- OpticCutoutSocket
         self.scope_plane_component:K2_AttachToComponent(
             self.scope_mesh,
-            "AimSocket",
+            "OpticCutoutSocket",
             2, -- Location rule
             2, -- Rotation rule
             2, -- Scale rule
             true -- Weld simulated bodies
         )
         self.scope_plane_component:K2_SetRelativeRotation(self.temp_vec3:set(0, 90, 90), false, self.reusable_hit_result, false)
-        self.scope_plane_component:K2_SetRelativeLocation(self.temp_vec3:set(0.25, 0, 0), false, self.reusable_hit_result, false)
+        self.scope_plane_component:K2_SetRelativeLocation(self.temp_vec3:set(0, 0, 0), false, self.reusable_hit_result, false)
         self.scope_plane_component:SetWorldScale3D(self.temp_vec3:set(0.025, 0.025, 0.00001))
         self.scope_plane_component:SetVisibility(false)
     end
