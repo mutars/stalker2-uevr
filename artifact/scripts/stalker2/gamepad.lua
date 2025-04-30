@@ -69,7 +69,7 @@ end
 -- Update state from XInput
 function GamepadState:Update(state)
     self.gamepadState = state
-    if isRhand then
+    if Config.dominantHand == 1 then
         self:UpdateRH(state)
     else
         self:UpdateLH(state)

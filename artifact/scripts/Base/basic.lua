@@ -8,7 +8,6 @@ local vr = uevr.params.vr
 local ignore_aiming_state = true
 
 --Config Recoil
---local isUpRecoilActive= true --on /off
 -- local variables for Recoil
 local VertDiff=0
 local RotDiff=0
@@ -298,7 +297,7 @@ local function update_weapon_offset(weapon_mesh)
     -- Z - forward, X - negative right, Y - negative up
     local lossy_offset = Vector3f.new(-location_diff.y, -location_diff.z+VertDiff, location_diff.x)
     -- Apply the offset to the weapon using motion controller state
-    UEVR_UObjectHook.get_or_add_motion_controller_state(weapon_mesh):set_hand(isRhand and 1 or 0)
+    UEVR_UObjectHook.get_or_add_motion_controller_state(weapon_mesh):set_hand(Config.dominantHand)
     UEVR_UObjectHook.get_or_add_motion_controller_state(weapon_mesh):set_location_offset(lossy_offset)
     UEVR_UObjectHook.get_or_add_motion_controller_state(weapon_mesh):set_permanent(true)
 end
@@ -366,11 +365,11 @@ uevr.sdk.callbacks.on_post_calculate_stereo_view_offset(function(device, view_in
     end
 
     -- Two handed weapon aiming (like rifles and shotguns)
-    if two_hand_aiming and is_using_two_handed_weapon and is_aiming(pawn) then
+    if Config.twoHandedAiming and TwoHandedStateActive and is_using_two_handed_weapon and is_aiming(pawn) then
         local dominant_hand_component
-        if isRhand then dominant_hand_component = right_hand_component else dominant_hand_component = left_hand_component end
+        if Config.dominantHand == 1 then dominant_hand_component = right_hand_component else dominant_hand_component = left_hand_component end
         local off_hand_component
-        if isRhand then off_hand_component = left_hand_component else off_hand_component = right_hand_component end
+        if Config.dominantHand == 1 then off_hand_component = left_hand_component else off_hand_component = right_hand_component end
         local dominant_hand_pos = dominant_hand_component:K2_GetComponentLocation()
         local off_hand_pos = off_hand_component:K2_GetComponentLocation()
         local dir_to_dominant_hand = (off_hand_pos - dominant_hand_pos):normalized()
@@ -515,7 +514,7 @@ function(device, view_index, world_to_meters, position, rotation, is_double)
 
 	--calculate rot to last tick
 
-	if isUpRecoilActive then
+	if Config.recoil then
 		ApplyRecoil()
 		UpdateOnStoppedShooting()
 		ApplyRecoilRecovery()

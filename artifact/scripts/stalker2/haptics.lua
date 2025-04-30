@@ -1,10 +1,6 @@
 require("Config.CONFIG")
-if not HapticFeedback then
-    print("Haptic feedback is disabled in the configuration.")
-    return
-end
-
-local BodyZones = SitMode and require("gestures.bodyzonesitting") or require("gestures.bodyzone")
+local BodyZonesSitting = require("gestures.bodyzonesitting")
+local BodyZonesStanding = require("gestures.bodyzone")
 local WeaponZones = require("gestures.weaponzones")
 
 local function HapticLeftCB(gesture, context)
@@ -31,24 +27,38 @@ local function HapticRightCB(gesture, context)
 end
 
 
-BodyZones.headZoneLH:SetExecutionCallback(HapticLeftCB)
-BodyZones.leftShoulderZoneLH:SetExecutionCallback(HapticLeftCB)
-BodyZones.rightShoulderZoneLH:SetExecutionCallback(HapticLeftCB)
-BodyZones.rightHipZoneLH:SetExecutionCallback(HapticLeftCB)
-BodyZones.leftHipZoneLH:SetExecutionCallback(HapticLeftCB)
-BodyZones.leftChestZoneLH:SetExecutionCallback(HapticLeftCB)
-BodyZones.rightChestZoneLH:SetExecutionCallback(HapticLeftCB)
-WeaponZones.reloadZoneLH:SetExecutionCallback(HapticLeftCB)
-WeaponZones.modeSwitchZoneLH:SetExecutionCallback(HapticLeftCB)
+local function toggleHaptic(bodyZones, weaponZones, enabled)
+    local hapticFeedbackLH = enabled and HapticLeftCB or nil
+    local hapticFeedbackRH = enabled and HapticRightCB or nil
+    bodyZones.headZoneLH:SetExecutionCallback(hapticFeedbackLH)
+    bodyZones.leftShoulderZoneLH:SetExecutionCallback(hapticFeedbackLH)
+    bodyZones.rightShoulderZoneLH:SetExecutionCallback(hapticFeedbackLH)
+    bodyZones.rightHipZoneLH:SetExecutionCallback(hapticFeedbackLH)
+    bodyZones.leftHipZoneLH:SetExecutionCallback(hapticFeedbackLH)
+    bodyZones.leftChestZoneLH:SetExecutionCallback(hapticFeedbackLH)
+    bodyZones.rightChestZoneLH:SetExecutionCallback(hapticFeedbackLH)
+    weaponZones.reloadZoneLH:SetExecutionCallback(hapticFeedbackLH)
+    weaponZones.modeSwitchZoneLH:SetExecutionCallback(hapticFeedbackLH)
 
+    bodyZones.headZoneRH:SetExecutionCallback(hapticFeedbackRH)
+    bodyZones.leftShoulderZoneRH:SetExecutionCallback(hapticFeedbackRH)
+    bodyZones.rightShoulderZoneRH:SetExecutionCallback(hapticFeedbackRH)
+    bodyZones.rightHipZoneRH:SetExecutionCallback(hapticFeedbackRH)
+    bodyZones.leftHipZoneRH:SetExecutionCallback(hapticFeedbackRH)
+    bodyZones.leftChestZoneRH:SetExecutionCallback(hapticFeedbackRH)
+    bodyZones.rightChestZoneRH:SetExecutionCallback(hapticFeedbackRH)
+    weaponZones.reloadZoneRH:SetExecutionCallback(hapticFeedbackRH)
+    weaponZones.modeSwitchZoneRH:SetExecutionCallback(hapticFeedbackRH)
+end
 
-BodyZones.headZoneRH:SetExecutionCallback(HapticRightCB)
-BodyZones.leftShoulderZoneRH:SetExecutionCallback(HapticRightCB)
-BodyZones.rightShoulderZoneRH:SetExecutionCallback(HapticRightCB)
-BodyZones.rightHipZoneRH:SetExecutionCallback(HapticRightCB)
-BodyZones.leftHipZoneRH:SetExecutionCallback(HapticRightCB)
-BodyZones.leftChestZoneRH:SetExecutionCallback(HapticRightCB)
-BodyZones.rightChestZoneRH:SetExecutionCallback(HapticRightCB)
-WeaponZones.reloadZoneRH:SetExecutionCallback(HapticRightCB)
-WeaponZones.modeSwitchZoneRH:SetExecutionCallback(HapticRightCB)
+local function updateHapticFeedback(enabled)
+    toggleHaptic(BodyZonesSitting, WeaponZones, enabled)
+    toggleHaptic(BodyZonesStanding, WeaponZones, enabled)
+end
+
+updateHapticFeedback(Config.hapticFeedback)
+
+return {
+    updateHapticFeedback = updateHapticFeedback
+}
 
