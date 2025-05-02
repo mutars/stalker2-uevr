@@ -10,7 +10,7 @@ local gestureSetLH = require("presets.presetLH")
 local gamepadState = require("stalker2.gamepad")
 local haptics = require("stalker2.haptics")
 require("Base.basic")
-require("Base.scope")
+local scopeController = require("Base.scope") -- Require the scope controller
 
 gameState:Init()
 gamepadState:Reset()
@@ -23,6 +23,11 @@ local function updateConfig(config)
         currentPreset = Config.sittingExperience and gestureSetRH.SitmodeSetRH or gestureSetRH.StandModeSetRH
     else
         currentPreset = Config.sittingExperience and gestureSetLH.SitModeSetLH or gestureSetLH.StandModeSetLH
+    end
+    -- Update scope brightness
+    if scopeController then
+        scopeController:SetScopeBrightness(config.scopeBrightnessAmplifier)
+        scopeController:SetScopePlaneScale(config.cylinderDepth)
     end
 end
 
@@ -103,6 +108,20 @@ uevr.sdk.callbacks.on_draw_ui(function()
     local twoHandedChanged, newTwoHanded = imgui.checkbox("Two-Handed Aiming", Config.twoHandedAiming)
     if twoHandedChanged then
         Config.twoHandedAiming = newTwoHanded
+        changed = true
+    end
+
+    -- Scope Brightness Amplifier
+    local brightnessChanged, newBrightness = imgui.slider_float("Scope Brightness", Config.scopeBrightnessAmplifier, 0.5, 3.0)
+    if brightnessChanged then
+        Config.scopeBrightnessAmplifier = newBrightness
+        changed = true
+    end
+
+    -- Cylinder Depth (Debug)
+    local depthChanged, newDepth = imgui.drag_float("Cylinder Depth (Debug)", Config.cylinderDepth, 0.00001, 0.0, 0.1, "%.5f")
+    if depthChanged then
+        Config.cylinderDepth = newDepth
         changed = true
     end
 

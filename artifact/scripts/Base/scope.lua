@@ -44,6 +44,7 @@ local ScopeController = {
     -- state variables
     current_weapon = nil,
     scope_mesh = nil,
+    scope_material = nil,
 }
 
 function ScopeController:new()
@@ -202,12 +203,24 @@ function ScopeController:spawn_scope_plane(world, owner, pos, rt)
 
     dynamic_material:SetTextureParameterValue("LinearColor", rt)
     local color = StructObject.new(self.flinearColor_c)
-    color.R = emissive_material_amplifier
-    color.G = emissive_material_amplifier
-    color.B = emissive_material_amplifier
-    color.A = emissive_material_amplifier
+    color.R = Config.scopeBrightnessAmplifier
+    color.G = Config.scopeBrightnessAmplifier
+    color.B = Config.scopeBrightnessAmplifier
+    color.A = Config.scopeBrightnessAmplifier
     dynamic_material:SetVectorParameterValue("Color", color)
     self.scope_plane_component = local_scope_mesh
+    self.scope_material = dynamic_material
+end
+
+function ScopeController:SetScopeBrightness(value)
+    if self.scope_material then
+        local color = StructObject.new(self.flinearColor_c)
+        color.R = value
+        color.G = value
+        color.B = value
+        color.A = value
+        self.scope_material:SetVectorParameterValue("Color", color)
+    end
 end
 
 function ScopeController:spawn_scene_capture_component(world, owner, pos, fov, rt)
@@ -336,8 +349,8 @@ function ScopeController:attach_components_to_weapon(weapon_mesh)
             true -- Weld simulated bodies
         )
         self.scope_plane_component:K2_SetRelativeRotation(self.temp_vec3:set(0, 90, 90), false, self.reusable_hit_result, false)
-        self.scope_plane_component:K2_SetRelativeLocation(self.temp_vec3:set(0, 0, 0), false, self.reusable_hit_result, false)
-        self.scope_plane_component:SetWorldScale3D(self.temp_vec3:set(0.025, 0.025, 0.00001))
+        self.scope_plane_component:K2_SetRelativeLocation(self.temp_vec3:set(Config.cylinderDepth, 0, 0), false, self.reusable_hit_result, false)
+        self.scope_plane_component:SetWorldScale3D(self.temp_vec3:set(0.025, 0.025, Config.cylinderDepth))
         self.scope_plane_component:SetVisibility(false)
     end
 end
@@ -431,8 +444,15 @@ function ScopeController:Reset()
     self.render_target = nil
     self.scope_mesh = nil
     self.current_weapon = nil
+    self.scope_material = nil
 end
 
+function ScopeController:SetScopePlaneScale(depth)
+    if self.scope_plane_component then
+        self.scope_plane_component:SetWorldScale3D(self.temp_vec3:set(0.025, 0.025, depth))
+        self.scope_plane_component:K2_SetRelativeLocation(self.temp_vec3:set(depth, 0, 0), false, self.reusable_hit_result, false)
+    end
+end
 
 local scope_controller = ScopeController:new()
 
@@ -451,3 +471,6 @@ uevr.sdk.callbacks.on_script_reset(function()
     scope_controller:Reset()
     scope_controller:ResetStatic()
 end)
+
+
+return scope_controller

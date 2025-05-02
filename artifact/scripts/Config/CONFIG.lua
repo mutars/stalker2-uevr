@@ -4,6 +4,8 @@ Config = {
 	recoil = true,
 	hapticFeedback = true,
 	twoHandedAiming = true,
+	scopeBrightnessAmplifier = 1.0,
+	cylinderDepth = 0.00015,
 }
 
 TwoHandedStateActive = false
