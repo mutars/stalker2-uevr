@@ -176,7 +176,7 @@ function ScopeController:spawn_scope_plane(world, owner, pos, rt)
         print("Failed to find material")
         return
     end
-    wanted_mat.BlendMode = 0
+    wanted_mat.BlendMode = 7
     wanted_mat.TwoSided = 0
     --     wanted_mat.bDisableDepthTest = true
     --     --wanted_mat.MaterialDomain = 0
@@ -238,7 +238,7 @@ function ScopeController:spawn_scene_capture_component(world, owner, pos, fov, r
     -- local_scene_capture_component.CaptureSource = 1;
     local_scene_capture_component.bAlwaysPersistRenderingState = true;
     local_scene_capture_component.bEnableVolumetricCloudsCapture = false;
-    local_scene_capture_component.bCaptureEveryFrame = 0;
+    local_scene_capture_component.bCaptureEveryFrame = 1;
 
     -- post processing
     local_scene_capture_component.PostProcessSettings.bOverride_MotionBlurAmount = true
@@ -340,6 +340,7 @@ function ScopeController:attach_components_to_weapon(weapon_mesh)
             return
         end
         -- OpticCutoutSocket
+        self.scope_mesh:SetScalarParameterValueOnMaterials("SightMaskScale", 0.0)
         self.scope_plane_component:K2_AttachToComponent(
             self.scope_mesh,
             "OpticCutoutSocket",
