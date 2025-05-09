@@ -1,6 +1,6 @@
 require(".\\Base\\Trackers\\Trackers")
 require("Config.CONFIG")
-basicInit=true
+local GameState = require("stalker2.gamestate")
 
 local api = uevr.api
 local vr = uevr.params.vr
@@ -281,23 +281,37 @@ end
 
 
 -- Helper function to calculate socket offset
-local function update_weapon_offset(weapon_mesh)
+local function update_weapon_offset(weapon_mesh, pawn)
     if not weapon_mesh then return end
 
-    local attach_socket_name = weapon_mesh.AttachSocketName
-
+    local virtualGunstock = Config.virtualGunstock and GameState:is_scope_active(pawn)
+    local offset = Vector3f.new(0, 0, 0)
+    if virtualGunstock then
+        -- offset = kismet_math_library:Subtract_VectorVector(default_transform.Translation, offset_transform.Translation)
+        local parent_transform = weapon_mesh:GetSocketTransform(weapon_mesh.AttachSocketName, 0)
+        local scope_mesh = GameState:get_scope_mesh(weapon_mesh)
+        local child_transform
+        if scope_mesh then
+            child_transform = scope_mesh:GetSocketTransform("OpticCutoutSocket", 0)
+        else
+            child_transform = weapon_mesh:GetSocketTransform("AimSocket", 0)
+        end
+        local offset_transform = kismet_math_library:MakeRelativeTransform(child_transform, parent_transform)
+        offset = offset_transform.Translation
+        offset.x = offset.x + 3.5
+    else
+        local parent_transform = weapon_mesh:GetSocketTransform(weapon_mesh.AttachSocketName, 0)
+        local child_transform = weapon_mesh:GetSocketTransform("jnt_offset", 0)
+        local offset_transform = kismet_math_library:MakeRelativeTransform(child_transform, parent_transform)
+        offset = offset_transform.Translation
+    end
     -- Get socket transforms
-    local default_transform = weapon_mesh:GetSocketTransform(attach_socket_name, 2)
-    local offset_transform = weapon_mesh:GetSocketTransform("jnt_offset", 2)
-    local location_diff = kismet_math_library:Subtract_VectorVector(
-        default_transform.Translation,
-        offset_transform.Translation
-    )
+
     -- from UE to UEVR X->Z Y->-X, Z->-Y
     -- Z - forward, X - negative right, Y - negative up
-    local lossy_offset = Vector3f.new(-location_diff.y, -location_diff.z+VertDiff, location_diff.x)
+    local lossy_offset = Vector3f.new(offset.y, offset.z+VertDiff, offset.x)
     -- Apply the offset to the weapon using motion controller state
-    UEVR_UObjectHook.get_or_add_motion_controller_state(weapon_mesh):set_hand(Config.dominantHand)
+    UEVR_UObjectHook.get_or_add_motion_controller_state(weapon_mesh):set_hand(virtualGunstock and 2 or Config.dominantHand)
     UEVR_UObjectHook.get_or_add_motion_controller_state(weapon_mesh):set_location_offset(lossy_offset)
     UEVR_UObjectHook.get_or_add_motion_controller_state(weapon_mesh):set_permanent(true)
 end
@@ -358,7 +372,7 @@ uevr.sdk.callbacks.on_post_calculate_stereo_view_offset(function(device, view_in
     end
 
     -- First apply the original weapon offset logic
-    update_weapon_offset(equipped_weapon)
+    update_weapon_offset(equipped_weapon, pawn)
 
     if not left_hand_component or not right_hand_component then
         return

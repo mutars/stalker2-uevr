@@ -4,7 +4,11 @@ Config = {
 	recoil = true,
 	hapticFeedback = true,
 	twoHandedAiming = true,
+	virtualGunstock = false,
 	scopeBrightnessAmplifier = 1.0,
+	scopeDiameter = 0.03,
+	scopeMagnifier = 0.6,
+	scopeTextureSize = 1024,
 	cylinderDepth = 0.00015,
 }
 
@@ -48,3 +52,4 @@ function Config:save()
 	end)
 end
 
+Config:load()

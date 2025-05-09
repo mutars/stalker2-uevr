@@ -1,3 +1,5 @@
+local utils = require("common.utils")
+
 local GameStateManager = {
     -- State tracking
     inMenu = false,
@@ -6,7 +8,7 @@ local GameStateManager = {
     worldTimeTick = 0,
     initialized = false,
     last_level = nil,
-
+    StaticMeshC = nil,
     -- API reference
     api = nil
 }
@@ -20,6 +22,7 @@ function GameStateManager:Init()
     self.worldTimeTick = 0
     self.last_level = nil
     self.initialized = true
+    self.StaticMeshC = utils.find_required_object("Class /Script/Engine.StaticMeshComponent")
     print("GameStateManager initialized")
 end
 
@@ -66,6 +69,33 @@ function GameStateManager:CheckInventoryPDAState()
             self.isInventoryPDA = false
         end
     end
+end
+
+
+function GameStateManager:is_scope_active(pawn)
+    if not pawn then return false end
+    local optical_scope = pawn.PlayerOpticScopeComponent
+    if not optical_scope then return false end
+    local scope_active = optical_scope:read_byte(0xA8, 1)
+    if scope_active > 0 then
+        return true
+    end
+    return false
+end
+
+function GameStateManager:get_scope_mesh(parent_mesh)
+    if not parent_mesh then return nil end
+
+    local child_components = parent_mesh.AttachChildren
+    if not child_components then return nil end
+
+    for _, component in ipairs(child_components) do
+        if component:is_a(self.StaticMeshC) and string.find(component:get_fname():to_string(), "scope") then
+            return component
+        end
+    end
+
+    return nil
 end
 
 -- Get current world time
