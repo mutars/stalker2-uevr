@@ -298,7 +298,7 @@ local function update_weapon_offset(weapon_mesh, pawn)
         end
         local offset_transform = kismet_math_library:MakeRelativeTransform(child_transform, parent_transform)
         offset = offset_transform.Translation
-        offset.x = offset.x + 3.5
+        offset.x = offset.x - 3.5
     else
         local parent_transform = weapon_mesh:GetSocketTransform(weapon_mesh.AttachSocketName, 0)
         local child_transform = weapon_mesh:GetSocketTransform("jnt_offset", 0)
@@ -309,7 +309,7 @@ local function update_weapon_offset(weapon_mesh, pawn)
 
     -- from UE to UEVR X->Z Y->-X, Z->-Y
     -- Z - forward, X - negative right, Y - negative up
-    local lossy_offset = Vector3f.new(offset.y, offset.z+VertDiff, offset.x)
+    local lossy_offset = Vector3f.new(offset.y, offset.z+VertDiff, -offset.x)
     -- Apply the offset to the weapon using motion controller state
     UEVR_UObjectHook.get_or_add_motion_controller_state(weapon_mesh):set_hand(virtualGunstock and 2 or Config.dominantHand)
     UEVR_UObjectHook.get_or_add_motion_controller_state(weapon_mesh):set_location_offset(lossy_offset)
