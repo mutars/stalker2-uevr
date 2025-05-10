@@ -28,6 +28,7 @@ local function updateConfig(config)
     if scopeController then
         scopeController:SetScopeBrightness(config.scopeBrightnessAmplifier)
         scopeController:SetScopePlaneScale(config.cylinderDepth)
+        scopeController:UpdateIndoorMode(config.indoor)
     end
 end
 
@@ -65,7 +66,6 @@ uevr.sdk.callbacks.on_script_reset(function()
 end)
 
 -- Load config at script init
-Config:load()
 updateConfig(Config)
 
 -- Config UI as a collapsing header
@@ -118,12 +118,67 @@ uevr.sdk.callbacks.on_draw_ui(function()
         changed = true
     end
 
+    -- Virtual Gunstock
+    local gunstockChanged, newGunstock = imgui.checkbox("Virtual Gunstock (Debug Not working)", Config.virtualGunstock)
+    if gunstockChanged then
+        Config.virtualGunstock = newGunstock
+        changed = true
+    end
+
+    -- Indoor Mode
+    local indoorChanged, newIndoor = imgui.checkbox("Indoor Mode (Scope OverExposure fix)", Config.indoor)
+    if indoorChanged then
+        Config.indoor = newIndoor
+        changed = true
+    end
+
+    -- Scope Diameter
+    local diameterChanged, newDiameter = imgui.drag_float("Scope Diameter", Config.scopeDiameter, 0.001, 0.01, 0.1, "%.3f")
+    if diameterChanged then
+        Config.scopeDiameter = newDiameter
+        changed = true
+    end
+
+    -- Scope Magnifier
+    local magnifierChanged, newMagnifier = imgui.drag_float("Scope FOV Magnifier", Config.scopeMagnifier, 0.1, 0.1, 1.0, "%.2f")
+    if magnifierChanged then
+        Config.scopeMagnifier = newMagnifier
+        changed = true
+    end
+
+    -- Scope Texture Size
+    local textureSizeChanged, newTextureSize = imgui.drag_int("Scope Texture Size (Require Script Reset)", Config.scopeTextureSize, 1, 256, 3072)
+    if textureSizeChanged then
+        Config.scopeTextureSize = newTextureSize
+        changed = true
+    end
+
     -- Cylinder Depth (Debug)
     local depthChanged, newDepth = imgui.drag_float("Cylinder Depth (Debug)", Config.cylinderDepth, 0.00001, 0.0, 0.1, "%.5f")
     if depthChanged then
         Config.cylinderDepth = newDepth
         changed = true
     end
+
+
+    -- local projection_matrix = UEVR_Matrix4x4f.new()
+    -- uevr.params.vr.get_ue_projection_matrix(0, projection_matrix)
+    -- imgui.text("Projection Matrix:")
+    -- imgui.text(string.format("[%.2f,%.2f,%.2f,%.2f]", projection_matrix[0][1], projection_matrix[1][1], projection_matrix[2][1], projection_matrix[3][1]))
+    -- imgui.text(string.format("[%.2f,%.2f,%.2f,%.2f]", projection_matrix[0][2], projection_matrix[1][2], projection_matrix[2][2], projection_matrix[3][2]))
+    -- imgui.text(string.format("[%.2f,%.2f,%.2f,%.2f]", projection_matrix[0][3], projection_matrix[1][3], projection_matrix[2][3], projection_matrix[3][3]))
+    -- imgui.text(string.format("[%.2f,%.2f,%.2f,%.2f]", projection_matrix[0][4], projection_matrix[1][4], projection_matrix[2][4], projection_matrix[3][4]))
+
+    -- local pawn = uevr.api:get_local_pawn(0)
+
+    -- if pawn and scopeController.scope_actor and uevr.params.vr.is_hmd_active() then
+    --     local size_ratio = scopeController:CalcActorScreenSizeSq(scopeController.scope_actor, 0)
+    --     local GetViewDistance = scopeController:GetViewDistance(0)
+    --     local view_pos = scopeController.left_view_location;
+    --     imgui.text("View Location: " .. string.format("X: %.2f, Y: %.2f, Z: %.2f", view_pos.x, view_pos.y, view_pos.z))
+    --     imgui.text("Scope Size Ratio: " .. size_ratio .. "distance: " .. GetViewDistance)
+    -- end
+
 
     if changed then
         updateConfig(Config)
