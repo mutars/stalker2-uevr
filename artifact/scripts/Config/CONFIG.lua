@@ -10,6 +10,7 @@ Config = {
 	scopeMagnifier = 0.6,
 	scopeTextureSize = 1024,
 	cylinderDepth = 0.00015,
+	indoor = false,
 }
 
 TwoHandedStateActive = false

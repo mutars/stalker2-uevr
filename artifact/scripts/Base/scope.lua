@@ -375,6 +375,12 @@ function ScopeController:GetRelativeLocation(component, point)
     return relative_location
 end
 
+function ScopeController:UpdateIndoorMode(indoor)
+    if self.scene_capture_component then
+        self.scene_capture_component.CaptureSource = indoor and 8 or 0
+    end
+end
+
 -- function ScopeController:CalcActorScreenSizeSqUE(actor, eye)
 --     if motionControllerActors:GetHMD() == nil then
 --         return 1.0

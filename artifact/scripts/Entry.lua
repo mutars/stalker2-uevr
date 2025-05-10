@@ -28,6 +28,7 @@ local function updateConfig(config)
     if scopeController then
         scopeController:SetScopeBrightness(config.scopeBrightnessAmplifier)
         scopeController:SetScopePlaneScale(config.cylinderDepth)
+        scopeController:UpdateIndoorMode(config.indoor)
     end
 end
 
@@ -121,6 +122,13 @@ uevr.sdk.callbacks.on_draw_ui(function()
     local gunstockChanged, newGunstock = imgui.checkbox("Virtual Gunstock (Debug Not working)", Config.virtualGunstock)
     if gunstockChanged then
         Config.virtualGunstock = newGunstock
+        changed = true
+    end
+
+    -- Indoor Mode
+    local indoorChanged, newIndoor = imgui.checkbox("Indoor Mode (Scope OverExposure fix)", Config.indoor)
+    if indoorChanged then
+        Config.indoor = newIndoor
         changed = true
     end
 
