@@ -5,16 +5,16 @@ local motionControllers = require("gestures.motioncontrollergestures")
 -- Base Location Gesture class
 local LocationGestureBase = GestureBase:new({
     name = "Location Gesture Base",
-    location = Vector3f.new(0, 0, 0),
-    rotation = Vector3f.new(0, 0, 0),
-    weaponLocation = Vector3f.new(0, 0, 0)
+    location = Vector3d.new(0, 0, 0),
+    rotation = Vector3d.new(0, 0, 0),
+    weaponLocation = Vector3d.new(0, 0, 0)
 })
 
 function LocationGestureBase:new(config)
     config = config or {}
-    config.location = Vector3f.new(0, 0, 0)
-    config.rotation = Vector3f.new(0, 0, 0)
-    config.weaponLocation = Vector3f.new(0, 0, 0)
+    config.location = Vector3d.new(0, 0, 0)
+    config.rotation = Vector3d.new(0, 0, 0)
+    config.weaponLocation = Vector3d.new(0, 0, 0)
     config.kismet_math_library = utils.find_static_class("Class /Script/Engine.KismetMathLibrary")
     local instance = GestureBase.new(self, config)
     return instance
@@ -128,7 +128,7 @@ local RightHandRelativeToLeftLocationGesture = LocationGestureBase:new({
     name = "Right Hand Weapon Location",
     rightHand = nil,
     leftHand = nil,
-    weaponLocation = Vector3f.new(0, 0, 0)
+    weaponLocation = Vector3d.new(0, 0, 0)
 })
 
 function RightHandRelativeToLeftLocationGesture:new(config)

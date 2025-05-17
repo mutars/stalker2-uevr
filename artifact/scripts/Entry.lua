@@ -110,11 +110,22 @@ uevr.sdk.callbacks.on_draw_ui(function()
         Config.twoHandedAiming = newTwoHanded
         changed = true
     end
-
     -- Scope Brightness Amplifier
-    local brightnessChanged, newBrightness = imgui.slider_float("Scope Brightness", Config.scopeBrightnessAmplifier, 0.5, 3.0)
+    local brightnessChanged, newBrightness = imgui.slider_float("Scope Brightness", Config.scopeBrightnessAmplifier, 0.01, 2.0)
     if brightnessChanged then
         Config.scopeBrightnessAmplifier = newBrightness
+        changed = true
+    end
+
+    local scaleLerpChanged, newScaleLerp = imgui.checkbox("Scale Lerp with Camera FOV", Config.scaleLerpWithCameraFov)
+    if scaleLerpChanged then
+        Config.scaleLerpWithCameraFov = newScaleLerp
+        changed = true
+    end
+    -- Lerp Override
+    local lerpOverrideChanged, newLerpOverride = imgui.drag_float("Lerp Override", Config.lerpOverride, 0.1, 0.1, 20.0, "%.2f")
+    if lerpOverrideChanged then
+        Config.lerpOverride = newLerpOverride
         changed = true
     end
 
@@ -122,6 +133,13 @@ uevr.sdk.callbacks.on_draw_ui(function()
     local gunstockChanged, newGunstock = imgui.checkbox("Virtual Gunstock (Debug Not working)", Config.virtualGunstock)
     if gunstockChanged then
         Config.virtualGunstock = newGunstock
+        changed = true
+    end
+
+    -- Virtual Gunstock Distance
+    local gunstockDistanceChanged, newGunstockDistance = imgui.drag_float("Virtual Gunstock Distance", Config.virtualGunstockDistance, 0.01, 0.01, 0.1, "%.3f")
+    if gunstockDistanceChanged then
+        Config.virtualGunstockDistance = newGunstockDistance
         changed = true
     end
 

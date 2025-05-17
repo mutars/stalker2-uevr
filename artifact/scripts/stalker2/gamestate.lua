@@ -108,6 +108,18 @@ function GameStateManager:GetWorldTime()
     return 0
 end
 
+function GameStateManager:GetFovDenominator()
+    local pc = self.api:get_player_controller(0)
+    if not pc then return 1.0 end
+    local camera = pc.PlayerCameraManager
+    if not camera then return 1.0 end
+    local vt = camera.ViewTarget
+    if not vt then return 1.0 end
+    local fov = math.tan(math.rad(vt.POV.FOV/2.0))
+    local desiredFov = math.tan(math.rad(vt.POV.DesiredFOV/2.0))
+    return fov / desiredFov
+end
+
 -- Get local player pawn
 function GameStateManager:GetLocalPawn()
     return self.api:get_local_pawn(0)

@@ -34,7 +34,7 @@ end
 function MotionControllerActors:spawn_actor(world_context, actor_class, location, collision_method, owner)
     self.zero_transform.Translation = location
     self.zero_transform.Rotation.W = 1.0 -- Set rotation to identity
-    self.zero_transform.Scale3D = Vector3f.new(1.0, 1.0, 1.0) -- Default scale
+    self.zero_transform.Scale3D = Vector3d.new(1.0, 1.0, 1.0) -- Default scale
 
     local actor = self.statics:BeginDeferredActorSpawnFromClass(world_context, actor_class, self.zero_transform, collision_method, owner)
     if actor == nil then

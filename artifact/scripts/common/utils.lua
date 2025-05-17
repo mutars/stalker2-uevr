@@ -47,7 +47,9 @@ local function destroy_actor(actor)
 end
 
 local Statics = find_static_class("Class /Script/Engine.GameplayStatics")
+local KismetMathLibrary = find_static_class("Class /Script/Engine.KismetMathLibrary")
 local ftransform_c = find_required_object("ScriptStruct /Script/CoreUObject.Transform")
+local fvector_c = find_required_object("ScriptStruct /Script/CoreUObject.Vector")
 local zero_transform = StructObject.new(ftransform_c)
 local temp_vec3 = Vector3d.new(0, 0, 0)
 zero_transform.Rotation.W = 1.0
@@ -68,11 +70,23 @@ local function spawn_actor(world_context, actor_class, location, collision_metho
     return actor
 end
 
+local function GetRelativeLocation(parent_transform, point)
+    local norm_q = KismetMathLibrary:Quat_Normalized(parent_transform.Rotation)
+    local pomponent_rotation_inv_q = KismetMathLibrary:Quat_Inversed(norm_q)
+    local location_diff = StructObject.new(fvector_c)
+    location_diff.X = point.X - parent_transform.Translation.X
+    location_diff.Y = point.Y - parent_transform.Translation.Y
+    location_diff.Z = point.Z - parent_transform.Translation.Z
+    local relative_location = KismetMathLibrary:Quat_RotateVector(pomponent_rotation_inv_q, location_diff)
+    return relative_location
+end
+
 return {
     find_required_object = find_required_object,
     find_required_object_no_cache = find_required_object_no_cache,
     find_static_class = find_static_class,
     validate_object = validate_object,
     destroy_actor = destroy_actor,
-    spawn_actor = spawn_actor
+    spawn_actor = spawn_actor,
+    GetRelativeLocation = GetRelativeLocation,
 }

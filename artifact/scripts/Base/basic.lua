@@ -1,6 +1,8 @@
 require(".\\Base\\Trackers\\Trackers")
 require("Config.CONFIG")
+local utils = require("common.utils")
 local GameState = require("stalker2.gamestate")
+local motionControllerActors = require("gestures.motioncontrolleractors")
 
 local api = uevr.api
 local vr = uevr.params.vr
@@ -45,6 +47,7 @@ local actor_c = find_required_object("Class /Script/Engine.Actor")
 local ftransform_c = find_required_object("ScriptStruct /Script/CoreUObject.Transform")
 local game_engine_class = find_required_object("Class /Script/Engine.GameEngine")
 local hitresult_c = find_required_object("ScriptStruct /Script/Engine.HitResult")
+local fvector_c = find_required_object("ScriptStruct /Script/CoreUObject.Vector")
 local empty_hitresult = StructObject.new(hitresult_c)
 local temp_transform = StructObject.new(ftransform_c)
 temp_transform.Rotation.W = 1.0
@@ -279,13 +282,69 @@ local function fix_effects(world)
     KismetMaterialLibrary:SetScalarParameterValue(world, fov_collection, "IsFOVEnabled", 0.0)
 end
 
+local function GetEyeTransform(eye)
+    local hmd_component = motionControllerActors:GetHMD()
+    local hmd_component_transform = hmd_component:K2_GetComponentToWorld()
+    local eye_offset = Vector3f.new(0, 0, 0)
+    uevr.params.vr.get_eye_offset(eye, eye_offset)
+    local ue_location = StructObject.new(fvector_c)
+    ue_location.X = -eye_offset.z*100.0 + Config.virtualGunstockDistance * 100.0
+    ue_location.Y = eye_offset.x*100.0
+    ue_location.Z = eye_offset.y*100.0
+    local rotated_offset = kismet_math_library:Quat_RotateVector(hmd_component_transform.Rotation, ue_location)
+    hmd_component_transform.Translation.X = hmd_component_transform.Translation.X + rotated_offset.X
+    hmd_component_transform.Translation.Y = hmd_component_transform.Translation.Y + rotated_offset.Y
+    hmd_component_transform.Translation.Z = hmd_component_transform.Translation.Z + rotated_offset.Z
+    return hmd_component_transform
+end
+
+local function uevr_to_ue_transform(pos, quat)
+    local ue_transform = StructObject.new(ftransform_c)
+    ue_transform.Translation.X = pos.x
+    ue_transform.Translation.Y = pos.y
+    ue_transform.Translation.Z = pos.z
+    ue_transform.Rotation.X = quat.x
+    ue_transform.Rotation.Y = quat.y
+    ue_transform.Rotation.Z = quat.z
+    ue_transform.Rotation.W = quat.w
+    ue_transform.Scale3D.X = 1.0
+    ue_transform.Scale3D.Y = 1.0
+    ue_transform.Scale3D.Z = 1.0
+    return ue_transform
+end
+
+local function GetEyeRelativeToHandTranslation(eye, hand)
+    local quat = Quaternionf.new(1, 0, 0, 0)
+    local pos = Vector3f.new(0, 0, 0)
+    uevr.params.vr.get_pose(0 , pos, quat)
+    local hmd_transform = uevr_to_ue_transform(pos, quat)
+    -- print("hmd_transform: [UE] : rotation " .. string.format("x=%f y=%f z=%f w=%f", hmd_transform.Rotation.X, hmd_transform.Rotation.Y, hmd_transform.Rotation.Z, hmd_transform.Rotation.W))
+    -- print("hmd transform: [Mod]: rotation " .. string.format("x=%f y=%f z=%f w=%f", quat.x, quat.y, quat.z, quat.w))
+    uevr.params.vr.get_eye_offset(eye, pos)
+    local ue_location = StructObject.new(fvector_c)
+    ue_location.X = pos.x
+    ue_location.Y = pos.y
+    ue_location.Z = pos.z
+    local rotated_offset = kismet_math_library:Quat_RotateVector(hmd_transform.Rotation, ue_location)
+    hmd_transform.Translation.X = hmd_transform.Translation.X + rotated_offset.X
+    hmd_transform.Translation.Y = hmd_transform.Translation.Y + rotated_offset.Y
+    hmd_transform.Translation.Z = hmd_transform.Translation.Z + rotated_offset.Z
+    uevr.params.vr.get_aim_pose(1 + hand , pos, quat)
+    local hand_transform = uevr_to_ue_transform(pos, quat)
+    -- print("hand_transform: [UE] : rotation " .. string.format("x=%f y=%f z=%f w=%f", hand_transform.Rotation.X, hand_transform.Rotation.Y, hand_transform.Rotation.Z, hand_transform.Rotation.W))
+    -- print("hand_transform: [Mod]: rotation " .. string.format("x=%f y=%f z=%f w=%f", quat.x, quat.y, quat.z, quat.w))
+    local relative_transform = kismet_math_library:MakeRelativeTransform(hmd_transform, hand_transform)
+    -- print("hand relative translation " .. string.format("x=%f y=%f z=%f", relative_transform.X, relative_transform.Y, relative_transform.Z))
+    return relative_transform.Translation
+end
+
 
 -- Helper function to calculate socket offset
-local function update_weapon_offset(weapon_mesh, pawn)
+local function update_weapon_offset__trash(weapon_mesh, pawn)
     if not weapon_mesh then return end
 
     local virtualGunstock = Config.virtualGunstock and GameState:is_scope_active(pawn)
-    local offset = Vector3f.new(0, 0, 0)
+    local offset = Vector3d.new(0, 0, 0)
     if virtualGunstock then
         -- offset = kismet_math_library:Subtract_VectorVector(default_transform.Translation, offset_transform.Translation)
         local parent_transform = weapon_mesh:GetSocketTransform(weapon_mesh.AttachSocketName, 0)
@@ -297,19 +356,69 @@ local function update_weapon_offset(weapon_mesh, pawn)
             child_transform = weapon_mesh:GetSocketTransform("AimSocket", 0)
         end
         local offset_transform = kismet_math_library:MakeRelativeTransform(child_transform, parent_transform)
-        offset = offset_transform.Translation
-        offset.x = offset.x - 3.5
+        local eye_transform = GetEyeTransform(Config.dominantHand)
+        local hand_component = motionControllerActors:GetHandComponent(Config.dominantHand+1)
+        local hand_component_transform = hand_component:K2_GetComponentToWorld()
+        local eye_relative_to_hand = kismet_math_library:MakeRelativeTransform(eye_transform, hand_component_transform)
+        offset.x = offset_transform.Translation.X - eye_relative_to_hand.Translation.X
+        offset.y = offset_transform.Translation.Y - eye_relative_to_hand.Translation.Y
+        offset.z = offset_transform.Translation.Z - eye_relative_to_hand.Translation.Z
     else
         local parent_transform = weapon_mesh:GetSocketTransform(weapon_mesh.AttachSocketName, 0)
         local child_transform = weapon_mesh:GetSocketTransform("jnt_offset", 0)
         local offset_transform = kismet_math_library:MakeRelativeTransform(child_transform, parent_transform)
-        offset = offset_transform.Translation
+        offset.x = offset_transform.Translation.X
+        offset.y = offset_transform.Translation.Y
+        offset.z = offset_transform.Translation.Z
     end
     -- Get socket transforms
 
     -- from UE to UEVR X->Z Y->-X, Z->-Y
     -- Z - forward, X - negative right, Y - negative up
-    local lossy_offset = Vector3f.new(offset.y, offset.z+VertDiff, -offset.x)
+    local lossy_offset = Vector3d.new(offset.y, offset.z+VertDiff, -offset.x)
+    -- Apply the offset to the weapon using motion controller state
+    UEVR_UObjectHook.get_or_add_motion_controller_state(weapon_mesh):set_hand(Config.dominantHand)
+    UEVR_UObjectHook.get_or_add_motion_controller_state(weapon_mesh):set_location_offset(lossy_offset)
+    UEVR_UObjectHook.get_or_add_motion_controller_state(weapon_mesh):set_permanent(true)
+end
+
+
+-- Helper function to calculate socket offset
+local function update_weapon_offset(weapon_mesh, pawn)
+    if not weapon_mesh then return end
+
+    local virtualGunstock = Config.virtualGunstock and GameState:is_scope_active(pawn)
+    local offset = Vector3d.new(0, 0, 0)
+    if virtualGunstock then
+        -- offset = kismet_math_library:Subtract_VectorVector(default_transform.Translation, offset_transform.Translation)
+        local parent_transform = weapon_mesh:GetSocketTransform(weapon_mesh.AttachSocketName, 0)
+        local scope_mesh = GameState:get_scope_mesh(weapon_mesh)
+        local child_transform
+        if scope_mesh then
+            child_transform = scope_mesh:GetSocketTransform("OpticCutoutSocket", 0)
+        else
+            child_transform = weapon_mesh:GetSocketTransform("AimSocket", 0)
+        end
+        local offset_transform = kismet_math_library:MakeRelativeTransform(child_transform, parent_transform)
+        local eye_offset = Vector3f.new(0, 0, 0)
+        uevr.params.vr.get_eye_offset(Config.dominantHand, eye_offset)
+        eye_offset.z = eye_offset.z - Config.virtualGunstockDistance
+        offset.x = offset_transform.Translation.X + eye_offset.z * 100.0
+        offset.y = offset_transform.Translation.Y - eye_offset.x * 100.0
+        offset.z = offset_transform.Translation.Z - eye_offset.y * 100.0
+    else
+        local parent_transform = weapon_mesh:GetSocketTransform(weapon_mesh.AttachSocketName, 0)
+        local child_transform = weapon_mesh:GetSocketTransform("jnt_offset", 0)
+        local offset_transform = kismet_math_library:MakeRelativeTransform(child_transform, parent_transform)
+        offset.x = offset_transform.Translation.X
+        offset.y = offset_transform.Translation.Y
+        offset.z = offset_transform.Translation.Z
+    end
+    -- Get socket transforms
+
+    -- from UE to UEVR X->Z Y->-X, Z->-Y
+    -- Z - forward, X - negative right, Y - negative up
+    local lossy_offset = Vector3d.new(offset.y, offset.z+VertDiff, -offset.x)
     -- Apply the offset to the weapon using motion controller state
     UEVR_UObjectHook.get_or_add_motion_controller_state(weapon_mesh):set_hand(virtualGunstock and 2 or Config.dominantHand)
     UEVR_UObjectHook.get_or_add_motion_controller_state(weapon_mesh):set_location_offset(lossy_offset)
@@ -342,6 +451,12 @@ uevr.sdk.callbacks.on_pre_engine_tick(function(engine, delta)
 
     -- Check if weapon is two-handed (simplified logic, might need adjustment based on your game's weapon system)
     local pawn = api:get_local_pawn(0)
+    if Config.scaleLerpWithCameraFov then
+        local lerp = Config.lerpOverride * GameState:GetFovDenominator()
+        uevr.params.vr.set_mod_value("UObjectHook_AttachLerpSpeed", lerp)
+        -- "UObjectHook_AttachLerpSpeed"
+        -- "UObjectHook_AttachLerpEnabled"
+    end
     if pawn and pawn.Mesh then
         local weapon_mesh = get_equipped_weapon(pawn)
         if weapon_mesh then

@@ -5,16 +5,16 @@ local motionControllerActors = require("gestures.motioncontrolleractors")
 local MotionControllerGesture = GestureBase:new({
     name = "Motion Controller Base",
     controllerIndex = 0,
-    location = Vector3f.new(0, 0, 0),
-    rotation = Vector3f.new(0, 0, 0),
-    pastLocation = Vector3f.new(0, 0, 0),
-    pastRotation = Vector3f.new(0, 0, 0)
+    location = Vector3d.new(0, 0, 0),
+    rotation = Vector3d.new(0, 0, 0),
+    pastLocation = Vector3d.new(0, 0, 0),
+    pastRotation = Vector3d.new(0, 0, 0)
 })
 
 function MotionControllerGesture:EvaluateInternal(context)    
     -- Store past values
-    self.pastLocation = Vector3f.new(self.location.x, self.location.y, self.location.z)
-    self.pastRotation = Vector3f.new(self.rotation.x, self.rotation.y, self.rotation.z)
+    self.pastLocation = Vector3d.new(self.location.x, self.location.y, self.location.z)
+    self.pastRotation = Vector3d.new(self.rotation.x, self.rotation.y, self.rotation.z)
     
     -- Get current position and rotation
     self.location = motionControllerActors:GetLocationByIndex(self.controllerIndex)

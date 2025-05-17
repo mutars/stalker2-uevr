@@ -222,28 +222,43 @@ function ScopeController:spawn_scene_capture_component(world, owner, pos, fov, r
     end
     local_scene_capture_component.TextureTarget = rt
     local_scene_capture_component.FOVAngle = fov
-    local_scene_capture_component.bCacheVolumetricCloudsShadowMaps = true;
-    -- local_scene_capture_component.bCachedDistanceFields = 1;
-    local_scene_capture_component.bUseRayTracingIfEnabled = false;
-    -- local_scene_capture_component.PrimitiveRenderMode = 2; -- 0 - legacy, 1 - other
-    -- local_scene_capture_component.CaptureSource = 1;
-    local_scene_capture_component.bAlwaysPersistRenderingState = true;
-    local_scene_capture_component.bEnableVolumetricCloudsCapture = false;
-    local_scene_capture_component.bCaptureEveryFrame = 1;
 
-    -- post processing
-    local_scene_capture_component.PostProcessSettings.bOverride_MotionBlurAmount = true
-    local_scene_capture_component.PostProcessSettings.MotionBlurAmount = 0.0 -- Disable motion blur
-    local_scene_capture_component.PostProcessSettings.bOverride_ScreenSpaceReflectionIntensity = true
-    local_scene_capture_component.PostProcessSettings.ScreenSpaceReflectionIntensity = 0.0 -- Disable screen space reflections
-    local_scene_capture_component.PostProcessSettings.bOverride_AmbientOcclusionIntensity = true
-    local_scene_capture_component.PostProcessSettings.AmbientOcclusionIntensity = 0.0 -- Disable ambient occlusion
-    local_scene_capture_component.PostProcessSettings.bOverride_BloomIntensity = true
-    local_scene_capture_component.PostProcessSettings.BloomIntensity = 0.0
-    local_scene_capture_component.PostProcessSettings.bOverride_LensFlareIntensity = true
-    local_scene_capture_component.PostProcessSettings.LensFlareIntensity = 0.0 -- Disable lens flares
-    local_scene_capture_component.PostProcessSettings.bOverride_VignetteIntensity = true
-    local_scene_capture_component.PostProcessSettings.VignetteIntensity = 0.0 -- Disable vignette
+    local pc = uevr.api:get_player_controller(0)
+    local vt = pc.PlayerCameraManager.ViewTarget
+    local_scene_capture_component.PostProcessSettings = vt.POV.PostProcessSettings
+
+    -- local_scene_capture_component.bCacheVolumetricCloudsShadowMaps = true;
+    -- -- local_scene_capture_component.bCachedDistanceFields = 1;
+    -- local_scene_capture_component.bUseRayTracingIfEnabled = false;
+    -- -- local_scene_capture_component.PrimitiveRenderMode = 2; -- 0 - legacy, 1 - other
+    -- -- local_scene_capture_component.CaptureSource = 1;
+    -- local_scene_capture_component.bAlwaysPersistRenderingState = true;
+    -- local_scene_capture_component.bEnableVolumetricCloudsCapture = false;
+    -- local_scene_capture_component.bCaptureEveryFrame = 1;
+
+    -- -- post processing
+    -- local_scene_capture_component.PostProcessSettings.bOverride_MotionBlurAmount = true
+    -- local_scene_capture_component.PostProcessSettings.MotionBlurAmount = 0.0 -- Disable motion blur
+    -- local_scene_capture_component.PostProcessSettings.bOverride_ScreenSpaceReflectionIntensity = true
+    -- local_scene_capture_component.PostProcessSettings.ScreenSpaceReflectionIntensity = 0.0 -- Disable screen space reflections
+    -- local_scene_capture_component.PostProcessSettings.bOverride_AmbientOcclusionIntensity = true
+    -- local_scene_capture_component.PostProcessSettings.AmbientOcclusionIntensity = 0.0 -- Disable ambient occlusion
+    -- local_scene_capture_component.PostProcessSettings.bOverride_BloomIntensity = true
+    -- local_scene_capture_component.PostProcessSettings.BloomIntensity = 0.0
+    -- local_scene_capture_component.PostProcessSettings.bOverride_LensFlareIntensity = true
+    -- local_scene_capture_component.PostProcessSettings.LensFlareIntensity = 0.0 -- Disable lens flares
+    -- local_scene_capture_component.PostProcessSettings.bOverride_VignetteIntensity = true
+    -- local_scene_capture_component.PostProcessSettings.VignetteIntensity = 0.0 -- Disable vignette
+
+
+    -- local_scene_capture_component.PostProcessSettings.bOverride_AutoExposureMethod     = true
+    -- local_scene_capture_component.PostProcessSettings.AutoExposureMethod               = 2    -- 0=Histogram,1=Basic,2=Manual
+    -- local_scene_capture_component.PostProcessSettings.bOverride_AutoExposureMinBrightness = true
+    -- local_scene_capture_component.PostProcessSettings.AutoExposureMinBrightness        = 1.0
+    -- local_scene_capture_component.PostProcessSettings.bOverride_AutoExposureMaxBrightness = true
+    -- local_scene_capture_component.PostProcessSettings.AutoExposureMaxBrightness        = 1.0
+    -- local_scene_capture_component.PostProcessSettings.bOverride_AutoExposureBias       = true
+    -- local_scene_capture_component.PostProcessSettings.AutoExposureBias                 = 1.0
 
     local_scene_capture_component:SetVisibility(false)
     self.scene_capture_component = local_scene_capture_component
@@ -319,8 +334,9 @@ function ScopeController:attach_components_to_weapon(weapon_mesh)
             true -- Weld simulated bodies
         )
         self.scene_capture_component:K2_SetRelativeRotation(self.temp_vec3:set(0, 0, 90), false, self.reusable_hit_result, false)
-        self.scene_capture_component:K2_SetRelativeLocation(self.temp_vec3:set(0.5, 0, 0), false, self.reusable_hit_result, false)
+        self.scene_capture_component:K2_SetRelativeLocation(self.temp_vec3:set(20.0, 0, 0), false, self.reusable_hit_result, false)
         self.scene_capture_component:SetVisibility(false)
+        self:SetScopeBrightness(Config.indoor and Config.scopeBrightnessAmplifier/2.0 or Config.scopeBrightnessAmplifier)
     end
 
     -- Attach plane to weapon
@@ -364,16 +380,6 @@ function ScopeController:update_scope_state(pawn)
     end
 end
 
-function ScopeController:GetRelativeLocation(component, point)
-    local pomponent_transform = component:K2_GetComponentToWorld()
-    local pomponent_rotation_inv_q = self.KismetMathLibrary:Quat_Inversed(pomponent_transform.Rotation)
-    local location_diff = StructObject.new(self.fvector_c)
-    location_diff.X = point.X - pomponent_transform.Translation.X
-    location_diff.Y = point.Y - pomponent_transform.Translation.Y
-    location_diff.Z = point.Z - pomponent_transform.Translation.Z
-    local relative_location = self.KismetMathLibrary:Quat_RotateVector(pomponent_rotation_inv_q, location_diff)
-    return relative_location
-end
 
 function ScopeController:UpdateIndoorMode(indoor)
     if self.scene_capture_component then

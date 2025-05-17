@@ -162,6 +162,20 @@ SDK::FTransform* Stalker2VR::on_get_weapon_forward(/*SDK::APC*/void* actor, SDK:
     return res;
 }
 
+
+SDK::FQuat* Stalker2VR::on_get_lasersight_forward(SDK::FQuat* out, /*SDK::APC*/void* actor) {
+    auto original_fn = g_plugin->m_original_on_get_lasersight_forward;
+    auto res = original_fn(out, actor);
+
+    auto weapon = get_weapon_in_hands();
+    if(weapon) {
+        /* another candidate is AimSocket */
+        auto socket_transform = get_socket_transform(weapon, L"Muzzle", 0);
+        *res = socket_transform.Rotation;
+    }
+    return res;
+}
+
 char Stalker2VR::on_set_scalar_value_mci(void *materialCollectionInstance, uevr::API::FName name, float value) {
 
     static uevr::API::FName fOpticScopePhase{L"OpticScope_Phase", uevr::API::FName::EFindName::Find};
@@ -259,6 +273,17 @@ void Stalker2VR::hook() {
    } else {
         PLUGIN_LOG_ONCE_ERROR("Failed to find get_weapon_origin function");
    }
+
+//    static const auto get_lasersigth_pattern = "48 89 5C 24 18 48 89 74 24 20 57 48 81 EC 30 01 00 00 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 F0";
+//    static auto get_lasersight_func_addr = utility::scan(mod, get_lasersigth_pattern);
+//     if(get_lasersight_func_addr) {
+//           m_on_get_weapon_forward_hook_id = API::get()->param()->functions->register_inline_hook((void*)get_lasersight_func_addr.value(), (void*)&on_get_lasersight_forward, (void**)&m_original_on_get_lasersight_forward);
+//           if(m_on_get_weapon_forward_hook_id == -1) {
+//                 PLUGIN_LOG_ONCE_ERROR("Failed to hook on_get_weapon_forward");
+//           }
+//     } else {
+//           PLUGIN_LOG_ONCE_ERROR("Failed to find get_lasersight function");
+//     }
 
 //    const auto func_addr = (uintptr_t )mod + 0x4aebaa0;
     // UMaterialInstanceDynamic::SetScalarParameterValue

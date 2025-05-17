@@ -24,5 +24,8 @@
     "terminal.integrated.env.windows": {
         "LUA_PATH": "${workspaceFolder}/artifact/scripts/?.lua;${workspaceFolder}/artifact/scripts/?/?.lua;${workspaceFolder}/tests/?.lua;;"
     },
-    "lua-local.interpreter": "lua5.3"
+    "lua-local.interpreter": "lua5.3",
+    "files.associations": {
+        "optional": "cpp"
+    }
 }
