@@ -160,6 +160,92 @@ uevr.sdk.callbacks.on_draw_ui(function()
         changed = true
     end
 
+    -- Gesture Settings
+    if imgui.collapsing_header("Gesture Settings") then
+        -- Flashlight
+        local flashlightChanged, newFlashlight = imgui.checkbox("Flashlight Gesture", Config.gestures.flashlight)
+        if flashlightChanged then
+            Config.gestures.flashlight = newFlashlight
+            changed = true
+        end
+
+        -- Primary Weapon
+        local primaryWeaponChanged, newPrimaryWeapon = imgui.checkbox("Primary Weapon Gesture", Config.gestures.primaryWeapon)
+        if primaryWeaponChanged then
+            Config.gestures.primaryWeapon = newPrimaryWeapon
+            changed = true
+        end
+
+        -- Secondary Weapon
+        local secondaryWeaponChanged, newSecondaryWeapon = imgui.checkbox("Secondary Weapon Gesture", Config.gestures.secondaryWeapon)
+        if secondaryWeaponChanged then
+            Config.gestures.secondaryWeapon = newSecondaryWeapon
+            changed = true
+        end
+
+        -- Sidearm Weapon
+        local sidearmWeaponChanged, newSidearmWeapon = imgui.checkbox("Sidearm Weapon Gesture", Config.gestures.sidearmWeapon)
+        if sidearmWeaponChanged then
+            Config.gestures.sidearmWeapon = newSidearmWeapon
+            changed = true
+        end
+
+        -- Melee Weapon
+        local meleeWeaponChanged, newMeleeWeapon = imgui.checkbox("Melee Weapon Gesture", Config.gestures.meleeWeapon)
+        if meleeWeaponChanged then
+            Config.gestures.meleeWeapon = newMeleeWeapon
+            changed = true
+        end
+
+        -- Bolt Action
+        local boltActionChanged, newBoltAction = imgui.checkbox("Bolt Action Gesture", Config.gestures.boltAction)
+        if boltActionChanged then
+            Config.gestures.boltAction = newBoltAction
+            changed = true
+        end
+
+        -- Grenade
+        local grenadeChanged, newGrenade = imgui.checkbox("Grenade Gesture", Config.gestures.grenade)
+        if grenadeChanged then
+            Config.gestures.grenade = newGrenade
+            changed = true
+        end
+
+        -- Inventory
+        local inventoryChanged, newInventory = imgui.checkbox("Inventory Gesture", Config.gestures.inventory)
+        if inventoryChanged then
+            Config.gestures.inventory = newInventory
+            changed = true
+        end
+
+        -- Scanner
+        local scannerChanged, newScanner = imgui.checkbox("Scanner Gesture", Config.gestures.scanner)
+        if scannerChanged then
+            Config.gestures.scanner = newScanner
+            changed = true
+        end
+
+        -- PDA
+        local pdaChanged, newPda = imgui.checkbox("PDA Gesture", Config.gestures.pda)
+        if pdaChanged then
+            Config.gestures.pda = newPda
+            changed = true
+        end
+
+        -- Reload
+        local reloadChanged, newReload = imgui.checkbox("Reload Gesture", Config.gestures.reload)
+        if reloadChanged then
+            Config.gestures.reload = newReload
+            changed = true
+        end
+
+        -- Mode Switch
+        local modeSwitchChanged, newModeSwitch = imgui.checkbox("Mode Switch Gesture", Config.gestures.modeSwitch)
+        if modeSwitchChanged then
+            Config.gestures.modeSwitch = newModeSwitch
+            changed = true
+        end
+    end
 
     -- local projection_matrix = UEVR_Matrix4x4f.new()
     -- uevr.params.vr.get_ue_projection_matrix(0, projection_matrix)
