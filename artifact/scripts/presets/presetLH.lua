@@ -14,7 +14,10 @@ local motionControllers = require("gestures.motioncontrollergestures")
 local gameState = require("stalker2.gamestate")
 local GestureSet = require("gestures.gestureset")
 
-local function createKeyPresExecutionCB(key)
+local function createKeyPresExecutionCB(key, gesture_config_key)
+    if not Config.gestures[gesture_config_key] then
+        return nil
+    end
     return function(gesture, context)
         if gesture:JustActivated() then
             gameState:SendKeyDown(key)
@@ -129,21 +132,21 @@ local function createPreset(bodyZones, weaponZones, sittingExperience)
         zone = weaponZones.barrelZoneLH
     })
 
-    flashlightGestureLH:SetExecutionCallback(createKeyPresExecutionCB('L'))
-    flashlightGestureRH:SetExecutionCallback(createKeyPresExecutionCB('L'))
-    primaryWeaponGestureLH:SetExecutionCallback(createKeyPresExecutionCB('3'))
-    secondaryWeaponGestureLH:SetExecutionCallback(createKeyPresExecutionCB('4'))
-    sidearmWeaponGestureLH:SetExecutionCallback(createKeyPresExecutionCB('2'))
-    meleeWeaponGestureRH:SetExecutionCallback(createKeyPresExecutionCB('1'))
-    boltActionGestureLH:SetExecutionCallback(createKeyPresExecutionCB('6'))
-    grenadeGestureRH:SetExecutionCallback(createKeyPresExecutionCB('5'))
+    flashlightGestureLH:SetExecutionCallback(createKeyPresExecutionCB('L', 'flashlight'))
+    flashlightGestureRH:SetExecutionCallback(createKeyPresExecutionCB('L', 'flashlight'))
+    primaryWeaponGestureLH:SetExecutionCallback(createKeyPresExecutionCB('3', 'primaryWeapon'))
+    secondaryWeaponGestureLH:SetExecutionCallback(createKeyPresExecutionCB('4', 'secondaryWeapon'))
+    sidearmWeaponGestureLH:SetExecutionCallback(createKeyPresExecutionCB('2', 'sidearmWeapon'))
+    meleeWeaponGestureRH:SetExecutionCallback(createKeyPresExecutionCB('1', 'meleeWeapon'))
+    boltActionGestureLH:SetExecutionCallback(createKeyPresExecutionCB('6', 'boltAction'))
+    grenadeGestureRH:SetExecutionCallback(createKeyPresExecutionCB('5', 'grenade'))
 
-    inventoryGestureRH:SetExecutionCallback(createKeyPresExecutionCB('I'))
+    inventoryGestureRH:SetExecutionCallback(createKeyPresExecutionCB('I', 'inventory'))
     -- dpadLeftGestureRH:SetExecutionCallback(createKeyPresExecutionCB('D'))
-    scannerGestureRH:SetExecutionCallback(createKeyPresExecutionCB('7'))
-    pdaGestureLH:SetExecutionCallback(createKeyPresExecutionCB('M'))
-    reloadGestureLH:SetExecutionCallback(createKeyPresExecutionCB('R'))
-    modeSwitchZoneLH:SetExecutionCallback(createKeyPresExecutionCB('B'))
+    scannerGestureRH:SetExecutionCallback(createKeyPresExecutionCB('7', 'scanner'))
+    pdaGestureLH:SetExecutionCallback(createKeyPresExecutionCB('M', 'pda'))
+    reloadGestureLH:SetExecutionCallback(createKeyPresExecutionCB('R', 'reload'))
+    modeSwitchZoneLH:SetExecutionCallback(createKeyPresExecutionCB('B', 'modeSwitch'))
 
     twoHandedAimGestureLH:SetExecutionCallback(twoHandedAimingCB)
 
@@ -155,9 +158,9 @@ local function createPreset(bodyZones, weaponZones, sittingExperience)
                 flashlightGestureRH,
                 primaryWeaponGestureLH,
                 secondaryWeaponGestureLH,
-                -- sidearmWeaponGestureLH,
-                -- meleeWeaponGestureRH,
-                -- boltActionGestureLH,
+                sidearmWeaponGestureLH,
+                meleeWeaponGestureRH,
+                boltActionGestureLH,
                 grenadeGestureRH,
                 inventoryGestureRH,
                 scannerGestureRH,

@@ -11,6 +11,22 @@ Config = {
 	scopeTextureSize = 1024,
 	cylinderDepth = 0.00015,
 	indoor = false,
+
+	-- Gesture enable/disable settings
+	gestures = {
+		flashlight = true,
+		primaryWeapon = true,
+		secondaryWeapon = true,
+		sidearmWeapon = true,
+		meleeWeapon = true,
+		boltAction = true,
+		grenade = true,
+		inventory = true,
+		scanner = true,
+		pda = true,
+		reload = true,
+		modeSwitch = true
+	},
 }
 
 TwoHandedStateActive = false
@@ -31,7 +47,16 @@ end
 function Config:update_from_table(tbl)
 	for k, v in pairs(tbl) do
 		if self[k] ~= nil then
-			self[k] = v
+			if type(v) == "table" and type(self[k]) == "table" then
+				-- Handle nested tables (like gestures)
+				for nested_k, nested_v in pairs(v) do
+					if self[k][nested_k] ~= nil then
+						self[k][nested_k] = nested_v
+					end
+				end
+			else
+				self[k] = v
+			end
 		end
 	end
 end
